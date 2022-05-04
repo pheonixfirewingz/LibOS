@@ -50,14 +50,12 @@ typedef enum losKeyboardButton : uint16
     LOS_KEYBOARD_APOSTROPHE,
     LOS_KEYBOARD_BACKSLASH,
     LOS_KEYBOARD_COMMA,
-    LOS_KEYBOARD_GRAVE_ACCENT,
     LOS_KEYBOARD_LEFT_BRACKET,
     LOS_KEYBOARD_MINUS,
     LOS_KEYBOARD_PERIOD,
     LOS_KEYBOARD_RIGHT_BRACKET,
     LOS_KEYBOARD_SEMICOLON,
     LOS_KEYBOARD_SLASH,
-    LOS_KEYBOARD_WORLD_2,
     LOS_KEYBOARD_BACKSPACE,
     LOS_KEYBOARD_DELETE,
     LOS_KEYBOARD_END,
@@ -65,7 +63,6 @@ typedef enum losKeyboardButton : uint16
     LOS_KEYBOARD_ESCAPE,
     LOS_KEYBOARD_HOME,
     LOS_KEYBOARD_INSERT,
-    LOS_KEYBOARD_MENU,
     LOS_KEYBOARD_PAGE_DOWN,
     LOS_KEYBOARD_PAGE_UP,
     LOS_KEYBOARD_PAUSE,
@@ -151,11 +148,14 @@ losResult losCreateKeyboard(losWindow);
 losResult losCreateMouse(losWindow);
 losResult losCreateTouch(losWindow);
 
+//the way to check if the window should close check to see if function returns "LOS_WINDOW_CLOSE"
 losResult losUpdateWindow(losWindow);
+//--------------------------------------------------------------------------------------------------------------------------
 bool losIsKeyDown(losWindow, losKeyboardButton);
 bool losIsMouseDown(losWindow, losMouseButton);
 losResult losRequestClose(losWindow);
 losPostition losRequestMousePosition(losWindow);
+losPostition losRequestMouseWheelDelta(losWindow);
 losPostition losIsBeingPressed(losWindow);
 
 losResult losDestoryKeyboard(losWindow);

@@ -15,21 +15,21 @@ losResult losCreateWindow(losWindow * ptr, losWindowInfo & info)
 losResult losCreateKeyboard(losWindow win)
 {
 #if __has_include(<windows.h>)
-    return winCreateKeyboard(win);
+    return LOS_SUCCESS;
 #endif
 }
 
 losResult losCreateMouse(losWindow win)
 {
 #if __has_include(<windows.h>)
-    return winCreateMouse(win);
+    return LOS_SUCCESS;
 #endif
 }
 
 losResult losCreateTouch(losWindow win)
 {
 #if __has_include(<windows.h>)
-    return winCreateTouch(win);
+    return LOS_SUCCESS;
 #endif
 }
 
@@ -47,52 +47,59 @@ losResult losRequestClose(losWindow win)
 #endif
 }
 
-bool losIsKeyDown(losWindow win, losKeyboardButton button)
+bool losIsKeyDown(losWindow, losKeyboardButton button)
 {
 #if __has_include(<windows.h>)
-    return winIsKeyDown(win,button);
+    return winIsKeyDown(button);
 #endif
 }
 
-bool losIsMouseDown(losWindow win, losMouseButton button)
+bool losIsMouseDown(losWindow, losMouseButton button)
 {
 #if __has_include(<windows.h>)
-    return winIsMouseDown(win, button);
+    return winIsMouseDown(button);
 #endif
 }
 
-losPostition losRequestMousePosition(losWindow win)
+losPostition losRequestMousePosition(losWindow)
 {
 #if __has_include(<windows.h>)
-    return winRequestMousePosition(win);
+    return winRequestMousePosition();
+#endif
+}
+
+losPostition losRequestMouseWheelDelta(losWindow)
+{
+#if __has_include(<windows.h>)
+    return winRequestMouseWheelDelta();
 #endif
 }
 
 losPostition losIsBeingPressed(losWindow win)
 {
 #if __has_include(<windows.h>)
-    return winIsBeingPressed(win);
+    return winIsBeingPressed();
 #endif
 }
 
 losResult losDestoryKeyboard(losWindow win)
 {
 #if __has_include(<windows.h>)
-    return winDestoryKeyboard(win);
+    return LOS_SUCCESS;
 #endif
 }
 
 losResult losDestoryMouse(losWindow win)
 {
 #if __has_include(<windows.h>)
-    return winDestoryMouse(win);
+    return LOS_SUCCESS;
 #endif
 }
 
 losResult losDestoryTouch(losWindow win)
 {
 #if __has_include(<windows.h>)
-    return winDestoryTouch(win);
+    return LOS_SUCCESS;
 #endif
 }
 

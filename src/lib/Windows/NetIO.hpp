@@ -1,7 +1,7 @@
 #pragma once
 #include "../INetIO.h"
 #include "windows_link.h"
-#include <LibOS/Components/NetIO.h>
+#include <Components/NetIO.h>
 #include <iphlpapi.h>
 #include <stdexcept>
 #include <vector>

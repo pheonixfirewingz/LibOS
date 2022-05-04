@@ -1,7 +1,7 @@
 #pragma once
 #include "../IFileIO.h"
 #include "windows_link.h"
-#include <LibOS/Components/FileIO.h>
+#include <Components/FileIO.h>
 
 struct losFileHandle_T
 {

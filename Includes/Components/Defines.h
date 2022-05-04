@@ -31,7 +31,6 @@ typedef enum losResult : uint8
     LOS_ERROR_COULD_NOT_DESTORY,
     LOS_ERROR_INVALID_FLAGS,
     LOS_ERROR_HANDLE_LOSSED,
-    // this is temp
     LOS_ERROR_FEATURE_NOT_IMPLEMENTED,
     // API CUSTOMS
     // NETWORK

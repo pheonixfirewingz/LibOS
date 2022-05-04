@@ -19,7 +19,9 @@ int main()
     std::string name = "this is the test window";
     info.title = name.data();
     info.title_size = name.size();
-    info.windowSize = {720, 1280};
+    info.windowSize.width = 720;
+    info.windowSize.height = 1280;
+
     losWindow window;
     TEST(losCreateWindow(&window, info));
     TEST(losCreateKeyboard(window));
