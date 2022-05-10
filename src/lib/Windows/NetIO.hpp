@@ -1,5 +1,4 @@
 #pragma once
-#include "../INetIO.h"
 #include "windows_link.h"
 #include <Components/NetIO.h>
 #include <iphlpapi.h>

@@ -1,20 +1,20 @@
 #pragma once
-#include <cstdio>
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef uint16 losUnicode;
 typedef unsigned int uint32;
 typedef unsigned long uint64;
+typedef unsigned long long size;
 
 typedef signed char int8;
 typedef signed short int16;
 typedef signed int int32;
 typedef signed long int64;
-typedef signed long long size;
+typedef signed long long ssize;
 
 #define DEFINE_HANDLE(object) typedef struct object##_T *object;
 
-#define os_print printf
+void lib_panic(const char*);
 
 typedef struct losSize
 {

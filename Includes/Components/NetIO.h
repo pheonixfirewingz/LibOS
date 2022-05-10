@@ -30,8 +30,8 @@ typedef struct losCreateSocketServerListenInfo
 void *losNetworkBytesToSystemBytes(const uint32 *,const size);
 void *losSystemBytesToNetworkBytes(const uint32 *, const size);
 
-const losResult losCreateSocket(losSocket *, const losCreateSocketInfo &);
-const losResult losReadSocket(losSocket, void *, size *);
-const losResult losWriteSocket(losSocket, const void *, const size);
-const losResult losListenSocket(const losCreateSocketServerListenInfo &);
-const losResult losDestorySocket(losSocket);
+losResult losCreateSocket(losSocket *, const losCreateSocketInfo &);
+losResult losReadSocket(losSocket, void *, size *);
+losResult losWriteSocket(losSocket, const void *, const size);
+losResult losListenSocket(losCreateSocketServerListenInfo &);
+losResult losDestorySocket(losSocket);

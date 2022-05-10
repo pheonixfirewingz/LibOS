@@ -27,7 +27,7 @@ losResult TCPtest(losSocket handle)
     if (ret != LOS_SUCCESS)
         return ret;
 
-    os_print("Returned:%s\n", std::string(data, 0, data_size).c_str());
+    printf("Returned:%s\n", std::string(data, 0, data_size).c_str());
     
     return LOS_SUCCESS;
 }
@@ -44,15 +44,15 @@ losResult UDPtest(losSocket handle)
 
 losResult testNetIOMain()
 {
-    os_print("NET_IO TESTS:\n");
+    printf("NET_IO TESTS:\n");
     losResult res;
     losSocket handle;
     std::string address = "127.0.0.1";
     TEST(LOS_SOCKET_UDP, address.data(), 54000, UDPtest);
-    os_print("test UDP Client passed\n");
+    printf("test UDP Client passed\n");
     TEST(LOS_SOCKET_TCP, address.data(), 54000, TCPtest);
-    os_print("test TCP Client passed\n");
-    os_print("all tests passed\n");
+    printf("test TCP Client passed\n");
+    printf("all tests passed\n");
+    printf("\n");
     return LOS_SUCCESS;
-    os_print("\n");
 }

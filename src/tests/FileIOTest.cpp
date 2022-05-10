@@ -88,34 +88,34 @@ losResult testBRead(losFileHandle handle)
 // TODO: add tests for LOS_FILE_BIT_FLIP_ENDIEN
 losResult testFileIOMain()
 {
-    os_print("FILEIO TESTS:\n");
+    printf("FILEIO TESTS:\n");
     losResult res;
     losFileHandle handle;
     std::string path = "$[binary_base]\\test.txt";
     std::string path_2 = "$[binary_base]/test.txt";
     std::string path_3 = "$[binary_base]/test.bin";
 
-    os_print("create file odd path test(Normal)\n");
+    printf("create file odd path test(Normal)\n");
     TEST(LOS_FILE_BIT_CREATE, path.data(), testNNorm)
-    os_print("delete file odd path test (Normal)\n");
+    printf("delete file odd path test (Normal)\n");
     TEST(LOS_FILE_BIT_DELETE_AFTER_CLOSE, path.data(), testNNorm)
-    os_print("create file test (Normal)\n");
+    printf("create file test (Normal)\n");
     TEST(LOS_FILE_BIT_CREATE, path_2.data(), testNNorm)
-    os_print("write file test (Normal)\n");
+    printf("write file test (Normal)\n");
     TEST(LOS_FILE_BIT_WRITE, path_2.data(), testNWrite)
-    os_print("read file test (Normal)\n");
+    printf("read file test (Normal)\n");
     TEST(LOS_FILE_BIT_READ, path_2.data(), testNRead)
-    os_print("delete file test (Normal)\n");
+    printf("delete file test (Normal)\n");
     TEST(LOS_FILE_BIT_DELETE_AFTER_CLOSE, path_2.data(), testNNorm)
-    os_print("create file test (BINARY)\n");
+    printf("create file test (BINARY)\n");
     TEST(LOS_FILE_BIT_CREATE | LOS_FILE_BIT_BINARY, path_3.data(), testNNorm)
-    os_print("write file test (BINARY)\n");
+    printf("write file test (BINARY)\n");
     TEST(LOS_FILE_BIT_WRITE | LOS_FILE_BIT_BINARY, path_3.data(), testBWrite)
-    os_print("read file test (BINARY)\n");
+    printf("read file test (BINARY)\n");
     TEST(LOS_FILE_BIT_READ | LOS_FILE_BIT_BINARY, path_3.data(), testBRead)
-    os_print("delete file test (BINARY)\n");
+    printf("delete file test (BINARY)\n");
     TEST(LOS_FILE_BIT_DELETE_AFTER_CLOSE | LOS_FILE_BIT_BINARY, path_3.data(), testNNorm)
-    os_print("all tests passed\n");
+    printf("all tests passed\n");
+    printf("\n");
     return LOS_SUCCESS;
-    os_print("\n");
 }

@@ -1,5 +1,4 @@
-#pragma once
-#include "../IFileIO.h"
+#include "FileIO.h"
 #include <Components/FileIO.h>
 #include <libgen.h>
 #include <unistd.h>
@@ -17,15 +16,16 @@ struct losFileHandle_T
 };
 
 #define BIT_CASE(bits, flag, e) \
-    case bits: {                         \
-        file_flags |= flag;               \
-        flags_used = bits;               \
-        extend = e;                     \
-        break;                           \
+    case bits: {                \
+        file_flags |= flag;     \
+        flags_used = bits;      \
+        extend = e;             \
+        break;                  \
     }
 
-const losResult linuxOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
+losResult losOpenFile(losFileHandle * handle, const losFileOpenInfo & info)
 {
+    (*handle) = new losFileHandle_T();
     int file_flags = 0;
     int flags_used = 0;
     int extend = 0;
@@ -82,7 +82,7 @@ const losResult linuxOpenFile(losFileHandle *handle, const losFileOpenInfo &info
     return LOS_SUCCESS;
 }
 
-const losResult linuxCloseFile(losFileHandle handle)
+losResult losCloseFile(losFileHandle handle)
 {
     if(handle->closeAfterDone)
         remove(handle->path.c_str());
@@ -91,24 +91,25 @@ const losResult linuxCloseFile(losFileHandle handle)
     return LOS_SUCCESS;
 }
 
-const losResult linuxReadFile(losFileHandle handle, void **data_ptr, size data_size)
+losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
 {
     struct stat sb{};
         
     if (fstat(handle->n_handle, &sb) < 0)
     {
         perror("system error");
-        linuxCloseFile(handle);
+        losCloseFile(handle);
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
     }
 
-    *data_ptr = malloc(sb.st_size * sizeof(char));
+    data_size = sb.st_size * sizeof(char);
+    *data_ptr = malloc(data_size);
 
     ssize_t bytesRead = 0;
     if((bytesRead = pread64(handle->n_handle,*data_ptr,sb.st_size,0)) < 0)
     {
         perror("system error");
-        linuxCloseFile(handle);
+        losCloseFile(handle);
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
     }
 
@@ -120,12 +121,12 @@ const losResult linuxReadFile(losFileHandle handle, void **data_ptr, size data_s
     return LOS_SUCCESS;
 }
 
-const losResult linuxWriteFile(losFileHandle handle,const void *data, const size data_size)
+losResult losWriteFile(losFileHandle handle,const void *data, const size data_size)
 {
     if(pwrite64(handle->n_handle,data,data_size,0) < 0)
     {
         perror("system error");
-        linuxCloseFile(handle);
+        losCloseFile(handle);
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
     }
     return LOS_SUCCESS;
@@ -133,7 +134,7 @@ const losResult linuxWriteFile(losFileHandle handle,const void *data, const size
 
 std::string linuxGetCurrentPath()
 {
-    char result[ PATH_MAX ];
-    ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
+    char result[4096];
+    (void)readlink("/proc/self/exe", result, 4096);
     return dirname(result);
 }

@@ -2,20 +2,27 @@ cmake_minimum_required(VERSION 3.16.3)
 project(LibOS CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_CXX_EXTENSIONS ON)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/ThirdParty/CmakeModules)
-include_directories(${PROJECT_SOURCE_DIR}/Includes STATIC)
+include_directories(${PROJECT_SOURCE_DIR}/Includes)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    message(ERROR "can no use this compiler")
+    message(ERROR "can not use this compiler")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -static-libstdc++ -static-libgcc")
-endif()
+    set(CMAKE_CXX_FLAGS "-m64 -Wall -Wextra -Werror")
+endif() 
 
-set(sources src/lib/FileIO.cpp 
-					src/lib/NetIO.cpp 
-					src/lib/Window.cpp)
+set(general_sources src/lib/FileIO.cpp)
 
-add_library(LibOS ${sources})
+set(linux_sources 
+src/lib/Linux/FileIO.cpp
+src/lib/Linux/NetIO.cpp
+src/lib/Linux/Window.cpp
+src/lib/Linux/Panic.cpp)
+
+
+add_library(LibOS SHARED ${general_sources} ${linux_sources})
 
 set(tests_sources 	src/tests/Main.cpp 
 					src/tests/FileIOTest.cpp

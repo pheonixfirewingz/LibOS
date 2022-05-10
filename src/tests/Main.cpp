@@ -1,11 +1,13 @@
 #include "FileIOTest.h"
 #include "NetIOTest.h"
 #include <CrystalOS.h>
+#include <cstdio>
 #include <string>
 #define TEST(func)                                                \
     if ((res = func) != LOS_SUCCESS)                              \
     {                                                             \
-        os_print("%s: %x\n", "the tests failed with ERROR", res); \
+        printf("%s: %x\n", "the tests failed with ERROR", res); \
+        exit(1); \
     }
 
 int main()
@@ -13,7 +15,7 @@ int main()
     losResult res;
     TEST(testFileIOMain())
     TEST(testNetIOMain())
-    os_print("final test  window test");
+    printf("final test  window test\n");
     losWindowInfo info;
     info.subWindow = false;
     std::string name = "this is the test window";

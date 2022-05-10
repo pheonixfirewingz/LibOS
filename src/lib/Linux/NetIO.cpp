@@ -1,6 +1,6 @@
-#pragma once
-#include "../INetIO.h"
+#include "Components/Defines.h"
 #include <Components/NetIO.h>
+#include <cstdio>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -16,7 +16,7 @@ struct losSocket_T
     bool isTCP = false;
 };
 
-void *linuxNetworkBytesToSystemBytes(const uint32 *data, const size data_size)
+void *losNetworkBytesToSystemBytes(const uint32 *data, const size data_size)
 {
     std::vector<uint32> bytes;
     bytes.reserve(data_size);
@@ -25,7 +25,7 @@ void *linuxNetworkBytesToSystemBytes(const uint32 *data, const size data_size)
     return std::move(bytes.data());
 }
 
-void *linuxSystemBytesToNetworkBytes(const uint32 *data, const size data_size)
+void *losSystemBytesToNetworkBytes(const uint32 *data, const size data_size)
 {
     std::vector<uint32> bytes;
     bytes.reserve(data_size);
@@ -40,13 +40,14 @@ losResult tellError()
     return LOS_SUCCESS;
 }
 
-const losResult linuxCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
+losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
 {
     *socket_in = new losSocket_T();
     switch (socket_info.socketBits)
     {
     case LOS_SOCKET_TCP | LOS_SOCKET_SERVER:
         (*socket_in)->isServer = true;
+        [[fallthrough]];
     case LOS_SOCKET_TCP: {
         (*socket_in)->ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         (*socket_in)->isTCP = true;
@@ -54,6 +55,7 @@ const losResult linuxCreateSocket(losSocket *socket_in, const losCreateSocketInf
     }
     case LOS_SOCKET_UDP | LOS_SOCKET_SERVER:
         (*socket_in)->isServer = true;
+        [[fallthrough]];
     case LOS_SOCKET_UDP: {
         (*socket_in)->server_address.sin_family = AF_INET;               // AF_INET = IPv4 addresses
         (*socket_in)->server_address.sin_port = htons(socket_info.port); // Little to big endian conversion
@@ -78,7 +80,7 @@ const losResult linuxCreateSocket(losSocket *socket_in, const losCreateSocketInf
 
     if ((*socket_in)->isTCP)
     {
-        sockaddr_in sockAddr = {0};
+        sockaddr_in sockAddr = {0,0,{},{}};
         sockAddr.sin_port = htons(socket_info.port);
         sockAddr.sin_family = AF_INET;
         sockAddr.sin_addr.s_addr = (*reinterpret_cast<unsigned long *>(ip->h_addr_list[0]));
@@ -90,7 +92,7 @@ const losResult linuxCreateSocket(losSocket *socket_in, const losCreateSocketInf
     return LOS_SUCCESS;
 }
 
-const losResult linuxReadSocket(losSocket socket, void *data, size *data_size)
+losResult losReadSocket(losSocket socket, void *data, size *data_size)
 {
     int iResult = 0;
     if (socket->isTCP)
@@ -106,7 +108,7 @@ const losResult linuxReadSocket(losSocket socket, void *data, size *data_size)
         return LOS_SUCCESS;
 }
 
-const losResult linuxWriteSocket(losSocket socket, const void *data, const size data_size)
+losResult losWriteSocket(losSocket socket, const void *data, const size data_size)
 {
     if (socket->isTCP)
     {
@@ -122,12 +124,12 @@ const losResult linuxWriteSocket(losSocket socket, const void *data, const size 
     return LOS_SUCCESS;
 }
 
-const losResult linuxListenSocket(const losCreateSocketServerListenInfo &server_listen)
+losResult losListenSocket(const losCreateSocketServerListenInfo &)
 {
-    return LOS_SUCCESS;
+    return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-const losResult linuxDestorySocket(losSocket socket)
+losResult losDestorySocket(losSocket socket)
 {
     if (shutdown(socket->ConnectSocket, SHUT_RDWR) < 0)
     {
