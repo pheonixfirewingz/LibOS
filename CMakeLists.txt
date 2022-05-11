@@ -8,10 +8,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/ThirdParty/CmakeM
 include_directories(${PROJECT_SOURCE_DIR}/Includes)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    message(ERROR "can not use this compiler")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -fsanitize=address -fno-omit-frame-pointer -Wall -Wextra -Werror")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "-m64 -Wall -Wextra -Werror")
-endif() 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -Wall -Wextra -Werror")
+endif()
 
 set(sources src/lib/FileIO.cpp)
 
@@ -23,7 +23,7 @@ src/lib/Linux/Window.cpp
 src/lib/Linux/Panic.cpp)
 endif()
 
-add_library(LibOS SHARED ${sources})
+add_library(LibOS ${sources})
 
 set(tests_sources 	src/tests/Main.cpp 
 					src/tests/FileIOTest.cpp
