@@ -7,7 +7,7 @@
 #ifdef linux
 #    include "Linux/FileIO.h"
 #endif
-#if __has_include(<windows.h>)
+#ifdef WIN32
 #    include "Windows/FileIO.hpp"
 #endif
 std::vector<std::string> split(std::string s, const char delimiter)
@@ -45,17 +45,17 @@ std::string getCorrectPath(const char* path)
             if (command == "binary_base")
             {
                 std::string path_os;
-#if __has_include(<windows.h>)
+#ifdef WIN32
                 path_os = std::move(winGetCurrentPath());
 #endif
-#if __has_include(<cpuid.h>)
+#ifdef linux
                 path_os = linuxGetCurrentPath();
 #endif
                 auto sun_tuk = split(std::move(path_os), '/');
-#if __has_include(<windows.h>)
+#ifdef WIN32
                 for (size i = 0; i < sun_tuk.size() - 1; i++)
 #endif
-#if __has_include(<cpuid.h>)
+#ifdef linux
                 for (size i = 0; i < sun_tuk.size(); i++)
 #endif
                     ret_path += (sun_tuk[i] += "/");

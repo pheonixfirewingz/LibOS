@@ -13,16 +13,17 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "-m64 -Wall -Wextra -Werror")
 endif() 
 
-set(general_sources src/lib/FileIO.cpp)
+set(sources src/lib/FileIO.cpp)
 
-set(linux_sources 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+set(sources ${sources}
 src/lib/Linux/FileIO.cpp
 src/lib/Linux/NetIO.cpp
 src/lib/Linux/Window.cpp
 src/lib/Linux/Panic.cpp)
+endif()
 
-
-add_library(LibOS SHARED ${general_sources} ${linux_sources})
+add_library(LibOS SHARED ${sources})
 
 set(tests_sources 	src/tests/Main.cpp 
 					src/tests/FileIOTest.cpp

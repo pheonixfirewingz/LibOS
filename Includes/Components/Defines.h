@@ -15,6 +15,7 @@ typedef signed long long ssize;
 #define DEFINE_HANDLE(object) typedef struct object##_T *object;
 
 void lib_panic(const char*);
+#define prog_panic(x) lib_panic(x)
 
 typedef struct losSize
 {
