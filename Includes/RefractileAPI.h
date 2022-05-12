@@ -1,10 +1,15 @@
 #pragma once
-// this is (DRAFT 1) of the refractal api
+// this is (DRAFT 2) of the refractile api
 #include "Components/Defines.h"
 #include "Components/Window.h"
 #include <string>
 
 DEFINE_HANDLE(refHandle)
+losResult refCreaterefractalContext(refHandle *);
+losResult refDestoryrefractalContext(refHandle);
+
+// The Graphics API
+//---------------------------------------------------------------------------------------------------------
 DEFINE_HANDLE(refImage)
 DEFINE_HANDLE(refDataBuffer)
 DEFINE_HANDLE(refFrameBuffer)
@@ -31,8 +36,8 @@ typedef struct refCreateDataBufferInfo
     size data_size;
 } refCreateDataBufferInfo;
 
-losResult refCreaterefractalContext(refHandle *,losWindow);
-losResult refDestoryrefractalContext(refHandle);
+losResult refAppendGraphicsContext(refHandle,losWindow);
+losResult refUnappendGraphicsContext(refHandle);
 
 losResult refCreateImage(refImage *);
 losResult refCopyDataToImage(refImage,void*,size);
@@ -61,3 +66,38 @@ losResult refEndComands(refCommandBuffer);
 losResult refExecuteCommands(refCommandBuffer);
 
 losResult refSwapbuffers(losWindow);
+//---------------------------------------------------------------------------------------------------------
+// The Audio API
+//---------------------------------------------------------------------------------------------------------
+DEFINE_HANDLE(refAudioDevice)
+DEFINE_HANDLE(refAudioBuffer)
+
+typedef enum refAudioBufferType
+{
+    WAV,
+    MP3,
+    FLAC,
+    OGG,
+} refAudioBufferType;
+
+typedef struct refCreateAudioBufferInfo
+{
+    refAudioBufferType bufferDataType;
+    std::string audioFile;
+    float64 pitch;
+    float64 scale;
+} refCreateAudioBufferInfo;
+
+losResult refAppendAudioContext(refHandle);
+losResult refUnappendAudioContext(refHandle);
+
+losResult refGetAudioDeviceList(refHandle, refAudioDevice *);
+losResult refSetAudioDevice(refHandle, refAudioDevice);
+losResult refSetAudioDeviceSoundLevel(refAudioDevice, float64);
+
+losResult refCreateAudioBuffer(refAudioDevice, refAudioBuffer *, refCreateAudioBufferInfo);
+losResult refDestoryAudioBuffer(refAudioDevice, refAudioBuffer);
+
+losResult refPlay(refAudioDevice, refAudioBuffer, float64, float64, float64);
+losResult refPause(refAudioDevice, refAudioBuffer);
+//---------------------------------------------------------------------------------------------------------

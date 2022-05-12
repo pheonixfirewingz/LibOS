@@ -20,7 +20,9 @@ set(sources ${sources}
 src/lib/Windows/FileIO.cpp
 src/lib/Windows/NetIO.cpp
 src/lib/Windows/Window.cpp
-src/lib/Windows/Panic.cpp)
+src/lib/Windows/Panic.cpp
+src/lib/Windows/Graphics/GraphicsContext.cpp
+src/lib/Windows/Audio/AudioContext.cpp)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

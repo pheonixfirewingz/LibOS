@@ -12,6 +12,9 @@ typedef signed int int32;
 typedef signed long int64;
 typedef signed long long ssize;
 
+typedef float float32;
+typedef double float64;
+
 #define DEFINE_HANDLE(object) typedef struct object##_T *object;
 
 void lib_panic(const char*);
