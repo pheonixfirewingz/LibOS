@@ -15,6 +15,14 @@ endif()
 
 set(sources src/lib/FileIO.cpp)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+set(sources ${sources}
+src/lib/Windows/FileIO.cpp
+src/lib/Windows/NetIO.cpp
+src/lib/Windows/Window.cpp
+src/lib/Windows/Panic.cpp)
+endif()
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 set(sources ${sources}
 src/lib/Linux/FileIO.cpp
@@ -22,6 +30,7 @@ src/lib/Linux/NetIO.cpp
 src/lib/Linux/Window.cpp
 src/lib/Linux/Panic.cpp)
 endif()
+
 
 add_library(LibOS ${sources})
 

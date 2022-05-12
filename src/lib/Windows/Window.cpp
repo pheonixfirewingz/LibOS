@@ -1,7 +1,5 @@
-#pragma once
 #include "windows_link.h"
 #include <Components/Window.h>
-
 struct losWindow_T
 {
     HWND win_hand{nullptr};
@@ -33,8 +31,6 @@ static uint64 mouse_position_y = 0;
 static uint64 mouse_wheel_delta_x = 0;
 static uint64 mouse_wheel_delta_y = 0;
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
-#ifdef WINDOWS_MESG_HANDLE
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch (Msg)
@@ -97,10 +93,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     }
     return DefWindowProc(hWnd, Msg, wParam, lParam);
 }
-#endif
 
-losResult winCreateWindow(losWindow *win, losWindowInfo &info)
+losResult losCreateWindow(losWindow *win, losWindowInfo &info)
 {
+    if (!(*win))
+        return LOS_ERROR_HANDLE_IN_USE;
+
     *win = new losWindow_T();
     WNDCLASSEX wc;
 
@@ -123,7 +121,22 @@ losResult winCreateWindow(losWindow *win, losWindowInfo &info)
     return LOS_SUCCESS;
 }
 
-losResult winUpdateWindow(losWindow win)
+losResult losCreateKeyboard(losWindow)
+{
+    return LOS_SUCCESS;
+}
+
+losResult losCreateMouse(losWindow)
+{
+    return LOS_SUCCESS;
+}
+
+losResult losCreateTouch(losWindow)
+{
+    return LOS_SUCCESS;
+}
+
+losResult losUpdateWindow(losWindow win)
 {
     if (!should_window_close)
     {
@@ -137,41 +150,55 @@ losResult winUpdateWindow(losWindow win)
     return LOS_SUCCESS;
 }
 
-losResult winDestoryWindow(losWindow);
-
-losResult winRequestClose(losWindow win)
+losResult losRequestClose(losWindow win)
 {
     should_window_close = true;
-    winDestoryWindow(win);
+    losDestoryWindow(win);
     return LOS_SUCCESS;
 }
 
-bool winIsKeyDown(losKeyboardButton key)
+bool losIsKeyDown(losWindow ,losKeyboardButton key)
 {
     return key_buttons[window_key_look_up_table[key]];
 }
 
-bool winIsMouseDown(losMouseButton button)
+bool losIsMouseDown(losWindow ,losMouseButton button)
 {
     return mouse_buttons[button];
 }
 
-losPostition winRequestMouseWheelDelta()
+losPostition losRequestMouseWheelDelta(losWindow)
 {
     return {mouse_position_x, mouse_position_y};
 }
 
-losPostition winRequestMousePosition()
+losPostition losRequestMousePosition(losWindow)
 {
     return {mouse_wheel_delta_x, mouse_wheel_delta_y};
 }
 
-losPostition winIsBeingPressed()
+losPostition losIsBeingPressed(losWindow win)
 {
-    return winRequestMousePosition();
+    return losRequestMousePosition(win);
 }
 
-losResult winDestoryWindow(losWindow win)
+
+losResult losDestoryKeyboard(losWindow)
+{
+    return LOS_SUCCESS;
+}
+
+losResult losDestoryMouse(losWindow)
+{
+    return LOS_SUCCESS;
+}
+
+losResult losDestoryTouch(losWindow)
+{
+    return LOS_SUCCESS;
+}
+
+losResult losDestoryWindow(losWindow win)
 {
     if (!win->active)
         return LOS_SUCCESS;

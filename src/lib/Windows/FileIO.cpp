@@ -1,4 +1,3 @@
-#pragma once
 #include "../IFileIO.h"
 #include "windows_link.h"
 #include <Components/FileIO.h>
@@ -18,8 +17,12 @@ struct losFileHandle_T
         break;                           \
     }
 
-const losResult winOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
+losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
 {
+    if (!(*handle))
+        return LOS_ERROR_HANDLE_IN_USE;
+
+    *handle = new losFileHandle_T();
     UINT file_flags = 0;
     UINT create_file_flags = 0;
     UINT flags_used = 0;
@@ -80,13 +83,12 @@ const losResult winOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
     return LOS_SUCCESS;
 }
 
-const losResult winCloseFile(losFileHandle handle);
-const losResult winReadFile(losFileHandle handle, void **data_ptr, size data_size)
+losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
 {
     LARGE_INTEGER temp = {0};
     if (GetFileSizeEx(handle->fileHandle, &temp) == 0)
     {
-        winCloseFile(handle);
+        losCloseFile(handle);
         return LOS_ERROR_HANDLE_LOSSED;
     }
 
@@ -96,7 +98,7 @@ const losResult winReadFile(losFileHandle handle, void **data_ptr, size data_siz
     DWORD dwBytesRead = 0;
     if (ReadFile(handle->fileHandle, *data_ptr, temp.QuadPart, &dwBytesRead, nullptr) == 0)
     {
-        winCloseFile(handle);
+        losCloseFile(handle);
         return LOS_ERROR_HANDLE_LOSSED;
     }
 
@@ -107,19 +109,19 @@ const losResult winReadFile(losFileHandle handle, void **data_ptr, size data_siz
     return LOS_SUCCESS;
 }
 
-const losResult winWriteFile(losFileHandle handle, const void *data_ptr, const size data_size)
+losResult losWriteFile(losFileHandle handle, const void *data_ptr, const size data_size)
 {
     DWORD dwBytesWrite = 0;
     if (WriteFile(handle->fileHandle, data_ptr, (DWORD)data_size, &dwBytesWrite, nullptr) == 0)
     {
-        winCloseFile(handle);
+        losCloseFile(handle);
         return LOS_ERROR_HANDLE_LOSSED;
     }
     (void)dwBytesWrite;
     return LOS_SUCCESS;
 }
 
-const losResult winCloseFile(losFileHandle handle)
+losResult losCloseFile(losFileHandle handle)
 {
     CloseHandle(handle->fileHandle);
     delete handle;

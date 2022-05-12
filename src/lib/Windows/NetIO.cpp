@@ -1,4 +1,3 @@
-#pragma once
 #include "windows_link.h"
 #include <Components/NetIO.h>
 #include <iphlpapi.h>
@@ -40,7 +39,7 @@ const losResult isLoaded(const bool clear)
     return LOS_SUCCESS;
 }
 
-void *winNetworkBytesToSystemBytes(const uint32 *data, const size data_size)
+void *losNetworkBytesToSystemBytes(const uint32 *data, const size data_size)
 {
     std::vector<uint32> bytes;
     bytes.reserve(data_size);
@@ -49,7 +48,7 @@ void *winNetworkBytesToSystemBytes(const uint32 *data, const size data_size)
     return std::move(bytes.data());
 }
 
-void *winSystemBytesToNetworkBytes(const uint32 *data, const size data_size)
+void *losSystemBytesToNetworkBytes(const uint32 *data, const size data_size)
 {
     std::vector<uint32> bytes;
     bytes.reserve(data_size);
@@ -74,8 +73,12 @@ losResult tellError()
     return LOS_SUCCESS;
 }
 
-const losResult winCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
+losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
 {
+    if (!(*socket_in))
+        return LOS_ERROR_HANDLE_IN_USE;
+
+
     *socket_in = new losSocket_T();
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_INIT;
@@ -132,7 +135,7 @@ const losResult winCreateSocket(losSocket *socket_in, const losCreateSocketInfo 
     return LOS_SUCCESS;
 }
 
-const losResult winReadSocket(losSocket socket, void *data, size *data_size)
+losResult losReadSocket(losSocket socket, void *data, size *data_size)
 {
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
@@ -150,7 +153,7 @@ const losResult winReadSocket(losSocket socket, void *data, size *data_size)
         return LOS_SUCCESS;
 }
 
-const losResult winWriteSocket(losSocket socket, const void *data, const size data_size)
+losResult losWriteSocket(losSocket socket, const void *data, const size data_size)
 {
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
@@ -169,15 +172,15 @@ const losResult winWriteSocket(losSocket socket, const void *data, const size da
     return LOS_SUCCESS;
 }
 
-const losResult winListenSocket(const losCreateSocketServerListenInfo &server_listen)
+losResult losListenSocket(const losCreateSocketServerListenInfo &server_listen)
 {
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
 
-    return LOS_SUCCESS;
+    return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-const losResult winDestorySocket(losSocket socket)
+losResult losDestorySocket(losSocket socket)
 {
     if (shutdown(socket->ConnectSocket, SD_SEND) == SOCKET_ERROR)
     {
