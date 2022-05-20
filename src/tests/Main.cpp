@@ -13,16 +13,16 @@
 int main()
 {
     losResult res;
-    TEST(testFileIOMain())
-    TEST(testNetIOMain())
+    //TEST(testFileIOMain())
+    //TEST(testNetIOMain())
     printf("final test  window test\n");
     losWindowInfo info;
-    info.subWindow = false;
+    info.sub_window = false;
     std::string name = "this is the test window";
     info.title = name.data();
     info.title_size = name.size();
-    info.windowSize.width = 720;
-    info.windowSize.height = 1280;
+    info.window_size.width = 720;
+    info.window_size.height = 1280;
 
     losWindow window;
     TEST(losCreateWindow(&window, info));
@@ -35,9 +35,9 @@ int main()
             losRequestClose(window);
     }
 
-    TEST(losDestoryKeyboard(window));
-    TEST(losDestoryMouse(window));
-    TEST(losDestoryWindow(window));
+    TEST(losDestroyKeyboard(window));
+    TEST(losDestroyMouse(window));
+    TEST(losDestroyWindow(window));
 
     return 0;
 }

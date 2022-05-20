@@ -111,16 +111,16 @@ typedef enum losKeyboardButton : uint16
     LOS_KEYBOARD_LEFT,
     LOS_KEYBOARD_RIGHT, 
     LOS_KEYBOARD_UP,
-    LOS_KEYBOARD_NUMPAD_0,
-    LOS_KEYBOARD_NUMPAD_1,
-    LOS_KEYBOARD_NUMPAD_2,
-    LOS_KEYBOARD_NUMPAD_3,
-    LOS_KEYBOARD_NUMPAD_4,
-    LOS_KEYBOARD_NUMPAD_5,
-    LOS_KEYBOARD_NUMPAD_6,
-    LOS_KEYBOARD_NUMPAD_7,
-    LOS_KEYBOARD_NUMPAD_8,
-    LOS_KEYBOARD_NUMPAD_9,
+    LOS_KEYBOARD_NUM_PAD_0,
+    LOS_KEYBOARD_NUM_PAD_1,
+    LOS_KEYBOARD_NUM_PAD_2,
+    LOS_KEYBOARD_NUM_PAD_3,
+    LOS_KEYBOARD_NUM_PAD_4,
+    LOS_KEYBOARD_NUM_PAD_5,
+    LOS_KEYBOARD_NUM_PAD_6,
+    LOS_KEYBOARD_NUM_PAD_7,
+    LOS_KEYBOARD_NUM_PAD_8,
+    LOS_KEYBOARD_NUM_PAD_9,
     LOS_KEYBOARD_ADD,
     LOS_KEYBOARD_DECIMAL,
     LOS_KEYBOARD_DIVIDE,
@@ -131,17 +131,17 @@ typedef enum losKeyboardButton : uint16
 
 typedef struct losWindowInfo
 {
-    bool subWindow;
-    losSize windowSize;
+    uint8 sub_window;
+    losSize window_size;
     char* title;
     size title_size;
 } losWindowInfo;
 
-typedef struct losPostition
+typedef struct losPosition
 {
     uint64 x;
     uint64 y;
-} losPostition;
+} losPosition;
 
 losResult losCreateWindow(losWindow *, losWindowInfo &);
 losResult losCreateKeyboard(losWindow);
@@ -154,11 +154,11 @@ losResult losUpdateWindow(losWindow);
 bool losIsKeyDown(losWindow, losKeyboardButton);
 bool losIsMouseDown(losWindow, losMouseButton);
 losResult losRequestClose(losWindow);
-losPostition losRequestMousePosition(losWindow);
-losPostition losRequestMouseWheelDelta(losWindow);
-losPostition losIsBeingPressed(losWindow);
+losPosition losRequestMousePosition(losWindow);
+losPosition losRequestMouseWheelDelta(losWindow);
+losPosition losIsBeingPressed(losWindow);
 
-losResult losDestoryKeyboard(losWindow);
-losResult losDestoryMouse(losWindow);
-losResult losDestoryTouch(losWindow);
-losResult losDestoryWindow(losWindow);
+losResult losDestroyKeyboard(losWindow);
+losResult losDestroyMouse(losWindow);
+losResult losDestroyTouch(losWindow);
+losResult losDestroyWindow(losWindow);

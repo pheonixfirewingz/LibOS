@@ -2,12 +2,11 @@
 // this is (DRAFT 2) of the refractile api
 #include "Components/Defines.h"
 #include "Components/Window.h"
-#include <string>
 
 DEFINE_HANDLE(refHandle)
-losResult refCreaterefractalContext(refHandle *);
-losResult refDestoryrefractalContext(refHandle);
-
+losResult refCreateRefractileContext(refHandle *);
+losResult refDestoryRefractileContext(refHandle);
+//---------------------------------------------------------------------------------------------------------
 // The Graphics API
 //---------------------------------------------------------------------------------------------------------
 DEFINE_HANDLE(refImage)
@@ -18,9 +17,9 @@ DEFINE_HANDLE(refShaderProgram)
 
 typedef struct refCreateShaderProgramInfo
 {
-    std::string shaderLayout;
-    std::string vertexShader;
-    std::string fragmentShader;
+    char* shaderLayout;
+    char* vertexShader;
+    char* fragmentShader;
 } refCreateShaderProgramInfo;
 
 typedef enum refDataBufferType
@@ -37,7 +36,7 @@ typedef struct refCreateDataBufferInfo
 } refCreateDataBufferInfo;
 
 losResult refAppendGraphicsContext(refHandle,losWindow);
-losResult refUnappendGraphicsContext(refHandle);
+losResult refUnAppendGraphicsContext(refHandle);
 
 losResult refCreateImage(refImage *);
 losResult refCopyDataToImage(refImage,void*,size);
@@ -70,6 +69,7 @@ losResult refSwapbuffers(losWindow);
 // The Audio API
 //---------------------------------------------------------------------------------------------------------
 DEFINE_HANDLE(refAudioDevice)
+DEFINE_HANDLE(refAudioPlayer)
 DEFINE_HANDLE(refAudioBuffer)
 
 typedef enum refAudioBufferType
@@ -83,13 +83,13 @@ typedef enum refAudioBufferType
 typedef struct refCreateAudioBufferInfo
 {
     refAudioBufferType bufferDataType;
-    std::string audioFile;
+    char* audioFile;
     float64 pitch;
     float64 scale;
 } refCreateAudioBufferInfo;
 
 losResult refAppendAudioContext(refHandle);
-losResult refUnappendAudioContext(refHandle);
+losResult refUnAppendAudioContext(refHandle);
 
 losResult refGetAudioDeviceList(refHandle, refAudioDevice *);
 losResult refSetAudioDevice(refHandle, refAudioDevice);
@@ -98,6 +98,9 @@ losResult refSetAudioDeviceSoundLevel(refAudioDevice, float64);
 losResult refCreateAudioBuffer(refAudioDevice, refAudioBuffer *, refCreateAudioBufferInfo);
 losResult refDestoryAudioBuffer(refAudioDevice, refAudioBuffer);
 
-losResult refPlay(refAudioDevice, refAudioBuffer, float64, float64, float64);
-losResult refPause(refAudioDevice, refAudioBuffer);
+losResult refPlay(refAudioDevice,refAudioPlayer*, refAudioBuffer, float64, float64, float64, uint8);
+losResult refPause(refAudioDevice,refAudioPlayer);
+losResult refResume(refAudioDevice,refAudioPlayer);
+losResult refStop(refAudioDevice,refAudioPlayer);
+
 //---------------------------------------------------------------------------------------------------------

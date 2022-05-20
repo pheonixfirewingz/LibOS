@@ -1,8 +1,8 @@
 #include "Components/Defines.h"
 #include <Components/NetIO.h>
+#include <arpa/inet.h>
 #include <cstdio>
 #include <netdb.h>
-#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
@@ -42,6 +42,9 @@ losResult tellError()
 
 losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
 {
+    if (!(*socket_in))
+        return LOS_ERROR_HANDLE_IN_USE;
+
     *socket_in = new losSocket_T();
     switch (socket_info.socketBits)
     {
@@ -80,12 +83,12 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
 
     if ((*socket_in)->isTCP)
     {
-        sockaddr_in sockAddr = {0,0,{},{}};
+        sockaddr_in sockAddr = {0, 0, {}, {}};
         sockAddr.sin_port = htons(socket_info.port);
         sockAddr.sin_family = AF_INET;
         sockAddr.sin_addr.s_addr = (*reinterpret_cast<unsigned long *>(ip->h_addr_list[0]));
 
-        if (connect((*socket_in)->ConnectSocket, (sockaddr*)(&sockAddr), sizeof(sockAddr)) < 0)
+        if (connect((*socket_in)->ConnectSocket, (sockaddr *)(&sockAddr), sizeof(sockAddr)) < 0)
             return tellError();
     }
 
