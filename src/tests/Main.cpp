@@ -1,5 +1,7 @@
+#include "Components/Defines.h"
 #include "FileIOTest.h"
 #include "NetIOTest.h"
+#include "RefractileAPI.h"
 #include <CrystalOS.h>
 #include <cstdio>
 #include <string>
@@ -13,6 +15,7 @@
 int main()
 {
     losResult res;
+    refHandle handle;
     //TEST(testFileIOMain())
     //TEST(testNetIOMain())
     printf("final test  window test\n");
@@ -28,6 +31,8 @@ int main()
     TEST(losCreateWindow(&window, info));
     TEST(losCreateKeyboard(window));
     TEST(losCreateMouse(window));
+    TEST(refCreateRefractileContext(&handle));
+    TEST(refAppendGraphicsContext(handle,window));
 
     while (losUpdateWindow(window) != LOS_WINDOW_CLOSE)
     {
@@ -35,6 +40,8 @@ int main()
             losRequestClose(window);
     }
 
+    TEST(refUnAppendGraphicsContext(handle));
+    TEST(refDestoryRefractileContext(handle));
     TEST(losDestroyKeyboard(window));
     TEST(losDestroyMouse(window));
     TEST(losDestroyWindow(window));

@@ -63,8 +63,6 @@ losResult refBindShaderProgram(refCommandBuffer, refShaderProgram);
 losResult refDrawBuffer(refCommandBuffer,bool,uint32,uint32,uint32,uint32);
 losResult refEndComands(refCommandBuffer);
 losResult refExecuteCommands(refCommandBuffer);
-
-losResult refSwapbuffers(losWindow);
 //---------------------------------------------------------------------------------------------------------
 // The Audio API
 //---------------------------------------------------------------------------------------------------------

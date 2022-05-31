@@ -1,4 +1,18 @@
-# LibOS
+# LibOS - V0.5.0
+
+## setup before building
+
+    1. git submodule init
+    2. cd vcpkg
+    3. /bootstrap-vcpkg.(bat|sh)
+    4. ./vcpkg integrate install
+    5. ./vcpkg install
+
+## dependencies
+    1. c++ compiler
+    2. cmake
+    3. Ninja-Build
+    4. vulkan sdk
 
 ## Contribution rules
 

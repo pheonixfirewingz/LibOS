@@ -3,6 +3,7 @@
 cmake-build-debug
 cmake-build-release
 CMakeFiles
+vcpkg_installed
 .vs
 out
 *.vcxproj

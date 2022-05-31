@@ -1,3 +1,5 @@
+#include "../Cmake.h"
+#if CMAKE_SYSTEM_NUMBER == 1
 #include "../IFileIO.h"
 #include "windows_link.h"
 #include <Components/FileIO.h>
@@ -138,3 +140,4 @@ std::string winGetCurrentPath()
     GetModuleFileName(NULL, (LPSTR)path.c_str(), MAX_PATH);
     return path;
 }
+#endif

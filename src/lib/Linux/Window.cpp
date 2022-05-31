@@ -9,7 +9,10 @@
 const xdg_surface_listener surface_listener = {[](void *, struct xdg_surface *, uint32_t) {}};
 
 const xdg_toplevel_listener toplevel_listener = {[](void *, xdg_toplevel *, int32_t, int32_t, struct wl_array *) {},
-                                                 [](void *, xdg_toplevel *) {},
+                                                 [](void * data, xdg_toplevel *) 
+                                                 {
+                                                     losRequestClose(static_cast<losWindow>(data));
+                                                 },
                                                  [](void *, xdg_toplevel *, int32_t, int32_t) {}};
 
 const wl_keyboard_listener keyboard_listener = {
@@ -118,7 +121,6 @@ losResult losCreateWindow(losWindow *window, losWindowInfo &info)
     xdg_toplevel_add_listener((*window)->xdg_top_level,&toplevel_listener, (*window));
     xdg_toplevel_set_app_id((*window)->xdg_top_level, "LibOSWindowClass");
     xdg_toplevel_set_title((*window)->xdg_top_level, info.title);
-    xdg_toplevel_set_maximized((*window)->xdg_top_level);
     wl_surface_commit((*window)->surface);
 
     wl_region *region = wl_compositor_create_region((*window)->compositor);
@@ -250,9 +252,7 @@ losResult losDestroyWindow(losWindow window)
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "wayland-util.h"
-#include <stdint.h>
-#include <stdlib.h>
+#include <wayland-util.h>
 
 #ifndef __has_attribute
 #    define __has_attribute(x) 0 /* Compatibility with non-clang compilers. */

@@ -1,0 +1,10 @@
+{
+    "name": "libos",
+    "version-string": "latest",
+    "dependencies": [
+        "vulkan-memory-allocator",
+        "vk-bootstrap",
+        "vulkan",
+        "openal-soft"
+    ]
+}

@@ -1,3 +1,5 @@
+#include "../Cmake.h"
+#if CMAKE_SYSTEM_NUMBER == 1
 #include "windows_link.h"
 #include <Components/Window.h>
 struct losWindow_T
@@ -208,3 +210,4 @@ losResult losDestoryWindow(losWindow win)
     win->active = false;
     return LOS_SUCCESS;
 }
+#endif

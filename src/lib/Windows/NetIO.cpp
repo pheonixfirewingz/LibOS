@@ -1,3 +1,5 @@
+#include "../Cmake.h"
+#if CMAKE_SYSTEM_NUMBER == 1
 #include "windows_link.h"
 #include <Components/NetIO.h>
 #include <iphlpapi.h>
@@ -194,3 +196,4 @@ losResult losDestorySocket(losSocket socket)
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
     return LOS_SUCCESS;
 }
+#endif
