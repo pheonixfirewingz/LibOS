@@ -1,5 +1,6 @@
 #pragma once
 #include <Components/Window.h>
+#include "../Callbacks.h"
 #include "xdg-shell-client-protocol.h"
 
 struct losWindow_T
@@ -14,4 +15,6 @@ struct losWindow_T
     wl_seat *seat;
     wl_pointer *pointer;
     wl_keyboard *keyboard;
+    ResizeCallbackFunction resize_callback;
+    requestObjectCallback object_callback;
 };

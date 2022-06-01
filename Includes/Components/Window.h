@@ -1,6 +1,7 @@
 #pragma once
 #include "Defines.h"
 DEFINE_HANDLE(losWindow)
+typedef void* (*requestObjectCallback)(const char*);
 
 typedef enum losMouseButton : uint8
 {
@@ -135,6 +136,7 @@ typedef struct losWindowInfo
     losSize window_size;
     char* title;
     size title_size;
+    requestObjectCallback request_callback;
 } losWindowInfo;
 
 typedef struct losPosition
@@ -143,22 +145,22 @@ typedef struct losPosition
     uint64 y;
 } losPosition;
 
-losResult losCreateWindow(losWindow *, losWindowInfo &);
-losResult losCreateKeyboard(losWindow);
-losResult losCreateMouse(losWindow);
-losResult losCreateTouch(losWindow);
+EXPORT_DLL losResult losCreateWindow(losWindow *, losWindowInfo &);
+EXPORT_DLL losResult losCreateKeyboard(losWindow);
+EXPORT_DLL losResult losCreateMouse(losWindow);
+EXPORT_DLL losResult losCreateTouch(losWindow);
 
 //the way to check if the window should close check to see if function returns "LOS_WINDOW_CLOSE"
-losResult losUpdateWindow(losWindow);
+EXPORT_DLL losResult losUpdateWindow(losWindow);
 //--------------------------------------------------------------------------------------------------------------------------
-bool losIsKeyDown(losWindow, losKeyboardButton);
-bool losIsMouseDown(losWindow, losMouseButton);
-losResult losRequestClose(losWindow);
-losPosition losRequestMousePosition(losWindow);
-losPosition losRequestMouseWheelDelta(losWindow);
-losPosition losIsBeingPressed(losWindow);
+EXPORT_DLL bool losIsKeyDown(losWindow, losKeyboardButton);
+EXPORT_DLL bool losIsMouseDown(losWindow, losMouseButton);
+EXPORT_DLL losResult losRequestClose(losWindow);
+EXPORT_DLL losPosition losRequestMousePosition(losWindow);
+EXPORT_DLL losPosition losRequestMouseWheelDelta(losWindow);
+EXPORT_DLL losPosition losIsBeingPressed(losWindow);
 
-losResult losDestroyKeyboard(losWindow);
-losResult losDestroyMouse(losWindow);
-losResult losDestroyTouch(losWindow);
-losResult losDestroyWindow(losWindow);
+EXPORT_DLL losResult losDestroyKeyboard(losWindow);
+EXPORT_DLL losResult losDestroyMouse(losWindow);
+EXPORT_DLL losResult losDestroyTouch(losWindow);
+EXPORT_DLL losResult losDestroyWindow(losWindow);

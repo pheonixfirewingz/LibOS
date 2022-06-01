@@ -1,0 +1,58 @@
+{
+    "version": 4,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 22,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "description": "",
+            "displayName": "",
+            "inherits": [],
+            "binaryDir": "${sourceDir}/${presetName}",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "type": "FILEPATH",
+                    "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+                },
+                "CMAKE_EXPORT_COMPILE_COMMANDS" : "1"
+
+            }
+        },
+        {
+            "name": "debug-linux",
+            "displayName": "linux",
+            "inherits": ["base"],
+            "generator": "Ninja Multi-Config",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE" : "Debug"
+            }
+        },
+        {
+            "name": "debug-osx",
+            "displayName": "mac",
+            "inherits": ["base"],
+            "generator": "xcode",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE" : "Debug"
+            }
+        },
+        {
+            "name": "debug-windows",
+            "displayName": "windows",
+            "inherits": ["base"],
+            "generator": "Visual Studio 17 2022",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE" : "Debug"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "default",
+            "configurePreset": "default"
+        }
+    ]
+}

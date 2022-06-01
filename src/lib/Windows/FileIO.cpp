@@ -87,18 +87,18 @@ losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
 
 losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
 {
-    LARGE_INTEGER temp = {0};
-    if (GetFileSizeEx(handle->fileHandle, &temp) == 0)
+    DWORD temp = {0};
+    if (GetFileSizeEx(handle->fileHandle, reinterpret_cast<PLARGE_INTEGER>(&temp)) == 0)
     {
         losCloseFile(handle);
         return LOS_ERROR_HANDLE_LOSSED;
     }
 
-    *data_ptr = malloc(temp.QuadPart * sizeof(char));
-    ZeroMemory(*data_ptr, temp.QuadPart);
+    *data_ptr = malloc(temp * sizeof(char));
+    ZeroMemory(*data_ptr, temp);
 
     DWORD dwBytesRead = 0;
-    if (ReadFile(handle->fileHandle, *data_ptr, temp.QuadPart, &dwBytesRead, nullptr) == 0)
+    if (ReadFile(handle->fileHandle, *data_ptr, temp, &dwBytesRead, nullptr) == 0)
     {
         losCloseFile(handle);
         return LOS_ERROR_HANDLE_LOSSED;

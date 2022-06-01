@@ -1,3 +1,5 @@
+#include "../Cmake.h"
+#if CMAKE_SYSTEM_NUMBER == 0
 #include "Components/Defines.h"
 #include <Components/NetIO.h>
 #include <arpa/inet.h>
@@ -142,3 +144,4 @@ losResult losDestorySocket(losSocket socket)
     close(socket->ConnectSocket);
     return LOS_SUCCESS;
 }
+#endif

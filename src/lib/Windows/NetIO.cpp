@@ -72,37 +72,39 @@ losResult tellError()
         printf("%x\n", error);
         return LOS_ERROR_COULD_NOT_INIT;
     }
-    return LOS_SUCCESS;
 }
 
 losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
 {
     if (!(*socket_in))
         return LOS_ERROR_HANDLE_IN_USE;
-
-
     *socket_in = new losSocket_T();
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_INIT;
 
+    addrinfo hints;
+    hints.ai_family = AF_INET;
+
     switch (socket_info.socketBits)
     {
     case LOS_SOCKET_TCP | LOS_SOCKET_SERVER:
+    {
+        hints.ai_flags = AI_PASSIVE;
         (*socket_in)->isServer = true;
+    }
     case LOS_SOCKET_TCP: {
-        (*socket_in)->ConnectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_protocol = IPPROTO_TCP;
         (*socket_in)->isTCP = true;
         break;
     }
     case LOS_SOCKET_UDP | LOS_SOCKET_SERVER:
+    {
         (*socket_in)->isServer = true;
+    }
     case LOS_SOCKET_UDP: {
-        (*socket_in)->server_address.sin_family = AF_INET;               // AF_INET = IPv4 addresses
-        (*socket_in)->server_address.sin_port = htons(socket_info.port); // Little to big endian conversion
-        inet_pton(AF_INET, socket_info.address,
-                  &(*socket_in)->server_address.sin_addr); // Convert from string to byte array
-        (*socket_in)->server_address_size = sizeof((*socket_in)->server_address);
-        (*socket_in)->ConnectSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        hints.ai_socktype = SOCK_DGRAM;
+        hints.ai_protocol = IPPROTO_UDP;
         (*socket_in)->isTCP = false;
         break;
     }
@@ -113,17 +115,23 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
     if ((*socket_in)->isServer)
         return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 
-    hostent *ip = gethostbyname(socket_info.address);
 
-    if (ip == NULL)
+    PADDRINFOA ip;
+
+
+    if (getaddrinfo(socket_info.address, NULL, &hints, &ip) != 0)
         return LOS_NET_IO_DOMAIN_NOT_FOUND;
 
     if ((*socket_in)->isTCP)
     {
-        SOCKADDR_IN sockAddr = {0};
+        for (addrinfo* res=ip; res!=NULL; res=res->ai_next) 
+        {
+
+        }
+        /*SOCKADDR_IN sockAddr = {0};
         sockAddr.sin_port = htons(socket_info.port);
         sockAddr.sin_family = AF_INET;
-        sockAddr.sin_addr.S_un.S_addr = (*reinterpret_cast<unsigned long *>(ip->h_addr_list[0]));
+        sockAddr.sin_addr.S_un.S_addr = (*reinterpret_cast<unsigned long *>(i));
 
         if (connect((*socket_in)->ConnectSocket, (SOCKADDR *)(&sockAddr), sizeof(sockAddr)) == SOCKET_ERROR)
         {
@@ -131,7 +139,7 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
                 return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
 
             return tellError();
-        }
+        }*/
     }
 
     return LOS_SUCCESS;
@@ -143,7 +151,7 @@ losResult losReadSocket(losSocket socket, void *data, size *data_size)
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
     int iResult = 0;
     if (socket->isTCP)
-        iResult = recv(socket->ConnectSocket, (char *)data, *data_size, 0);
+        iResult = recv(socket->ConnectSocket, (char *)data, static_cast<int32>(*data_size), 0);
     else
         return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 
@@ -162,19 +170,19 @@ losResult losWriteSocket(losSocket socket, const void *data, const size data_siz
 
     if (socket->isTCP)
     {
-        if (send(socket->ConnectSocket, (const char *)data, data_size, 0) == SOCKET_ERROR)
+        if (send(socket->ConnectSocket, (const char *)data, static_cast<int32>(data_size), 0) == SOCKET_ERROR)
             return tellError();
     }
     else
     {
-        if (sendto(socket->ConnectSocket, (const char *)data, data_size, 0, (struct sockaddr *)&socket->server_address,
+        if (sendto(socket->ConnectSocket, (const char *)data, static_cast<int32>(data_size), 0, (struct sockaddr *)&socket->server_address,
                    socket->server_address_size) == SOCKET_ERROR)
             return tellError();
     }
     return LOS_SUCCESS;
 }
 
-losResult losListenSocket(const losCreateSocketServerListenInfo &server_listen)
+losResult losListenSocket(const losCreateSocketServerListenInfo &)
 {
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;

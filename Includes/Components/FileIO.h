@@ -21,7 +21,7 @@ typedef struct losFileOpenInfo
 
 } losFileOpenInfo;
 
-losResult losOpenFile(losFileHandle *, const losFileOpenInfo &);
-losResult losReadFile(losFileHandle, void **, size);
-losResult losWriteFile(losFileHandle,const void *,const size);
-losResult losCloseFile(losFileHandle);
+EXPORT_DLL losResult losOpenFile(losFileHandle *, const losFileOpenInfo &);
+EXPORT_DLL losResult losReadFile(losFileHandle, void **, size);
+EXPORT_DLL losResult losWriteFile(losFileHandle,const void *,const size);
+EXPORT_DLL losResult losCloseFile(losFileHandle);

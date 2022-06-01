@@ -4,8 +4,8 @@
 #include "Components/Window.h"
 
 DEFINE_HANDLE(refHandle)
-losResult refCreateRefractileContext(refHandle *);
-losResult refDestoryRefractileContext(refHandle);
+EXPORT_DLL losResult refCreateRefractileContext(refHandle *);
+EXPORT_DLL losResult refDestroyRefractileContext(refHandle);
 //---------------------------------------------------------------------------------------------------------
 // The Graphics API
 //---------------------------------------------------------------------------------------------------------
@@ -17,9 +17,9 @@ DEFINE_HANDLE(refShaderProgram)
 
 typedef struct refCreateShaderProgramInfo
 {
-    char* shaderLayout;
-    char* vertexShader;
-    char* fragmentShader;
+    const char* shaderLayout;
+    const char* vertexShader;
+    const char* fragmentShader;
 } refCreateShaderProgramInfo;
 
 typedef enum refDataBufferType
@@ -35,34 +35,35 @@ typedef struct refCreateDataBufferInfo
     size data_size;
 } refCreateDataBufferInfo;
 
-losResult refAppendGraphicsContext(refHandle,losWindow);
-losResult refUnAppendGraphicsContext(refHandle);
+EXPORT_DLL losResult refAppendGraphicsContext(refHandle,losWindow);
+EXPORT_DLL losResult refUnAppendGraphicsContext(refHandle);
 
-losResult refCreateImage(refImage *);
-losResult refCopyDataToImage(refImage,void*,size);
-losResult refDestoryImage(refImage);
+EXPORT_DLL losResult refCreateImage(refImage *);
+EXPORT_DLL losResult refCopyDataToImage(refImage,void*,size);
+EXPORT_DLL losResult refDestroyImage(refImage);
 
-losResult refCreateDataBuffer(refDataBuffer *, refCreateDataBufferInfo &);
-losResult refCopyDataToDataBuffer(refDataBuffer, void *, size);
-losResult refDestoryDataBuffer(refDataBuffer);
+EXPORT_DLL losResult refCreateDataBuffer(refDataBuffer *, refCreateDataBufferInfo &);
+EXPORT_DLL losResult refCopyDataToDataBuffer(refDataBuffer, void *, size);
+EXPORT_DLL losResult refDestroyDataBuffer(refDataBuffer);
 
-losResult refCreateFrameBuffer(refFrameBuffer *);
-losResult refDestoryFrameBuffer(refFrameBuffer);
+EXPORT_DLL losResult refCreateFrameBuffer(refFrameBuffer *);
+EXPORT_DLL losResult refDestroyFrameBuffer(refFrameBuffer);
 
-losResult refCreateCommandBuffer(refCommandBuffer *);
-losResult refDestoryCommandBuffer(refCommandBuffer);
+EXPORT_DLL losResult refCreateCommandBuffer(refHandle, refCommandBuffer *);
+EXPORT_DLL losResult refDestroyCommandBuffer(refHandle, refCommandBuffer);
 
-losResult refCreateShaderProgram(refShaderProgram *, refCreateShaderProgramInfo &);
-losResult refDestoryShaderProgram(refShaderProgram);
+EXPORT_DLL losResult refCreateShaderProgram(refHandle, refShaderProgram *, refCreateShaderProgramInfo &);
+EXPORT_DLL losResult refDestroyShaderProgram(refHandle, refShaderProgram);
 
-losResult refBeginCommands(refCommandBuffer);
-losResult refBindFrameBuffer(refCommandBuffer, refFrameBuffer);
-losResult refBindVertexBuffer(refCommandBuffer, refDataBuffer);
-losResult refBindIndexBuffer(refCommandBuffer, refDataBuffer);
-losResult refBindShaderProgram(refCommandBuffer, refShaderProgram);
-losResult refDrawBuffer(refCommandBuffer,bool,uint32,uint32,uint32,uint32);
-losResult refEndComands(refCommandBuffer);
-losResult refExecuteCommands(refCommandBuffer);
+EXPORT_DLL losResult refBeginCommands(refHandle, refCommandBuffer);
+EXPORT_DLL losResult refBindFrameBuffer(refHandle, refCommandBuffer, refFrameBuffer);
+EXPORT_DLL losResult refBindVertexBuffer(refHandle, refCommandBuffer, refDataBuffer);
+EXPORT_DLL losResult refBindIndexBuffer(refHandle, refCommandBuffer, refDataBuffer);
+EXPORT_DLL losResult refBindShaderProgram(refHandle, refCommandBuffer, refShaderProgram);
+EXPORT_DLL losResult refDraw(refHandle, refCommandBuffer,uint32,uint32,uint32,uint32,uint32);
+EXPORT_DLL losResult refDrawIndexed(refHandle, refCommandBuffer,uint32,uint32,uint32,uint32,uint32);
+EXPORT_DLL losResult refEndCommands(refHandle, refCommandBuffer);
+EXPORT_DLL losResult refExecuteCommands(refHandle, refCommandBuffer, bool);
 //---------------------------------------------------------------------------------------------------------
 // The Audio API
 //---------------------------------------------------------------------------------------------------------
@@ -86,19 +87,19 @@ typedef struct refCreateAudioBufferInfo
     float64 scale;
 } refCreateAudioBufferInfo;
 
-losResult refAppendAudioContext(refHandle);
-losResult refUnAppendAudioContext(refHandle);
+EXPORT_DLL losResult refAppendAudioContext(refHandle);
+EXPORT_DLL losResult refUnAppendAudioContext(refHandle);
 
-losResult refGetAudioDeviceList(refHandle, refAudioDevice *);
-losResult refSetAudioDevice(refHandle, refAudioDevice);
-losResult refSetAudioDeviceSoundLevel(refAudioDevice, float64);
+EXPORT_DLL losResult refGetAudioDeviceList(refHandle, refAudioDevice *);
+EXPORT_DLL losResult refSetAudioDevice(refHandle, refAudioDevice);
+EXPORT_DLL losResult refSetAudioDeviceSoundLevel(refAudioDevice, float64);
 
-losResult refCreateAudioBuffer(refAudioDevice, refAudioBuffer *, refCreateAudioBufferInfo);
-losResult refDestoryAudioBuffer(refAudioDevice, refAudioBuffer);
+EXPORT_DLL losResult refCreateAudioBuffer(refAudioDevice, refAudioBuffer *, refCreateAudioBufferInfo);
+EXPORT_DLL losResult refDestoryAudioBuffer(refAudioDevice, refAudioBuffer);
 
-losResult refPlay(refAudioDevice,refAudioPlayer*, refAudioBuffer, float64, float64, float64, uint8);
-losResult refPause(refAudioDevice,refAudioPlayer);
-losResult refResume(refAudioDevice,refAudioPlayer);
-losResult refStop(refAudioDevice,refAudioPlayer);
+EXPORT_DLL losResult refPlay(refAudioDevice,refAudioPlayer*, refAudioBuffer, float64, float64, float64, uint8);
+EXPORT_DLL losResult refPause(refAudioDevice,refAudioPlayer);
+EXPORT_DLL losResult refResume(refAudioDevice,refAudioPlayer);
+EXPORT_DLL losResult refStop(refAudioDevice,refAudioPlayer);
 
 //---------------------------------------------------------------------------------------------------------

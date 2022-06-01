@@ -1,12 +1,10 @@
 #include "../Cmake.h"
 #if CMAKE_SYSTEM_NUMBER == 1
+#include "Window.h"
 #include "windows_link.h"
 #include <Components/Window.h>
-struct losWindow_T
-{
-    HWND win_hand{nullptr};
-    bool active = true;
-};
+#include <memory>
+
 const static uint16 window_key_look_up_table[256] = {
     0x30,         0x31,          0x32,        0x33,        0x34,       0x35,       0x36,         0x37,
     0x38,         0x39,          0x41,        0x42,        0x43,       0x44,       0x45,         0x46,
@@ -30,8 +28,10 @@ static bool key_buttons[256];
 static bool mouse_buttons[3];
 static uint64 mouse_position_x = 0;
 static uint64 mouse_position_y = 0;
-static uint64 mouse_wheel_delta_x = 0;
-static uint64 mouse_wheel_delta_y = 0;
+static float64 mouse_wheel_delta_x = 0;
+static float64 mouse_wheel_delta_y = 0;
+requestObjectCallback object_callback;
+losWindow* window;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -45,8 +45,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         ZeroMemory(&mouse_buttons[0], sizeof(mouse_buttons));
         break;
     }
-    case WM_SIZE:
+    case WM_SIZING: {
+        if((*window)->resize_callback)
+            (*window)->resize_callback((refHandle)object_callback("refHandle"),MAKEPOINTS(lParam).x, MAKEPOINTS(lParam).y);
         break;
+    }
     case WM_KEYDOWN:
         key_buttons[wParam] = true;
         break;
@@ -80,9 +83,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEWHEEL:
     case WM_MOUSEHWHEEL: {
         if (Msg == WM_MOUSEWHEEL)
-            mouse_wheel_delta_y = (float)GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+            mouse_wheel_delta_y = (float64)GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
         else
-            mouse_wheel_delta_x = (float)GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+            mouse_wheel_delta_x = (float64)GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
         break;
     }
     case WM_MOUSEMOVE: {
@@ -104,22 +107,27 @@ losResult losCreateWindow(losWindow *win, losWindowInfo &info)
     *win = new losWindow_T();
     WNDCLASSEX wc;
 
+    window = win;
+
+
+    object_callback = std::move(info.request_callback);
+
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW);
     wc.lpfnWndProc = WndProc;
     wc.hInstance = GetModuleHandle(nullptr);
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.lpszClassName = "LibOSWindowClass";
+    wc.lpszClassName = static_cast<LPCSTR>("LibOSWindowClass");
     RegisterClassEx(&wc);
 
     (*win)->win_hand =
-        CreateWindowEx(0, "LibOSWindowClass", info.title, WS_OVERLAPPEDWINDOW, 0, 0, info.windowSize.height,
-                       info.windowSize.width, nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
+        CreateWindowEx(0, static_cast<LPCSTR>("LibOSWindowClass"), info.title, WS_OVERLAPPEDWINDOW, 0, 0, info.window_size.height,
+                       info.window_size.width, nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
 
     ShowWindow((*win)->win_hand, SW_SHOWDEFAULT);
     MoveWindow((*win)->win_hand, GetSystemMetrics(SM_CXSCREEN) / 12, GetSystemMetrics(SM_CYSCREEN) / 12,
-               info.windowSize.height, info.windowSize.width, true);
+               info.window_size.height, info.window_size.width, true);
     return LOS_SUCCESS;
 }
 
@@ -152,10 +160,11 @@ losResult losUpdateWindow(losWindow win)
     return LOS_SUCCESS;
 }
 
+losResult losDestroyWindow(losWindow);
 losResult losRequestClose(losWindow win)
 {
     should_window_close = true;
-    losDestoryWindow(win);
+    losDestroyWindow(win);
     return LOS_SUCCESS;
 }
 
@@ -169,38 +178,38 @@ bool losIsMouseDown(losWindow ,losMouseButton button)
     return mouse_buttons[button];
 }
 
-losPostition losRequestMouseWheelDelta(losWindow)
+losPosition losRequestMouseWheelDelta(losWindow)
 {
     return {mouse_position_x, mouse_position_y};
 }
 
-losPostition losRequestMousePosition(losWindow)
+losPosition losRequestMousePosition(losWindow)
 {
-    return {mouse_wheel_delta_x, mouse_wheel_delta_y};
+    return {static_cast<uint64>(mouse_wheel_delta_x),static_cast<uint64>(mouse_wheel_delta_y)};
 }
 
-losPostition losIsBeingPressed(losWindow win)
+losPosition losIsBeingPressed(losWindow win)
 {
     return losRequestMousePosition(win);
 }
 
 
-losResult losDestoryKeyboard(losWindow)
+losResult losDestroyKeyboard(losWindow)
 {
     return LOS_SUCCESS;
 }
 
-losResult losDestoryMouse(losWindow)
+losResult losDestroyMouse(losWindow)
 {
     return LOS_SUCCESS;
 }
 
-losResult losDestoryTouch(losWindow)
+losResult losDestroyTouch(losWindow)
 {
     return LOS_SUCCESS;
 }
 
-losResult losDestoryWindow(losWindow win)
+losResult losDestroyWindow(losWindow win)
 {
     if (!win->active)
         return LOS_SUCCESS;

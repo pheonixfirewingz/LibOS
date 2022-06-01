@@ -1,3 +1,5 @@
+#include "../Cmake.h"
+#if CMAKE_SYSTEM_NUMBER == 0
 #include "FileIO.h"
 #include <Components/FileIO.h>
 #include <fcntl.h>
@@ -144,3 +146,4 @@ std::string linuxGetCurrentPath()
     (void)readlink("/proc/self/exe", result, 4096);
     return dirname(result);
 }
+#endif

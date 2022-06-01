@@ -2,7 +2,8 @@
 
 ## setup before building
 
-    1. git submodule init
+   0. git submodule init
+    1. git submodule update
     2. cd vcpkg
     3. /bootstrap-vcpkg.(bat|sh)
     4. ./vcpkg integrate install

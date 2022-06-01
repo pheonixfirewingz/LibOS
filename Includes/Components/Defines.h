@@ -1,4 +1,10 @@
 #pragma once
+#if _WIN64
+#    define EXPORT_DLL extern "C" __declspec(dllexport)
+#else
+#    define EXPORT_DLL
+#endif
+
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef uint16 losUnicode;
@@ -17,7 +23,7 @@ typedef double float64;
 
 #define DEFINE_HANDLE(object) typedef struct object##_T *object;
 
-void lib_panic(const char*);
+EXPORT_DLL void lib_panic(const char*);
 #define prog_panic(x) lib_panic(x)
 
 typedef struct losSize

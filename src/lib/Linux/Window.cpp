@@ -1,3 +1,5 @@
+#include "../Cmake.h"
+#if CMAKE_SYSTEM_NUMBER == 0
 #include "Window.h"
 #include "Components/Window.h"
 #include "xdg-shell-client-protocol.h"
@@ -385,3 +387,4 @@ static const struct wl_message xdg_popup_events[] = {
 WL_PRIVATE const struct wl_interface xdg_popup_interface = {
     "xdg_popup", 4, 3, xdg_popup_requests, 3, xdg_popup_events,
 };
+#endif

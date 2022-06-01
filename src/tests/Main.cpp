@@ -12,10 +12,13 @@
         exit(1); \
     }
 
+refHandle handle;
+
 int main()
 {
     losResult res;
-    refHandle handle;
+    refCommandBuffer buffer;
+    refShaderProgram program;
     //TEST(testFileIOMain())
     //TEST(testNetIOMain())
     printf("final test  window test\n");
@@ -26,6 +29,13 @@ int main()
     info.title_size = name.size();
     info.window_size.width = 720;
     info.window_size.height = 1280;
+    info.request_callback = [](const char * object)
+    { 
+        if(std::string(object)._Equal("refHandle")) 
+            return (void*)handle; 
+        
+        return (void*)nullptr;
+    };
 
     losWindow window;
     TEST(losCreateWindow(&window, info));
@@ -34,14 +44,31 @@ int main()
     TEST(refCreateRefractileContext(&handle));
     TEST(refAppendGraphicsContext(handle,window));
 
+    TEST(refCreateCommandBuffer(handle,&buffer));
+    refCreateShaderProgramInfo shader_info;
+    shader_info.shaderLayout = "$[binary_base]/layout.json";
+    shader_info.vertexShader = "$[binary_base]/vertexShader.gim";
+    shader_info.fragmentShader = "$[binary_base]/fragmentShader.gim";
+
+    TEST(refCreateShaderProgram(handle,&program,shader_info));
+
+    TEST(refBeginCommands(handle,buffer));
+    TEST(refBindShaderProgram(handle,buffer,program));
+    TEST(refEndCommands(handle,buffer));
+
+#ifndef LINUX
     while (losUpdateWindow(window) != LOS_WINDOW_CLOSE)
+#endif
     {
         if (losIsKeyDown(window, LOS_KEYBOARD_X))
             losRequestClose(window);
+        TEST(refExecuteCommands(handle,buffer,true));
     }
 
+    TEST(refDestroyShaderProgram(handle,program));
+    TEST(refDestroyCommandBuffer(handle,buffer));
     TEST(refUnAppendGraphicsContext(handle));
-    TEST(refDestoryRefractileContext(handle));
+    TEST(refDestroyRefractileContext(handle));
     TEST(losDestroyKeyboard(window));
     TEST(losDestroyMouse(window));
     TEST(losDestroyWindow(window));
