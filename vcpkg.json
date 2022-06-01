@@ -2,7 +2,6 @@
     "name": "libos",
     "version-string": "latest",
     "dependencies": [
-        "spirv-cross",
         "vulkan-memory-allocator",
         "vk-bootstrap",
         "openal-soft"
