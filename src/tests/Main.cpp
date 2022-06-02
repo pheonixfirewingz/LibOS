@@ -31,7 +31,7 @@ int main()
     info.window_size.height = 1280;
     info.request_callback = [](const char * object)
     { 
-        if(std::string(object)._Equal("refHandle")) 
+        if(std::string(object) == "refHandle") 
             return (void*)handle; 
         
         return (void*)nullptr;
@@ -42,6 +42,15 @@ int main()
     TEST(losCreateKeyboard(window));
     TEST(losCreateMouse(window));
     TEST(refCreateRefractileContext(&handle));
+    TEST(refAppendAudioContext(handle));
+
+    refAudioDevice* devices_list;
+    uint8 device_count;
+    TEST(refGetAudioDeviceList(handle, devices_list,device_count));
+    TEST(refSetAudioDevice(handle,devices_list[0]));
+
+
+#ifndef __linux__
     TEST(refAppendGraphicsContext(handle,window));
 
     TEST(refCreateCommandBuffer(handle,&buffer));
@@ -56,18 +65,22 @@ int main()
     TEST(refBindShaderProgram(handle,buffer,program));
     TEST(refEndCommands(handle,buffer));
 
-#ifndef LINUX
     while (losUpdateWindow(window) != LOS_WINDOW_CLOSE)
 #endif
     {
         if (losIsKeyDown(window, LOS_KEYBOARD_X))
             losRequestClose(window);
+#ifndef __linux__
         TEST(refExecuteCommands(handle,buffer,true));
+#endif
     }
 
+#ifndef __linux__
     TEST(refDestroyShaderProgram(handle,program));
     TEST(refDestroyCommandBuffer(handle,buffer));
     TEST(refUnAppendGraphicsContext(handle));
+#endif
+    TEST(refUnAppendAudioContext(handle));
     TEST(refDestroyRefractileContext(handle));
     TEST(losDestroyKeyboard(window));
     TEST(losDestroyMouse(window));

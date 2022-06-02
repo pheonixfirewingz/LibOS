@@ -90,8 +90,9 @@ typedef struct refCreateAudioBufferInfo
 EXPORT_DLL losResult refAppendAudioContext(refHandle);
 EXPORT_DLL losResult refUnAppendAudioContext(refHandle);
 
-EXPORT_DLL losResult refGetAudioDeviceList(refHandle, refAudioDevice *);
+EXPORT_DLL losResult refGetAudioDeviceList(refHandle, refAudioDevice *,uint8);
 EXPORT_DLL losResult refSetAudioDevice(refHandle, refAudioDevice);
+EXPORT_DLL losResult refUnsetAudioDevice(refHandle, refAudioDevice);
 EXPORT_DLL losResult refSetAudioDeviceSoundLevel(refAudioDevice, float64);
 
 EXPORT_DLL losResult refCreateAudioBuffer(refAudioDevice, refAudioBuffer *, refCreateAudioBufferInfo);

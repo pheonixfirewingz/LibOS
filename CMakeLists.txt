@@ -43,8 +43,12 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 
 set(sources src/lib/FileIO.cpp
     src/lib/RefractileContext.cpp
-    src/lib/Graphics/GraphicsContext.cpp
-    src/lib/Graphics/CommandBuffer.cpp
+
+    # Graphics
+    #src/lib/Graphics/GraphicsContext.cpp
+    #src/lib/Graphics/CommandBuffer.cpp
+
+    # Audio
     src/lib/Audio/AudioContext.cpp
 
     # windows
@@ -68,6 +72,10 @@ else()
   target_compile_options(libos PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  target_link_options(libos PRIVATE -lwayland-client)
+endif()
+
 if(${USE_SANATIZER})
 if(MSVC)
   target_compile_options(libos PRIVATE /fsanitize=address)
@@ -76,7 +84,7 @@ else()
 endif()
 endif()
 
-target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL vk-bootstrap::vk-bootstrap)
+target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL ) #vk-bootstrap::vk-bootstrap
 
 set(tests_sources src/tests/Main.cpp
     src/tests/FileIOTest.cpp

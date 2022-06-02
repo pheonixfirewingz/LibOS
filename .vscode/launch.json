@@ -10,7 +10,7 @@
             "request": "launch",
             "name": "Launch",
             "linux": {
-                "program": "${workspaceFolder}/build/LibOSTests",
+                "program": "${workspaceFolder}/debug-linux/Debug/LibOSTests",
             },
             "windows": {
                 "program": "${workspaceFolder}/debug-windows/Debug/LibOSTests.exe",
@@ -23,7 +23,7 @@
             "request": "launch",
             "name": "Debug",
             "linux": {
-                "program": "${workspaceFolder}/build/LibOSTests",
+                "program": "${workspaceFolder}/debug-linux/Debug/LibOSTests",
             },
             "windows": {
                 "program": "${workspaceFolder}/debug-windows/Debug/LibOSTests.exe",

@@ -16,4 +16,5 @@ struct refHandle_T
     VkQueue graphics_queue;
     VkQueue present_queue;
     VkSurfaceFormatKHR surface_format {VK_FORMAT_MAX_ENUM,VK_COLOR_SPACE_MAX_ENUM_KHR};
+    ALCcontext* audio_context;
 };
