@@ -1,5 +1,6 @@
 debug-windows
 debug-linux
+build
 debug-osx
 vcpkg_installed
 src/lib/Cmake.h

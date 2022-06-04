@@ -34,6 +34,7 @@ configure_file(src/lib/Cmake.h.in ../src/lib/Cmake.h @ONLY)
 find_package(Vulkan REQUIRED)
 find_package(vk-bootstrap CONFIG REQUIRED)
 find_package(OpenAL CONFIG REQUIRED)
+find_package(FreeALUT CONFIG REQUIRED)
 
 # add non auto includes here
 
@@ -50,6 +51,7 @@ set(sources src/lib/FileIO.cpp
 
     # Audio
     src/lib/Audio/AudioContext.cpp
+    src/lib/Audio/AudioBuffers.cpp
 
     # windows
     src/lib/Windows/FileIO.cpp
@@ -84,7 +86,7 @@ else()
 endif()
 endif()
 
-target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL ) #vk-bootstrap::vk-bootstrap
+target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut) #vk-bootstrap::vk-bootstrap
 
 set(tests_sources src/tests/Main.cpp
     src/tests/FileIOTest.cpp

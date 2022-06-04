@@ -4,6 +4,7 @@
     "dependencies": [
         "vulkan-memory-allocator",
         "vk-bootstrap",
-        "openal-soft"
+        "openal-soft",
+        "freealut"
     ]
 }

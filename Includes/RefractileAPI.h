@@ -1,5 +1,5 @@
 #pragma once
-// this is (DRAFT 2) of the refractile api
+// this is (DRAFT 3) of the refractile api
 #include "Components/Defines.h"
 #include "Components/Window.h"
 
@@ -82,25 +82,22 @@ typedef enum refAudioBufferType
 typedef struct refCreateAudioBufferInfo
 {
     refAudioBufferType bufferDataType;
-    char* audioFile;
-    float64 pitch;
-    float64 scale;
+    const char* audioFile;
 } refCreateAudioBufferInfo;
 
 EXPORT_DLL losResult refAppendAudioContext(refHandle);
 EXPORT_DLL losResult refUnAppendAudioContext(refHandle);
 
-EXPORT_DLL losResult refGetAudioDeviceList(refHandle, refAudioDevice *,uint8);
-EXPORT_DLL losResult refSetAudioDevice(refHandle, refAudioDevice);
-EXPORT_DLL losResult refUnsetAudioDevice(refHandle, refAudioDevice);
-EXPORT_DLL losResult refSetAudioDeviceSoundLevel(refAudioDevice, float64);
+EXPORT_DLL losResult refGetAudioDeviceList(refHandle, refAudioDevice* devices_list);
+EXPORT_DLL losResult refSetAudioDevice(refHandle, refAudioDevice dev,uint8);
+EXPORT_DLL losResult refUnsetAudioDevice(refHandle);
 
-EXPORT_DLL losResult refCreateAudioBuffer(refAudioDevice, refAudioBuffer *, refCreateAudioBufferInfo);
-EXPORT_DLL losResult refDestoryAudioBuffer(refAudioDevice, refAudioBuffer);
+EXPORT_DLL losResult refCreateAudioBuffer(refAudioBuffer *, refCreateAudioBufferInfo);
+EXPORT_DLL losResult refDestroyAudioBuffer(refAudioBuffer);
 
-EXPORT_DLL losResult refPlay(refAudioDevice,refAudioPlayer*, refAudioBuffer, float64, float64, float64, uint8);
-EXPORT_DLL losResult refPause(refAudioDevice,refAudioPlayer);
-EXPORT_DLL losResult refResume(refAudioDevice,refAudioPlayer);
-EXPORT_DLL losResult refStop(refAudioDevice,refAudioPlayer);
+EXPORT_DLL losResult refPlay(refAudioPlayer*, refAudioBuffer, float64, float64, float64, uint8);
+EXPORT_DLL losResult refPause(refAudioPlayer);
+EXPORT_DLL losResult refResume(refAudioPlayer);
+EXPORT_DLL losResult refStop(refAudioPlayer);
 
 //---------------------------------------------------------------------------------------------------------
