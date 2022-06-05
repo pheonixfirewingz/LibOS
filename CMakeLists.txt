@@ -3,6 +3,7 @@ project(libos CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_CXX_EXTENSIONS ON)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMake_Modules)
 
 #options
 option(USE_SANATIZER ON)
@@ -19,6 +20,7 @@ endif()
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    find_package(Wayland REQUIRED)
     include_directories(${WAYLAND_INCLUDE_DIR})
     include_directories(${PROJECT_SOURCE_DIR}/vcpkg_installed/x64-linux/include)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/share)
@@ -86,7 +88,11 @@ else()
 endif()
 endif()
 
-target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut vk-bootstrap::vk-bootstrap) 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut ${WAYLAND_LIBRARIES}) 
+else()
+  target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut vk-bootstrap::vk-bootstrap) 
+endif()
 
 set(tests_sources src/tests/Main.cpp
     src/tests/FileIOTest.cpp

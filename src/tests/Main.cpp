@@ -53,7 +53,7 @@ int main()
 
     refCreateAudioBufferInfo a_info;
     a_info.bufferDataType = WAV;
-    a_info.audioFile = "$[binary_base]/test.wav";
+    a_info.audioFile = "$[binary_base]/piano2.wav";
 
     TEST(refCreateAudioBuffer(&a_buffer, a_info));
     TEST(refPlay(&player, a_buffer, 0, 0, 0, 1));

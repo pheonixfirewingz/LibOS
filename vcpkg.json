@@ -2,6 +2,7 @@
     "name": "libos",
     "version-string": "latest",
     "dependencies": [
+        "vulkan",
         "vulkan-memory-allocator",
         "vk-bootstrap",
         "openal-soft",

@@ -1,6 +1,7 @@
 #include "../InternalRefractile.h"
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <AL/alut.h>
 #include <RefractileAPI.h>
 #include <cstring>
 #include <memory>
@@ -50,12 +51,14 @@ losResult refGetAudioDeviceList(refHandle, refAudioDevice *devices_list)
             i++;
         }
 
+        (void)alGetError();
         [[unlikely]] if (!(*devices_list)) return LOS_ERROR_COULD_NOT_INIT;
         return LOS_SUCCESS;
     }
     else
     {
         (*devices_list) = new refAudioDevice_T(alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER));
+        (void)alGetError();
         return LOS_SUCCESS;
     }
 }
@@ -69,29 +72,27 @@ losResult refSetAudioDevice(refHandle handle, refAudioDevice dev, uint8 offset)
         return LOS_SUCCESS;
     }
     device_is_set = true;
-    auto& name = dev[offset].name;
+    auto &name = dev[offset].name;
     dev[offset].device = alcOpenDevice(name);
-    ALCenum error = alGetError();
-    if (error != AL_NO_ERROR)
+    if (dev[offset].device == NULL)
     {
-        dev[offset].device = alcOpenDevice(NULL);
-        error = alGetError();
-        if (error != AL_NO_ERROR)
-        {
-            printf("LibOS: Open AL Error - %x\n", error);
-            return LOS_ERROR_COULD_NOT_INIT;
-        }
-    }
-    handle->audio_context = alcCreateContext(dev[offset].device, NULL);
-    error = alGetError();
-    if (error != AL_NO_ERROR)
-    {
+        ALCenum error = alGetError();
         printf("LibOS: Open AL Error - %x\n", error);
         return LOS_ERROR_COULD_NOT_INIT;
     }
+    handle->audio_context = alcCreateContext(dev[offset].device, NULL);
+    if (handle->audio_context == NULL)
+    {
+        ALCenum error = alGetError();
+        printf("LibOS: Open AL Error - %x\n", error);
+        return LOS_ERROR_COULD_NOT_INIT;
+    }
+    alcMakeContextCurrent(handle->audio_context);
+    alutInit(NULL,NULL);
     dev[offset].initialized = true;
 
     device = dev[offset];
+    (void)alGetError();
     return LOS_SUCCESS;
 }
 
@@ -104,20 +105,10 @@ losResult refUnsetAudioDevice(refHandle handle)
         return LOS_SUCCESS;
     }
     device_is_set = false;
+    alutExit();
+    alcMakeContextCurrent(NULL);
     alcDestroyContext((*handle).audio_context);
-    ALCenum error = alGetError();
-    if (error != AL_NO_ERROR)
-    {
-        printf("LibOS: Open AL Error - %x\n", error);
-        return LOS_ERROR_COULD_NOT_DESTORY;
-    }
     alcCloseDevice(device.device);
-    error = alGetError();
-    if (error != AL_NO_ERROR)
-    {
-        printf("LibOS: Open AL Error - %x\n", error);
-        return LOS_ERROR_COULD_NOT_DESTORY;
-    }
     device.initialized = false;
     device = NULL;
     return LOS_SUCCESS;

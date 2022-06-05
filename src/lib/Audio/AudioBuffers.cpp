@@ -16,31 +16,30 @@ struct refAudioPlayer_T
     bool paused = false;
     bool initialized = false;
 };
-#define TEST_ERROR(_msg, x)                                  \
-    error = alGetError();                                    \
-    if (error != AL_NO_ERROR)                                \
-    {                                                        \
-        fprintf(stderr, "LIBOS - OpenAL Error: %s\n", _msg); \
-        return x;                                            \
+#define TEST_ERROR(_msg, x)                                                    \
+    error = alGetError();                                                      \
+    if (error != AL_NO_ERROR)                                                  \
+    {                                                                          \
+        fprintf(stderr, "LIBOS - OpenAL Error: %s - code: %x\n", _msg, error); \
+        return x;                                                              \
     }
 
 losResult refCreateAudioBuffer(refAudioBuffer *buffer, refCreateAudioBufferInfo info)
 {
-    ALCenum error;
+    ALuint error;
     *buffer = new refAudioBuffer_T();
     alGenBuffers(1, &(*buffer)->buffer);
     TEST_ERROR("buffer generation", LOS_ERROR_COULD_NOT_INIT);
-    ALsizei v_size;
-    ALfloat freq;
-    ALenum format;
-    ALvoid *data;
 
     auto path = getCorrectPath(info.audioFile);
-    data = alutLoadMemoryFromFile(path.c_str(), &format, &v_size, &freq);
-    TEST_ERROR("loading wav file", LOS_ERROR_COULD_NOT_INIT);
-    alBufferData((*buffer)->buffer, format, data, v_size, freq);
-    TEST_ERROR("buffer copy", LOS_ERROR_COULD_NOT_INIT);
-
+    error = alutCreateBufferFromFile(path.c_str());
+    if (error == AL_NONE)
+    {
+        fprintf(stderr, "LIBOS - OpenAL WARNING: %s - ALUT ERROR CODE: %X\n", "loading audio file failed",
+                alutGetError());
+    }
+    TEST_ERROR("loading audio file", LOS_ERROR_COULD_NOT_INIT);
+    (*buffer)->buffer = error;
     return LOS_SUCCESS;
 }
 
@@ -50,7 +49,7 @@ losResult refDestroyAudioBuffer(refAudioBuffer buffer)
     return LOS_SUCCESS;
 }
 
-losResult refPlay(refAudioPlayer *player, refAudioBuffer, float64 x, float64 y, float64 z, uint8 pitch)
+losResult refPlay(refAudioPlayer *player, refAudioBuffer buffer, float64 x, float64 y, float64 z, uint8 pitch)
 {
     ALCenum error;
     if (!(*player))
@@ -81,6 +80,8 @@ losResult refPlay(refAudioPlayer *player, refAudioBuffer, float64 x, float64 y, 
             TEST_ERROR("source velocity", LOS_ERROR_COULD_NOT_INIT);
             alSourcei((*player)->source, AL_LOOPING, AL_FALSE);
             TEST_ERROR("source looping", LOS_ERROR_COULD_NOT_INIT);
+            alSourcei((*player)->source,AL_BUFFER,buffer->buffer);
+            TEST_ERROR("attach buffer", LOS_ERROR_COULD_NOT_INIT);
             alSourcePlay((*player)->source);
             (*player)->initialized = true;
         }
@@ -104,9 +105,9 @@ losResult refResume(refAudioPlayer player)
 
 losResult refStop(refAudioPlayer player)
 {
-    if(!player->initialized)
-       return LOS_SUCCESS;
-    
+    if (!player->initialized)
+        return LOS_SUCCESS;
+
     player->initialized = false;
     player->paused = false;
 

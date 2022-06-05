@@ -1,10 +1,20 @@
 {
     "files.associations": {
+        "*.ejs": "html",
         "chrono": "cpp",
         "optional": "cpp",
         "regex": "cpp",
         "system_error": "cpp",
         "xlocale": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp"
     }
 }

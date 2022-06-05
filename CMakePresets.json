@@ -17,7 +17,8 @@
                     "type": "FILEPATH",
                     "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
-                "CMAKE_EXPORT_COMPILE_COMMANDS" : "1"
+                "CMAKE_EXPORT_COMPILE_COMMANDS" : "1",
+                "CMAKE_BUILD_TYPE" : "Debug"
 
             }
         },
@@ -25,28 +26,19 @@
             "name": "debug-linux",
             "displayName": "linux",
             "inherits": ["base"],
-            "generator": "Ninja Multi-Config",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE" : "Debug"
-            }
+            "generator": "Ninja Multi-Config"
         },
         {
             "name": "debug-osx",
             "displayName": "mac",
             "inherits": ["base"],
-            "generator": "xcode",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE" : "Debug"
-            }
+            "generator": "xcode"
         },
         {
             "name": "debug-windows",
             "displayName": "windows",
             "inherits": ["base"],
-            "generator": "Visual Studio 17 2022",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE" : "Debug"
-            }
+            "generator": "Visual Studio 17 2022"
         }
     ],
     "buildPresets": [

@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/Includes",
-                "${workspaceFolder}/vcpkg_installed/x64-windows/include"
+                "${workspaceFolder}/vcpkg_installed/x64-windows/include",
+                "${workspaceFolder}/vcpkg_installed/x64-linux/include"
             ],
             "defines": [
                 "_DEBUG",
