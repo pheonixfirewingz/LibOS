@@ -86,7 +86,7 @@ else()
 endif()
 endif()
 
-target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut) #vk-bootstrap::vk-bootstrap
+target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut vk-bootstrap::vk-bootstrap) 
 
 set(tests_sources src/tests/Main.cpp
     src/tests/FileIOTest.cpp
