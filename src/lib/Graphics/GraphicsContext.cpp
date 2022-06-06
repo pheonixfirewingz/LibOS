@@ -94,7 +94,7 @@ const char *getError(VkResult result)
     case VK_PIPELINE_COMPILE_REQUIRED_EXT:
         return "VK_PIPELINE_COMPILE_REQUIRED_EXT";
     default:
-        std::printf("LIB OS: Vulkan Error Not Translatable: %d\n", result);
+        printf("LIB OS: Vulkan Error Not Translatable: %d\n", result);
         return "";
     }
 }
@@ -109,7 +109,7 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
 
         if (!result)                                  
         {                                                                         
-            std::printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
+            printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
             return LOS_ERROR_COULD_NOT_INIT;                                                           
         }
         handle->instance = result.value();
@@ -130,7 +130,7 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
 
     if((result = vkCreateWin32SurfaceKHR(handle->instance, &surface_info, nullptr, &handle->surface)) != VK_SUCCESS)
     {
-        std::printf("LIB OS: Vulkan Error: %s\n", getError(result)); 
+        printf("LIB OS: Vulkan Error: %s\n", getError(result)); 
         return LOS_ERROR_COULD_NOT_INIT;
     }
 #endif
@@ -142,7 +142,7 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
 
         if (!result)                                  
         {                                                                         
-            std::printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
+            printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
             return LOS_ERROR_COULD_NOT_INIT;                                                           
         }
         handle->physical = result.value();
@@ -153,7 +153,7 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
 
         if (!result)                                  
         {                                                                         
-            std::printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
+            printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
             return LOS_ERROR_COULD_NOT_INIT;                                                           
         }
 
@@ -170,7 +170,7 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
 
         if((result = vmaCreateAllocator(&allocatorInfo, &(*handle).vulkan_allocator))  != VK_SUCCESS)
         {
-            std::printf("LIB OS: Vulkan Error: %s\n", getError(result)); 
+            printf("LIB OS: Vulkan Error: %s\n", getError(result)); 
             return LOS_ERROR_COULD_NOT_INIT;
         }
     }
@@ -181,7 +181,7 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
         
         if (!result)                                  
         {                                                                         
-            std::printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
+            printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
             return LOS_ERROR_COULD_NOT_INIT;                                                           
         }
 
@@ -196,7 +196,7 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
         
             if (!result)                                  
             {                                                                         
-                std::printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
+                printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
                 return LOS_ERROR_COULD_NOT_INIT;                                                           
             }
 

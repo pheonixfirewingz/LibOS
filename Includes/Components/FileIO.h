@@ -16,7 +16,7 @@ typedef enum losFileBits
 typedef struct losFileOpenInfo
 {
     uint8 fileBits;
-    char* path;
+    const char* path;
 	size  path_size;
 
 } losFileOpenInfo;

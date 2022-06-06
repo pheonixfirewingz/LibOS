@@ -24,22 +24,15 @@ struct refAudioPlayer_T
         return x;                                                              \
     }
 
-losResult refCreateAudioBuffer(refAudioBuffer *buffer, refCreateAudioBufferInfo info)
+losResult refCreateAudioBuffer(refAudioBuffer *buffer, const char * audioFile)
 {
-    ALuint error;
     *buffer = new refAudioBuffer_T();
-    alGenBuffers(1, &(*buffer)->buffer);
-    TEST_ERROR("buffer generation", LOS_ERROR_COULD_NOT_INIT);
-
-    auto path = getCorrectPath(info.audioFile);
-    error = alutCreateBufferFromFile(path.c_str());
-    if (error == AL_NONE)
+    (*buffer)->buffer = alutCreateBufferFromFile(getCorrectPath(audioFile).c_str());
+    if ((*buffer)->buffer == AL_NONE)
     {
         fprintf(stderr, "LIBOS - OpenAL WARNING: %s - ALUT ERROR CODE: %X\n", "loading audio file failed",
                 alutGetError());
     }
-    TEST_ERROR("loading audio file", LOS_ERROR_COULD_NOT_INIT);
-    (*buffer)->buffer = error;
     return LOS_SUCCESS;
 }
 
@@ -49,41 +42,47 @@ losResult refDestroyAudioBuffer(refAudioBuffer buffer)
     return LOS_SUCCESS;
 }
 
-losResult refPlay(refAudioPlayer *player, refAudioBuffer buffer, float64 x, float64 y, float64 z, uint8 pitch)
+losResult refPrepPlayer(refAudioPlayer* player)
+{
+    if(!(player))
+        return LOS_ERROR_HANDLE_IN_USE;
+    (*player) = new refAudioPlayer_T();
+    return LOS_SUCCESS;
+}
+
+losResult refPlay(refAudioPlayer player, refAudioBuffer buffer, float64 x, float64 y, float64 z, uint8 pitch)
 {
     ALCenum error;
-    if (!(*player))
-        *player = new refAudioPlayer_T();
 
-    [[likely]] if ((*player)->paused)
+    [[likely]] if (player->paused)
     {
-        (*player)->paused = false;
-        alSourcePlay((*player)->source);
+        player->paused = false;
+        alSourcePlay(player->source);
     }
     else
     {
-        [[likely]] if ((*player)->initialized)
+        [[likely]] if (player->initialized)
         {
             return LOS_SUCCESS;
         }
         else
         {
-            alGenSources((ALuint)1, &(*player)->source);
+            alGenSources((ALuint)1, &player->source);
             TEST_ERROR("source generation", LOS_ERROR_COULD_NOT_INIT);
-            alSourcef((*player)->source, AL_PITCH, pitch);
-            TEST_ERROR("(*player)->source pitch", LOS_ERROR_COULD_NOT_INIT);
-            alSourcef((*player)->source, AL_GAIN, 1);
+            alSourcef(player->source, AL_PITCH, pitch);
+            TEST_ERROR("player->source pitch", LOS_ERROR_COULD_NOT_INIT);
+            alSourcef(player->source, AL_GAIN, 1);
             TEST_ERROR("source gain", LOS_ERROR_COULD_NOT_INIT);
-            alSource3f((*player)->source, AL_POSITION, x, y, z);
-            TEST_ERROR("(*player)->source position", LOS_ERROR_COULD_NOT_INIT);
-            alSource3f((*player)->source, AL_VELOCITY, 0, 0, 0);
+            alSource3f(player->source, AL_POSITION, static_cast<ALfloat>(x), static_cast<ALfloat>(y), static_cast<ALfloat>(z));
+            TEST_ERROR("player->source position", LOS_ERROR_COULD_NOT_INIT);
+            alSource3f(player->source, AL_VELOCITY, 0, 0, 0);
             TEST_ERROR("source velocity", LOS_ERROR_COULD_NOT_INIT);
-            alSourcei((*player)->source, AL_LOOPING, AL_FALSE);
+            alSourcei(player->source, AL_LOOPING, AL_FALSE);
             TEST_ERROR("source looping", LOS_ERROR_COULD_NOT_INIT);
-            alSourcei((*player)->source,AL_BUFFER,buffer->buffer);
+            alSourcei(player->source,AL_BUFFER,buffer->buffer);
             TEST_ERROR("attach buffer", LOS_ERROR_COULD_NOT_INIT);
-            alSourcePlay((*player)->source);
-            (*player)->initialized = true;
+            alSourcePlay(player->source);
+            player->initialized = true;
         }
     }
     return LOS_SUCCESS;
@@ -100,7 +99,7 @@ losResult refPause(refAudioPlayer player)
 
 losResult refResume(refAudioPlayer player)
 {
-    return refPlay(&player, nullptr, 0, 0, 0, 0);
+    return refPlay(player, nullptr, 0, 0, 0, 0);
 }
 
 losResult refStop(refAudioPlayer player)

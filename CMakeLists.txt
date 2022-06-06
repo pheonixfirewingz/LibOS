@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20.0)
+cmake_minimum_required(VERSION 3.22.0)
 project(libos CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,6 +31,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(CMAKE_SYSTEM_NUMBER 1)
 endif()
 configure_file(src/lib/Cmake.h.in ../src/lib/Cmake.h @ONLY)
+configure_file(src/tests/Cmake.h.in ../src/tests/Cmake.h @ONLY)
 
 # add new packages here
 find_package(Vulkan REQUIRED)

@@ -1,11 +1,13 @@
-#include "Components/Defines.h"
 #include "FileIOTest.h"
 #include "NetIOTest.h"
-#include "RefractileAPI.h"
+#include "Cmake.h"
+#include <RefractileAPI.h> 
 #include <CrystalOS.h>
 #include <cstdio>
 #include <string>
 #include <thread>
+#include <chrono>
+#include <iostream>
 #define TEST(func)                                              \
     if ((res = func) != LOS_SUCCESS)                            \
     {                                                           \
@@ -42,35 +44,14 @@ int main()
     TEST(losCreateKeyboard(window));
     TEST(losCreateMouse(window));
     TEST(refCreateRefractileContext(&handle));
-    TEST(refAppendAudioContext(handle));
-
-    refAudioDevice devices_list;
-    TEST(refGetAudioDeviceList(handle, &devices_list));
-    TEST(refSetAudioDevice(handle, devices_list,0));
-
-    refAudioBuffer a_buffer;
-    refAudioPlayer player;
-
-    refCreateAudioBufferInfo a_info;
-    a_info.bufferDataType = WAV;
-    a_info.audioFile = "$[binary_base]/piano2.wav";
-
-    TEST(refCreateAudioBuffer(&a_buffer, a_info));
-    TEST(refPlay(&player, a_buffer, 0, 0, 0, 1));
-    sleep(2);
-    TEST(refPause(player));
-    sleep(2);
-    TEST(refResume(player));
-    sleep(2);
-    TEST(refStop(player));
 #ifndef __linux__
     TEST(refAppendGraphicsContext(handle, window));
 
     TEST(refCreateCommandBuffer(handle, &buffer));
     refCreateShaderProgramInfo shader_info;
-    shader_info.shaderLayout = "$[binary_base]/layout.json";
-    shader_info.vertexShader = "$[binary_base]/vertexShader.gim";
-    shader_info.fragmentShader = "$[binary_base]/fragmentShader.gim";
+    shader_info.shaderLayout = "$[asset_base]/Shader/layout.json";
+    shader_info.vertexShader = "$[asset_base]/Shader/vertexShader.glsl";
+    shader_info.fragmentShader = "$[asset_base]/Shader/fragmentShader.glsl";
 
     TEST(refCreateShaderProgram(handle, &program, shader_info));
 
@@ -93,9 +74,28 @@ int main()
     TEST(refDestroyCommandBuffer(handle, buffer));
     TEST(refUnAppendGraphicsContext(handle));
 #endif
-    TEST(refDestroyAudioBuffer(a_buffer));
-    TEST(refUnsetAudioDevice(handle));
-    TEST(refUnAppendAudioContext(handle));
+    printf("TEST AUDIO API? - [Y/n]:");
+    std::string input;
+    std::getline (std::cin, input);
+    if(input == "Y")
+    {
+        TEST(refAppendAudioContext(handle));
+        refAudioBuffer a_buffer;
+        refAudioPlayer player;
+        using namespace std::chrono_literals;
+        TEST(refCreateAudioBuffer(&a_buffer, "$[asset_base]/Audio/piano2.wav"));
+        TEST(refPrepPlayer(&player));
+        TEST(refPlay(player, a_buffer, 0, 0, 0, 1));
+        std::this_thread::sleep_for(2s);
+        TEST(refPause(player));
+        std::this_thread::sleep_for(2s);
+        TEST(refResume(player));
+        std::this_thread::sleep_for(2s);
+        TEST(refStop(player));
+        TEST(refDestroyAudioBuffer(a_buffer));
+        TEST(refUnAppendAudioContext(handle));
+        printf("TEST AUDIO COMPLETE\n");
+    }
     TEST(refDestroyRefractileContext(handle));
     TEST(losDestroyKeyboard(window));
     TEST(losDestroyMouse(window));

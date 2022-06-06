@@ -1,5 +1,5 @@
 #pragma once
-// this is (DRAFT 3) of the refractile api
+// this is (DRAFT 4) of the refractile api
 #include "Components/Defines.h"
 #include "Components/Window.h"
 
@@ -67,35 +67,20 @@ EXPORT_DLL losResult refExecuteCommands(refHandle, refCommandBuffer, bool);
 //---------------------------------------------------------------------------------------------------------
 // The Audio API
 //---------------------------------------------------------------------------------------------------------
-DEFINE_HANDLE(refAudioDevice)
+// FIXME: add support for choosing device by user interface
+// FIXME: add support for choosing device sound level by user interface
 DEFINE_HANDLE(refAudioPlayer)
 DEFINE_HANDLE(refAudioBuffer)
-
-typedef enum refAudioBufferType
-{
-    WAV,
-    MP3,
-    FLAC,
-    OGG,
-} refAudioBufferType;
-
-typedef struct refCreateAudioBufferInfo
-{
-    refAudioBufferType bufferDataType;
-    const char* audioFile;
-} refCreateAudioBufferInfo;
 
 EXPORT_DLL losResult refAppendAudioContext(refHandle);
 EXPORT_DLL losResult refUnAppendAudioContext(refHandle);
 
-EXPORT_DLL losResult refGetAudioDeviceList(refHandle, refAudioDevice* devices_list);
-EXPORT_DLL losResult refSetAudioDevice(refHandle, refAudioDevice dev,uint8);
-EXPORT_DLL losResult refUnsetAudioDevice(refHandle);
-
-EXPORT_DLL losResult refCreateAudioBuffer(refAudioBuffer *, refCreateAudioBufferInfo);
+EXPORT_DLL losResult refCreateAudioBuffer(refAudioBuffer *, const char *);
 EXPORT_DLL losResult refDestroyAudioBuffer(refAudioBuffer);
 
-EXPORT_DLL losResult refPlay(refAudioPlayer*, refAudioBuffer, float64, float64, float64, uint8);
+EXPORT_DLL losResult refPrepPlayer(refAudioPlayer*);
+
+EXPORT_DLL losResult refPlay(refAudioPlayer, refAudioBuffer, float64, float64, float64, uint8);
 EXPORT_DLL losResult refPause(refAudioPlayer);
 EXPORT_DLL losResult refResume(refAudioPlayer);
 EXPORT_DLL losResult refStop(refAudioPlayer);
