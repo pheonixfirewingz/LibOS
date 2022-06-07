@@ -35,8 +35,8 @@ typedef struct refCreateDataBufferInfo
     size data_size;
 } refCreateDataBufferInfo;
 
-EXPORT_DLL losResult refAppendGraphicsContext(refHandle,losWindow);
-EXPORT_DLL losResult refUnAppendGraphicsContext(refHandle);
+EXPORT_DLL losResult refAppendGraphicsContext(refHandle,losWindow) noexcept;
+EXPORT_DLL losResult refUnAppendGraphicsContext(refHandle) noexcept;
 
 EXPORT_DLL losResult refCreateImage(refImage *);
 EXPORT_DLL losResult refCopyDataToImage(refImage,void*,size);

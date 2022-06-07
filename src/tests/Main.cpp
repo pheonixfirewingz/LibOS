@@ -19,12 +19,19 @@ refHandle handle;
 
 int main()
 {
+    using namespace std::chrono_literals;
     losResult res;
     refCommandBuffer buffer;
     refShaderProgram program;
-    // TEST(testFileIOMain())
-    // TEST(testNetIOMain())
+    TEST(testFileIOMain())
+    //TEST(testNetIOMain())
+
+    std::string file CMAKE_SOURCE_DIR;
+    file += "/tests";
+    TEST(losSetAssetPath(file.c_str()));
+
     printf("final test  window test\n");
+
     losWindowInfo info;
     info.sub_window = false;
     std::string name = "this is the test window";
@@ -44,14 +51,13 @@ int main()
     TEST(losCreateKeyboard(window));
     TEST(losCreateMouse(window));
     TEST(refCreateRefractileContext(&handle));
-#ifndef __linux__
     TEST(refAppendGraphicsContext(handle, window));
 
     TEST(refCreateCommandBuffer(handle, &buffer));
     refCreateShaderProgramInfo shader_info;
     shader_info.shaderLayout = "$[asset_base]/Shader/layout.json";
-    shader_info.vertexShader = "$[asset_base]/Shader/vertexShader.glsl";
-    shader_info.fragmentShader = "$[asset_base]/Shader/fragmentShader.glsl";
+    shader_info.vertexShader = "$[asset_base]/Shader/vertexShader.glm";
+    shader_info.fragmentShader = "$[asset_base]/Shader/fragmentShader.glm";
 
     TEST(refCreateShaderProgram(handle, &program, shader_info));
 
@@ -59,21 +65,22 @@ int main()
     TEST(refBindShaderProgram(handle, buffer, program));
     TEST(refEndCommands(handle, buffer));
 
-    while (losUpdateWindow(window) != LOS_WINDOW_CLOSE)
-#endif
-    {
-        if (losIsKeyDown(window, LOS_KEYBOARD_X))
-            losRequestClose(window);
-#ifndef __linux__
-        TEST(refExecuteCommands(handle, buffer, true));
-#endif
-    }
+    #ifdef __linux__
+    std::this_thread::sleep_for(2s);
+    #else
+        while (losUpdateWindow(window) != LOS_WINDOW_CLOSE)
+        {
+            if (losIsKeyDown(window, LOS_KEYBOARD_X))
+                losRequestClose(window);
+            TEST(refExecuteCommands(handle, buffer, true));
 
-#ifndef __linux__
+
+        }
+    #endif
+
     TEST(refDestroyShaderProgram(handle, program));
     TEST(refDestroyCommandBuffer(handle, buffer));
     TEST(refUnAppendGraphicsContext(handle));
-#endif
     printf("TEST AUDIO API? - [Y/n]:");
     std::string input;
     std::getline (std::cin, input);
@@ -82,7 +89,6 @@ int main()
         TEST(refAppendAudioContext(handle));
         refAudioBuffer a_buffer;
         refAudioPlayer player;
-        using namespace std::chrono_literals;
         TEST(refCreateAudioBuffer(&a_buffer, "$[asset_base]/Audio/piano2.wav"));
         TEST(refPrepPlayer(&player));
         TEST(refPlay(player, a_buffer, 0, 0, 0, 1));

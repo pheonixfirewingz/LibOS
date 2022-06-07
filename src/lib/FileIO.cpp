@@ -10,6 +10,14 @@
 #ifdef WIN32
 #    include "Windows/FileIO.h"
 #endif
+std::string asset_path = "NOT_SET";
+
+losResult losSetAssetPath(const char* path)
+{
+    asset_path = path;
+    return LOS_SUCCESS;
+}
+
 std::vector<std::string> split(std::string s, const char delimiter)
 {
     std::vector<std::string> tokens;
@@ -59,6 +67,11 @@ std::string getCorrectPath(const char* path)
                 for (size i = 0; i < sun_tuk.size(); i++)
 #endif
                     ret_path += (sun_tuk[i] += "/");
+            }
+            else if (command == "asset_base")
+            {
+                ret_path += asset_path;
+                ret_path += '/';
             }
         }
         else

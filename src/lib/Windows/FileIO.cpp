@@ -3,6 +3,7 @@
 #include "../IFileIO.h"
 #include "windows_link.h"
 #include <Components/FileIO.h>
+#include <atomic>
 
 struct losFileHandle_T
 {
@@ -85,29 +86,37 @@ losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
     return LOS_SUCCESS;
 }
 
+std::atomic<DWORD> BytesTransferred;
 losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
 {
-    DWORD temp = {0};
-    if (GetFileSizeEx(handle->fileHandle, reinterpret_cast<PLARGE_INTEGER>(&temp)) == 0)
+    OVERLAPPED overlapped = {0};
+    FILE_STANDARD_INFO file_info = {0};
+
+    if(GetFileInformationByHandleEx(handle->fileHandle,FileStandardInfo,&file_info,sizeof(FILE_STANDARD_INFO))  == 0)
     {
         losCloseFile(handle);
         return LOS_ERROR_HANDLE_LOSSED;
     }
 
-    *data_ptr = malloc(temp * sizeof(char));
-    ZeroMemory(*data_ptr, temp);
+    *data_ptr = new char[file_info.EndOfFile.QuadPart + 1];
+    ZeroMemory(*data_ptr, file_info.EndOfFile.QuadPart + 1);
 
-    DWORD dwBytesRead = 0;
-    if (ReadFile(handle->fileHandle, *data_ptr, temp, &dwBytesRead, nullptr) == 0)
+    
+
+    if (ReadFileEx(handle->fileHandle, *data_ptr, static_cast<DWORD>(file_info.EndOfFile.QuadPart), &overlapped, 
+    [](__in  DWORD,__in  DWORD dwNumberOfBytesTransfered,__in  LPOVERLAPPED)
+    {
+      BytesTransferred = dwNumberOfBytesTransfered;
+    }) == 0)
     {
         losCloseFile(handle);
         return LOS_ERROR_HANDLE_LOSSED;
     }
 
     if (data_ptr != nullptr)
-        data_size = dwBytesRead - 1;
-
-    (void)dwBytesRead;
+        data_size = BytesTransferred - 1;
+        
+    BytesTransferred = 0;
     return LOS_SUCCESS;
 }
 

@@ -88,9 +88,10 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "queue": "cpp"
     },
-    "cmake.loggingLevel": "debug",
+    "cmake.loggingLevel": "info",
     "cmake.useCMakePresets": "always",
     "cmake.allowCommentsInPresetsFile": false
 }

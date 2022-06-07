@@ -4,6 +4,8 @@
     "dependencies": [
         "vulkan",
         "vulkan-memory-allocator",
+        "shaderc",
+        "llvm",
         "openal-soft",
         "freealut"
     ]

@@ -51,7 +51,15 @@ losResult refEndCommands(refHandle, refCommandBuffer)
     return LOS_SUCCESS;
 }
 
-losResult refExecuteCommands(refHandle, refCommandBuffer,bool)
+losResult refExecuteCommands(refHandle, refCommandBuffer,bool present)
 {
+    if (present)
+    {
+
+    }
+    else
+    {
+
+    }
     return LOS_SUCCESS;
 }

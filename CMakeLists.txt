@@ -18,18 +18,14 @@ else()
     message(FATAL_ERROR "compiler not supported")
 endif()
 
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     find_package(Wayland REQUIRED)
     include_directories(${WAYLAND_INCLUDE_DIR})
-    include_directories(${PROJECT_SOURCE_DIR}/vcpkg_installed/x64-linux/include)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/share)
     set(CMAKE_SYSTEM_NUMBER 0)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    include_directories(${PROJECT_SOURCE_DIR}/vcpkg_installed/x64-windows/include)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/share)
     set(CMAKE_SYSTEM_NUMBER 1)
 endif()
+
 configure_file(src/lib/Cmake.h.in ../src/lib/Cmake.h @ONLY)
 configure_file(src/tests/Cmake.h.in ../src/tests/Cmake.h @ONLY)
 
@@ -39,13 +35,16 @@ find_package(OpenAL CONFIG REQUIRED)
 find_package(FreeALUT CONFIG REQUIRED)
 
 # add non auto includes here
-
 include_directories(${PROJECT_SOURCE_DIR}/Includes)
 include_directories(${Vulkan_INCLUDE_DIRS})
 
 
 set(sources src/lib/FileIO.cpp
     src/lib/RefractileContext.cpp
+
+    # Compiler
+    src/lib/Graphics/Compiler/Compiler.cpp
+    src/lib/Graphics/Compiler/Lexer.cpp
 
     # Graphics
     src/lib/Graphics/ShaderProgram.cpp
@@ -89,11 +88,13 @@ else()
 endif()
 endif()
 
+set(LINK_LIBS Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut)
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut ${WAYLAND_LIBRARIES}) 
-else()
-  target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut) 
+  set(LINK_LIBS ${LINK_LIBS} ${WAYLAND_LIBRARIES})
 endif()
+
+target_link_libraries(libos PRIVATE ${LINK_LIBS}) 
 
 set(tests_sources src/tests/Main.cpp
     src/tests/FileIOTest.cpp
