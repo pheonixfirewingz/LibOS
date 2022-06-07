@@ -4,8 +4,11 @@
     "dependencies": [
         "vulkan",
         "vulkan-memory-allocator",
-        "shaderc",
-        "llvm",
+        {
+            "name" : "llvm",
+            "default-features": false,
+            "features": [ "disable-assertions","compiler-rt","enable-threads","target-spirv","polly","mlir","core","default-options","lld","tools"]
+        },
         "openal-soft",
         "freealut"
     ]

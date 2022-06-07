@@ -33,10 +33,16 @@ configure_file(src/tests/Cmake.h.in ../src/tests/Cmake.h @ONLY)
 find_package(Vulkan REQUIRED)
 find_package(OpenAL CONFIG REQUIRED)
 find_package(FreeALUT CONFIG REQUIRED)
+find_package(LLVM CONFIG REQUIRED)
+
+list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
+include(HandleLLVMOptions)
+add_definitions(${LLVM_DEFINITIONS})
 
 # add non auto includes here
+target_include_directories(libos PRIVATE ${LLVM_INCLUDE_DIRS})
+target_include_directories(${Vulkan_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/Includes)
-include_directories(${Vulkan_INCLUDE_DIRS})
 
 
 set(sources src/lib/FileIO.cpp
@@ -69,6 +75,7 @@ set(sources src/lib/FileIO.cpp
     src/lib/Linux/Window.cpp
     src/lib/Linux/Panic.cpp)
 
+llvm_map_components_to_libnames(llvm_libs Support Core IRReader ...)
 add_library(libos SHARED ${sources})
 if(MSVC)
   target_compile_options(libos PRIVATE /W4 /WX)
@@ -88,7 +95,7 @@ else()
 endif()
 endif()
 
-set(LINK_LIBS Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut)
+set(LINK_LIBS Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut  ${llvm_libs})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINK_LIBS ${LINK_LIBS} ${WAYLAND_LIBRARIES})

@@ -18,7 +18,8 @@
                     "value": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                 },
                 "CMAKE_EXPORT_COMPILE_COMMANDS" : "1",
-                "CMAKE_BUILD_TYPE" : "Debug"
+                "CMAKE_BUILD_TYPE" : "Debug",
+                "VCPKG_BUILD_TYPE" : "Release"
 
             }
         },
