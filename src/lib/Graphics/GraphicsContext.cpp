@@ -14,6 +14,8 @@
     1. add swap_chain funcionality to the mix
     2. add swap_chain resize to context + create callback resize for window resize
   ----------------------------------------------------------------*/
+#define PROFILE_NAME VP_LUNARG_DESKTOP_PORTABILITY_2021_NAME
+#define PROFILE_SPEC_VERSION VP_LUNARG_DESKTOP_PORTABILITY_2021_SPEC_VERSION
 
 const char *getError(VkResult result)
 {
@@ -101,28 +103,29 @@ const char *getError(VkResult result)
 
 losResult refAppendGraphicsContext(refHandle handle, losWindow window)
 {
-    //instance
-    {
-        vkb::InstanceBuilder inst_builder;
-        auto result = inst_builder.set_app_name("LibOS_app").set_engine_name("LibOS RefractileAPI Api Abstraction").set_engine_version(0,0,2)
-        .require_api_version(VK_API_VERSION_1_3).use_default_debug_messenger().build();
+    VkResult result;
+    const VpProfileProperties profile_properties = {PROFILE_NAME, PROFILE_SPEC_VERSION};
 
-        if (!result)                                  
-        {                                                                         
-            printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
-            return LOS_ERROR_COULD_NOT_INIT;                                                           
-        }
-        handle->instance = result.value();
+	// Check if the profile is supported at instance level
+	VkBool32 profile_supported;
+	result = vpGetInstanceProfileSupport(nullptr, &profile_properties, &profile_supported);
+
+    if (!profile_supported)
+	{
+        printf("LIB OS: Vulkan Error: %s\n", "Profile Not Supported"); 
+        return LOS_ERROR_COULD_NOT_INIT;
     }
     //surface
     {
-        VkResult result;
 #if CMAKE_SYSTEM_NUMBER == 0
-    const VkWaylandSurfaceCreateInfoKHR surface_info{VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR, nullptr, 0,
+        const VkWaylandSurfaceCreateInfoKHR surface_info{VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR, nullptr, 0,
                                                      window->display, window->surface};
 
-    PASSED(vkCreateWaylandSurfaceKHR((*handle).instance, &surface_info, nullptr, &(*handle).surface),
-           LOS_ERROR_HANDLE_IN_USE);
+        if((result = vkCreateWaylandSurfaceKHR((*handle).instance, &surface_info, nullptr, &(*handle).surface)) != VK_SUCCESS)
+        {
+            std::printf("LIB OS: Vulkan Error: %s\n", getError(result)); 
+            return LOS_ERROR_COULD_NOT_INIT;
+        }
 #endif
 #if CMAKE_SYSTEM_NUMBER == 1
     const VkWin32SurfaceCreateInfoKHR surface_info{VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR, nullptr, 0,
@@ -134,30 +137,6 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
         return LOS_ERROR_COULD_NOT_INIT;
     }
 #endif
-    }
-    //physical device
-    {
-        vkb::PhysicalDeviceSelector phys_dev_selector (handle->instance);
-        auto result = phys_dev_selector.set_surface(handle->surface).select();
-
-        if (!result)                                  
-        {                                                                         
-            printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
-            return LOS_ERROR_COULD_NOT_INIT;                                                           
-        }
-        handle->physical = result.value();
-    }
-    {
-        vkb::DeviceBuilder device_builder (handle->physical);
-        auto result = device_builder.build();
-
-        if (!result)                                  
-        {                                                                         
-            printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
-            return LOS_ERROR_COULD_NOT_INIT;                                                           
-        }
-
-        handle->device = result.value();
     }
     //memory management
     {
@@ -174,45 +153,12 @@ losResult refAppendGraphicsContext(refHandle handle, losWindow window)
             return LOS_ERROR_COULD_NOT_INIT;
         }
     }
-    //swap_chain
-    {
-        vkb::SwapchainBuilder swapchain_builder(handle->device);
-        auto result = swapchain_builder.build();
-        
-        if (!result)                                  
-        {                                                                         
-            printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
-            return LOS_ERROR_COULD_NOT_INIT;                                                           
-        }
-
-        handle->swap_chain = result.value();
-
-        window->resize_callback = [](refHandle handle,uint64 width,uint64 height)
-        {
-            (void)width; 
-            (void)height;
-            vkb::SwapchainBuilder swap_chain_builder(handle->device);
-            auto result = swap_chain_builder.set_old_swapchain(handle->swap_chain).build();
-        
-            if (!result)                                  
-            {                                                                         
-                printf("LIB OS: Vulkan Error: %s\n", result.error().message().data()); 
-                return LOS_ERROR_COULD_NOT_INIT;                                                           
-            }
-
-            handle->swap_chain = result.value();
-            return LOS_SUCCESS;
-        };
-    }
     return LOS_SUCCESS;
 }
 
 losResult refUnAppendGraphicsContext(refHandle handle)
 {
-    vkb::destroy_swapchain(handle->swap_chain);
     vmaDestroyAllocator(handle->vulkan_allocator);
-    vkb::destroy_device(handle->device);
     vkDestroySurfaceKHR(handle->instance, handle->surface, nullptr);
-    vkb::destroy_instance(handle->instance);
     return LOS_SUCCESS;
 }

@@ -35,7 +35,6 @@ configure_file(src/tests/Cmake.h.in ../src/tests/Cmake.h @ONLY)
 
 # add new packages here
 find_package(Vulkan REQUIRED)
-find_package(vk-bootstrap CONFIG REQUIRED)
 find_package(OpenAL CONFIG REQUIRED)
 find_package(FreeALUT CONFIG REQUIRED)
 
@@ -49,8 +48,9 @@ set(sources src/lib/FileIO.cpp
     src/lib/RefractileContext.cpp
 
     # Graphics
-    #src/lib/Graphics/GraphicsContext.cpp
-    #src/lib/Graphics/CommandBuffer.cpp
+    src/lib/Graphics/ShaderProgram.cpp
+    src/lib/Graphics/GraphicsContext.cpp
+    src/lib/Graphics/CommandBuffer.cpp
 
     # Audio
     src/lib/Audio/AudioContext.cpp
@@ -92,7 +92,7 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut ${WAYLAND_LIBRARIES}) 
 else()
-  target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut vk-bootstrap::vk-bootstrap) 
+  target_link_libraries(libos PRIVATE Vulkan::Vulkan OpenAL::OpenAL FreeALUT::alut) 
 endif()
 
 set(tests_sources src/tests/Main.cpp

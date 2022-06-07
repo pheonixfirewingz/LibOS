@@ -8,10 +8,10 @@
 struct refHandle_T
 {
     VmaAllocator vulkan_allocator;
-    vkb::Instance instance;
-    vkb::PhysicalDevice physical;
-    vkb::Device device;
-    vkb::Swapchain swap_chain;
+    VkInstance instance;
+    VkPhysicalDevice physical;
+    VkDevice device;
+    VkSwapchainKHR swap_chain;
     VkSurfaceKHR surface;
     VkQueue graphics_queue;
     VkQueue present_queue;

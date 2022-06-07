@@ -22,7 +22,7 @@
 #pragma warning( disable : 4083)
 #endif
 #include <vk_mem_alloc.h>
-#include <VkBootstrap.h>
+#include <vulkan/vulkan_profiles.hpp>
 #if CMAKE_COMPILER_NUMBER == 1
 #pragma GCC diagnostic pop
 #endif
