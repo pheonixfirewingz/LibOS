@@ -7,7 +7,7 @@
         {
             "name" : "llvm",
             "default-features": false,
-            "features": [ "disable-assertions","compiler-rt","enable-threads","target-spirv","polly","mlir","core","default-options","lld","tools"]
+            "features": [ "enable-abi-breaking-checks","disable-assertions","compiler-rt","enable-threads","target-spirv","mlir","default-options","lld","tools"]
         },
         "openal-soft",
         "freealut"
