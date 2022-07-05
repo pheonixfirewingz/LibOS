@@ -89,9 +89,19 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "filesystem": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "coroutine": "cpp",
+        "*.tcc": "cpp",
+        "cwctype": "cpp",
+        "memory_resource": "cpp",
+        "numbers": "cpp",
+        "semaphore": "cpp"
     },
     "cmake.loggingLevel": "info",
     "cmake.useCMakePresets": "always",
-    "cmake.allowCommentsInPresetsFile": false
+    "cmake.allowCommentsInPresetsFile": false,
+    "cSpell.words": [
+        "spirv",
+        "subpass"
+    ]
 }

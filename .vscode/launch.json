@@ -7,7 +7,7 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Launch",
+            "name": "lldb",
             "linux": {
                 "program": "${workspaceFolder}/debug-linux/Debug/LibOSTests",
             },
@@ -18,9 +18,9 @@
             "cwd": "${workspaceFolder}"
         },
         {
-            "type": "lldb",
+            "type": "cppvsdbg",
             "request": "launch",
-            "name": "Debug",
+            "name": "cppvsdbg",
             "linux": {
                 "program": "${workspaceFolder}/debug-linux/Debug/LibOSTests",
             },

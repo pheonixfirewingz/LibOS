@@ -1,0 +1,43 @@
+{
+    "Layout": 
+    {
+        "Vertex": 
+        {
+            "Input":[
+                {
+                "RasterIndex" : 0,
+                "Type" : "uint32",
+                "Name" : "Vertex_index",
+                "HasMask" : true,
+                "Mask" : "gl_VertexIndex"
+                }
+            ],
+            "Output":[
+                {
+                "Position" : 0,
+                "Type" : "float4",
+                "Name" : "ret_data",
+                "HasMask" : true,
+                "Mask" : "gl_Position"
+                }
+            ]
+        },
+        "Fragment":
+        {
+            "Output":[
+                {
+                    "Position" : 0,
+                    "Type" : "float4",
+                    "Name" : "outColor",
+                    "HasMask" : false
+                }    
+            ]
+        }
+    },
+    "Compiler":
+    {
+        "Mode": "Debug",
+        "Optimize" : false,
+        "Cash": true
+    }
+}

@@ -87,7 +87,7 @@ losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
 }
 
 std::atomic<DWORD> BytesTransferred;
-losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
+losResult losReadFile(losFileHandle handle, void **data_ptr, size* data_size)
 {
     OVERLAPPED overlapped = {0};
     FILE_STANDARD_INFO file_info = {0};
@@ -101,8 +101,6 @@ losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
     *data_ptr = new char[file_info.EndOfFile.QuadPart + 1];
     ZeroMemory(*data_ptr, file_info.EndOfFile.QuadPart + 1);
 
-    
-
     if (ReadFileEx(handle->fileHandle, *data_ptr, static_cast<DWORD>(file_info.EndOfFile.QuadPart), &overlapped, 
     [](__in  DWORD,__in  DWORD dwNumberOfBytesTransfered,__in  LPOVERLAPPED)
     {
@@ -114,11 +112,11 @@ losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
     }
 
     if (data_ptr != nullptr)
-        data_size = BytesTransferred - 1;
+        *data_size = file_info.EndOfFile.QuadPart;
         
-    BytesTransferred = 0;
+    //BytesTransferred = 0;
     return LOS_SUCCESS;
-}
+ }
 
 losResult losWriteFile(losFileHandle handle, const void *data_ptr, const size data_size)
 {

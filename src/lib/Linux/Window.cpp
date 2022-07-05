@@ -86,6 +86,11 @@ const wl_registry_listener registry_listener = {
     },
     [](void *, wl_registry *, uint32_t) {}};
 
+bool hasWindowClosed() noexcept
+{
+    return false;
+}
+
 losResult losCreateWindow(losWindow *window, losWindowInfo &info)
 {
     if (!(*window))

@@ -8,5 +8,5 @@
 // Copyright Luke Shore (c) 2020, 2021
 
 #ifndef CMAKE_SOURCE_DIR
-#define CMAKE_SOURCE_DIR = "D:/Desktop/LibOS"
+#define CMAKE_SOURCE_DIR = "/home/luke/Desktop/LibOS"
 #endif

@@ -4,12 +4,8 @@
     "dependencies": [
         "vulkan",
         "vulkan-memory-allocator",
-        {
-            "name" : "llvm",
-            "default-features": false,
-            "features": [ "enable-abi-breaking-checks","disable-assertions","compiler-rt","enable-threads","target-spirv","mlir","default-options","lld","tools"]
-        },
         "openal-soft",
-        "freealut"
+        "freealut",
+        "jsoncpp"
     ]
 }

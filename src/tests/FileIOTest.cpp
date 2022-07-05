@@ -30,12 +30,15 @@ losResult testNRead(losFileHandle handle)
     losResult res;
     void *read_str;
     size read_str_size = 0;
-    if ((res = losReadFile(handle, &read_str, read_str_size)) != LOS_SUCCESS)
+    if ((res = losReadFile(handle, &read_str, &read_str_size)) != LOS_SUCCESS)
         return res;
 
     std::string test_read_str((char*)read_str, 0, read_str_size);
+
+    if (read_str_size == 0)
+        return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
     
-    if (!test_read_str.compare("this is a test"))
+    if (test_read_str != "this is a test")
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
 
     return res;
@@ -68,8 +71,11 @@ losResult testBRead(losFileHandle handle)
 
     void *read_str;
     size read_str_size = 0;
-    if ((res = losReadFile(handle, &read_str, read_str_size)) != LOS_SUCCESS)
+    if ((res = losReadFile(handle, &read_str, &read_str_size)) != LOS_SUCCESS)
         return res;
+
+    if (read_str_size == 0)
+        return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
 
     testBINARY* test_read_str = (testBINARY *)read_str;
 

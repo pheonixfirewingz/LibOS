@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <iostream>
 
 struct losFileHandle_T
 {
@@ -27,9 +28,10 @@ struct losFileHandle_T
 
 losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
 {
+    /* FIXME: this check should stop reusing handles already in use
     if (!(*handle))
         return LOS_ERROR_HANDLE_IN_USE;
-
+    */
     (*handle) = new losFileHandle_T();
     int file_flags = 0;
     int flags_used = 0;
@@ -55,6 +57,10 @@ losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo &info)
                  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
         BIT_CASE(LOS_FILE_BIT_WRITE | LOS_FILE_BIT_BINARY | LOS_FILE_BIT_CREATE, O_WRONLY | O_CREAT | O_TRUNC,
                  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
+
+        BIT_CASE(LOS_FILE_BIT_BINARY | LOS_FILE_BIT_READ | LOS_FILE_BIT_WRITE, O_RDWR | O_TRUNC,0)
+        BIT_CASE(LOS_FILE_BIT_CREATE | LOS_FILE_BIT_READ | LOS_FILE_BIT_WRITE, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
+        BIT_CASE(LOS_FILE_BIT_BINARY | LOS_FILE_BIT_CREATE | LOS_FILE_BIT_READ | LOS_FILE_BIT_WRITE, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
     default:
         return LOS_ERROR_INVALID_FLAGS;
     }
@@ -96,25 +102,21 @@ losResult losCloseFile(losFileHandle handle)
         remove(handle->path.c_str());
 
     close(handle->n_handle);
+    handle = NULL;
     return LOS_SUCCESS;
 }
 
-losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
+losResult losReadFile(losFileHandle handle, void **data_ptr, size* data_size)
 {
-    struct stat sb
-    {
-    };
-
+    struct stat sb{};
     if (fstat(handle->n_handle, &sb) < 0)
     {
         perror("system error");
         losCloseFile(handle);
         return LOS_ERROR_COULD_NOT_GET_CORRECT_DATA;
     }
-
-    data_size = sb.st_size * sizeof(char);
-    *data_ptr = malloc(data_size);
-
+    *data_size = (sb.st_size) * sizeof(char);
+    *data_ptr = malloc(*data_size);
     ssize_t bytesRead = 0;
     if ((bytesRead = pread64(handle->n_handle, *data_ptr, sb.st_size, 0)) < 0)
     {
@@ -124,7 +126,7 @@ losResult losReadFile(losFileHandle handle, void **data_ptr, size data_size)
     }
 
     if (data_ptr != nullptr)
-        data_size = bytesRead - 1;
+        *data_size = bytesRead;
 
     return LOS_SUCCESS;
 }

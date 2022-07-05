@@ -22,3 +22,7 @@
 #ifndef CMAKE_COMPILER_NUMBER
 #cmakedefine CMAKE_COMPILER_NUMBER @CMAKE_COMPILER_NUMBER@
 #endif
+
+#ifndef BUILD_OF_JNI
+#cmakedefine01 BUILD_OF_JNI
+#endif

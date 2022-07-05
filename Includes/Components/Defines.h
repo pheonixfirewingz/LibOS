@@ -2,7 +2,7 @@
 #if _WIN64
 #    define EXPORT_DLL extern "C" __declspec(dllexport)
 #else
-#    define EXPORT_DLL
+#    define EXPORT_DLL extern "C"
 #endif
 
 typedef unsigned char uint8;
@@ -49,4 +49,6 @@ typedef enum losResult : uint8
     LOS_NET_IO_CONNECTION_CLOSED_SERVER_END,
     // WINDOW
     LOS_WINDOW_CLOSE,
+    //ThreadGuard
+    LOS_ERROR_TRIED_TO_ACCESS_THREAD_RESOURCES_ON_OTHER_THREAD
 } losResult;

@@ -33,6 +33,11 @@ static float64 mouse_wheel_delta_y = 0;
 requestObjectCallback object_callback;
 losWindow* window;
 
+bool hasWindowClosed() noexcept
+{
+    return should_window_close;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch (Msg)

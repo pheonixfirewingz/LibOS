@@ -118,7 +118,6 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
 
     PADDRINFOA ip;
 
-
     if (getaddrinfo(socket_info.address, NULL, &hints, &ip) != 0)
         return LOS_NET_IO_DOMAIN_NOT_FOUND;
 
@@ -126,7 +125,6 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
     {
         for (addrinfo* res=ip; res!=NULL; res=res->ai_next) 
         {
-
         }
         /*SOCKADDR_IN sockAddr = {0};
         sockAddr.sin_port = htons(socket_info.port);
@@ -141,7 +139,6 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
             return tellError();
         }*/
     }
-
     return LOS_SUCCESS;
 }
 

@@ -21,6 +21,7 @@
 #pragma warning( disable : 4100)
 #pragma warning( disable : 4083)
 #endif
+#include <vulkan/vulkan_core.h>
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan_profiles.hpp>
 #if CMAKE_COMPILER_NUMBER == 1
@@ -29,7 +30,6 @@
 #if CMAKE_COMPILER_NUMBER == 2
 #pragma warning( pop )
 #endif
-#include "../InternalRefractile.h"
 #if CMAKE_SYSTEM_NUMBER == 0
 #include "../Linux/Window.h"
 #include <vulkan/vulkan_wayland.h>
