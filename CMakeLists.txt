@@ -20,8 +20,6 @@ else()
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    find_package(Wayland REQUIRED)
-    include_directories(${WAYLAND_INCLUDE_DIR})
     set(CMAKE_SYSTEM_NUMBER 0)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(CMAKE_SYSTEM_NUMBER 1)
