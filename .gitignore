@@ -1,6 +1,15 @@
 debug-windows
+release-windows
+debug-windows-store
 debug-linux
-build
+release-linux
 debug-osx
-vcpkg_installed
+release-osx
+build
+TOOLCHAIN
 src/lib/Cmake.h
+.vs
+.idea
+base
+src/test/Cmake.h
+src/shared/Cmake.h

@@ -1,0 +1,9 @@
+#pragma once
+// LIBOS LICENCE
+//
+// GNU Lesser General Public License Version 3.0
+//
+// Copyright Luke Shore (c) 2020, 2023
+#ifndef CMAKE_SOURCE_DIR
+#cmakedefine CMAKE_SOURCE_DIR "@CMAKE_SOURCE_DIR@"
+#endif
