@@ -1,0 +1,6 @@
+ADD_FILES(
+	FileIO.cpp
+	Main.cpp
+	NetIO.cpp
+	Window.cpp
+)

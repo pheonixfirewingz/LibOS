@@ -3,7 +3,6 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#include <extend_std/Macro.h>
 #include <libos/FileIO.h>
 #include <string>
 #include <vector>
@@ -59,16 +58,13 @@ std::string getCorrectPath(const char *path)
             if (command == "binary_base")
             {
                 auto sun_tuk = platformSplit(platformGetCurrentPath());
-                if constexpr (IS_LINUX())
-                {
+#if ON_LINUX
                     for (data_size_t i = 0; i < sun_tuk.size(); i++)
                         ret_path += (sun_tuk[i] += '/');
-                }
-                else
-                {
+#else
                     for (data_size_t i = 0; i < sun_tuk.size() - 1; i++)
                         ret_path += (sun_tuk[i] += '/');
-                }
+#endif
             }
             else if (command == "asset_base")
             {
@@ -81,14 +77,9 @@ std::string getCorrectPath(const char *path)
         else
             ret_path += (tokens += '/');
     }
-    if constexpr (IS_LINUX())
-    {
-#if IS_WINDOWS_UWP()
-        if (!ret_path._Starts_with("/"))
-#else
+#if ON_LINUX
         if (!ret_path.starts_with('/'))
+        ret_path = (std::string() += '/') += ret_path;
 #endif
-            ret_path = (std::string() += '/') += ret_path;
-    }
     return ret_path;
 }

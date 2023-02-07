@@ -1,4 +1,3 @@
-#include <Cmake.h>
 // LIBOS LICENCE
 //
 // GNU Lesser General Public License Version 3.0
@@ -6,7 +5,7 @@
 // Copyright Luke Shore (c) 2020, 2023
 #include <libos/Defines.h>
 
-#if CMAKE_SYSTEM_NUMBER == 0
+#if ON_LINUX
 void libOSInit()
 {
 }
@@ -15,7 +14,7 @@ void libOSCleanUp()
 {
 }
 #endif
-#if CMAKE_SYSTEM_NUMBER == 1
+#if ON_UWP
 #    include <winrt/base.h>
 
 void libOSInit()
@@ -28,7 +27,7 @@ void libOSCleanUp()
     winrt::uninit_apartment();
 }
 #endif
-#if CMAKE_SYSTEM_NUMBER == 2
+#if ON_WINDOWS
 #    include <combaseapi.h>
 #    include <comdef.h>
 #    define SUCCESS(x)                                                 \
