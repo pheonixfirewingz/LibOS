@@ -163,6 +163,12 @@ EXPORT_DLL enum losResult losCreateWindow(losWindow *window_handle, losWindowInf
 EXPORT_DLL enum losResult losUpdateWindow(losWindow window_handle);
 /*!
  * \param[in] window_handle
+ * \return losSize
+ * \brief losUpdateWindow is used to get the current window size of the window at the time of the request
+ */
+EXPORT_DLL struct losSize* losRequestWindowSize(losWindow window_handle);
+/*!
+ * \param[in] window_handle
  * \param[in] button
  * \return uint8_t
  * \brief losIsKeyDown is used for the library user to ask if a keyboard button is active

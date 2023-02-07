@@ -67,6 +67,11 @@ losResult losUpdateWindow(losWindow window)
     return window->window->losUpdateWindow();
 }
 
+losSize* losRequestWindowSize(losWindow window)
+{
+    return window->window->getWindowSize();
+}
+
 uint8_t losIsKeyDown(losWindow window, losKeyboardButton key)
 {
     return (uint8_t)window->window->losIsKeyDown(key);
