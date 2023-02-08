@@ -36,11 +36,11 @@ typedef enum losFileBits
  */
 typedef struct losFileOpenInfo
 {
-    uint8_t fileBits; //!< file (bits/flags) combination tells the library how to lock the file down to act like a
+    uint8_t fileBits = 0; //!< file (bits/flags) combination tells the library how to lock the file down to act like a
                       //!< sanity check
     const char *path; //!< path to the file $[binary_base] and $[asset_base] can be used as relative path for internal
                       //!< program file path handling
-    data_size_t path_size; //!< size of the path to the file
+    data_size_t path_size = 0; //!< size of the path to the file
 
 } losFileOpenInfo;
 /*!

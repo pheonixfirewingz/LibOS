@@ -7,9 +7,8 @@
 #include <libos/Window.h>
 #include <libos/NativeWindow.h>
 #include <string>
-class AbstractWindow
+struct BaseWindow
 {
-  public:
     virtual losUsedWindowAPI getType() const noexcept = 0;
     virtual bool hasWindowClosed() const noexcept = 0;
     virtual losResult losUpdateWindow() noexcept = 0;
@@ -21,7 +20,7 @@ class AbstractWindow
     virtual losSize losIsBeingPressed() const noexcept = 0;
     virtual void losDestroyWindow() noexcept = 0;
     virtual void *internalGet() noexcept = 0;
-    virtual losSize* getWindowSize() noexcept = 0;
+    virtual losSize getWindowSize() noexcept = 0;
     virtual bool hasFailed() const noexcept = 0;
-    virtual ~AbstractWindow(){};
+    virtual ~BaseWindow() = default;
 };

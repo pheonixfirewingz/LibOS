@@ -12,7 +12,7 @@
 #include <stdexcept>
 struct losWindow_T
 {
-    AbstractWindow *window;
+    BaseWindow *window;
 };
 
 losResult losCreateWindow(losWindow *window, losWindowInfo info)
@@ -27,33 +27,20 @@ losResult losCreateWindow(losWindow *window, losWindowInfo info)
         info.title_size = 14;
     }
 
-    if constexpr (IS_WINDOWS_WIN32())
+#ifdef ON_WINDOWS
         (*window)->window = new (std::nothrow) Win32Window(info.title, info.window_size);
-    else if constexpr (IS_WINDOWS_UWP())
+#elif defined(ON_UWP)
         (*window)->window = new (std::nothrow) WinRTWindow(info.title, info.window_size);
-    else if constexpr (IS_LINUX())
-    {
+#elif defined(ON_LINUX)
         (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
         if ((*window)->window->hasFailed())
         {
             delete (*window)->window;
-#if defined(__GNUC__) || defined(__GNUG__)
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#else
-#    pragma warning(push)
-#    pragma warning(disable : 4996)
-#endif
             (*window)->window = new (std::nothrow) XcbWindow(info.title, info.window_size);
-#if defined(__GNUC__) || defined(__GNUG__)
-#    pragma GCC diagnostic pop
-#else
-#    pragma warning(pop)
-#endif
         }
-    }
-    else
+#else
         return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
+#endif
 
     if ((*window)->window == NULL)
         return LOS_ERROR_COULD_NOT_INIT;
@@ -67,9 +54,9 @@ losResult losUpdateWindow(losWindow window)
     return window->window->losUpdateWindow();
 }
 
-losSize* losRequestWindowSize(losWindow window)
+losSize losRequestWindowSize(losWindow window)
 {
-    return window->window->getWindowSize();
+    return std::move(window->window->getWindowSize());
 }
 
 uint8_t losIsKeyDown(losWindow window, losKeyboardButton key)

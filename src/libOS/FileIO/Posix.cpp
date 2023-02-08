@@ -74,7 +74,7 @@ std::vector<std::string> platformSplit(std::string path) noexcept
     return ret;
 }
 
-losResult platformOpenFile(losFileHandle *handle, const losFileOpenInfo info)
+losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)
 {
     if (!(*handle = new losFileHandle_T()))
         return LOS_ERROR_COULD_NOT_INIT;
@@ -148,7 +148,7 @@ losResult platformOpenFile(losFileHandle *handle, const losFileOpenInfo info)
     return LOS_SUCCESS;
 }
 
-losResult platformCloseFile(losFileHandle handle)
+losResult losCloseFile(losFileHandle handle)
 {
     if (handle->closeAfterDone)
         remove(handle->path.c_str());
@@ -158,7 +158,7 @@ losResult platformCloseFile(losFileHandle handle)
     return LOS_SUCCESS;
 }
 
-losResult platformReadFile(losFileHandle handle, void **data_ptr, data_size_t *bytes_read)
+losResult losReadFile(losFileHandle handle, void **data_ptr, data_size_t *bytes_read)
 {
     struct stat sb
     {
@@ -182,7 +182,7 @@ losResult platformReadFile(losFileHandle handle, void **data_ptr, data_size_t *b
     return LOS_SUCCESS;
 }
 
-losResult platformWriteFile(losFileHandle handle, const void *data, const data_size_t data_data_size)
+losResult losWriteFile(losFileHandle handle, const void *data, const data_size_t data_data_size)
 {
     if (pwrite64(handle->n_handle, data, data_data_size, 0) < 0)
     {

@@ -1,4 +1,3 @@
-#include <Cmake.h>
 // LIBOS LICENCE
 //
 // GNU Lesser General Public License Version 3.0
@@ -67,14 +66,14 @@ std::vector<std::string> iSplit(std::string s, char delimiter) noexcept
     return ret;
 }
 
- LPSTR GetFormattedMessage(DWORD pMessage)
+ LPSTR GetFormattedMessage(LPCVOID pMessage)
 {
     LPSTR pBuffer = NULL;
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, (LPCVOID)pMessage, 0, 0, (LPSTR)&pBuffer, 0,NULL);
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, pMessage, 0, 0, (LPSTR)&pBuffer, 0,NULL);
     return pBuffer;
 }
 
-losResult platformOpenFile(losFileHandle *handle, const losFileOpenInfo info)
+losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)
 {
     if (!(*handle))
         return LOS_ERROR_COULD_NOT_INIT;
@@ -120,7 +119,9 @@ losResult platformOpenFile(losFileHandle *handle, const losFileOpenInfo info)
 #endif
     if ((*handle)->fileHandle == INVALID_HANDLE_VALUE)
     {
-        puts(GetFormattedMessage(GetLastError()));
+#pragma warning(disable : 4312)
+        puts(GetFormattedMessage(reinterpret_cast<LPCVOID>(GetLastError())));
+#pragma warning(default : 4312)
         return LOS_ERROR_COULD_NOT_INIT;
     }
 
@@ -150,7 +151,7 @@ losResult platformOpenFile(losFileHandle *handle, const losFileOpenInfo info)
     return LOS_SUCCESS;
 }
 
-losResult platformCloseFile(losFileHandle handle)
+losResult losCloseFile(losFileHandle handle)
 {
     CloseHandle(handle->fileHandle);
     delete handle;
@@ -158,7 +159,7 @@ losResult platformCloseFile(losFileHandle handle)
 }
 
 std::atomic<DWORD> BytesTransferred;
-losResult platformReadFile(losFileHandle handle, void **data_ptr, data_size_t *bytes_read)
+losResult losReadFile(losFileHandle handle, void **data_ptr, data_size_t *bytes_read)
 {
     OVERLAPPED overlapped = {0};
     FILE_STANDARD_INFO file_info = {0};
@@ -188,7 +189,7 @@ losResult platformReadFile(losFileHandle handle, void **data_ptr, data_size_t *b
     return LOS_SUCCESS;
 }
 
-losResult platformWriteFile(losFileHandle handle, const void *data_ptr, const data_size_t data_size)
+losResult losWriteFile(losFileHandle handle, const void *data_ptr, const data_size_t data_size)
 {
     DWORD dwBytesWrite = 0;
     if (WriteFile(handle->fileHandle, data_ptr, (DWORD)data_size, &dwBytesWrite, nullptr) == 0)

@@ -17,27 +17,27 @@ struct losSocket_T
     bool isTCP = false;
 };
 
-losResult platformCreateSocket(losSocket *, const losCreateSocketInfo &)
+losResult losCreateSocket(losSocket *, const losCreateSocketInfo &)
 {
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-losResult platformReadSocket(losSocket , void *, data_size_t *)
+losResult losReadSocket(losSocket, void *, data_size_t *)
 {
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-losSocket platformWaitForClient(losSocket)
+losSocket losWaitForClient(losSocket)
 {
     return nullptr;
 }
 
-losResult platformWriteSocket(losSocket, const void *, const data_size_t)
+losResult losWriteSocket(losSocket, const void *, const data_size_t)
 {
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-losResult platformDestroySocket(losSocket )
+losResult losDestroySocket(losSocket )
 {
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }

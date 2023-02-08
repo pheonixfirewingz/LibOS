@@ -1,4 +1,3 @@
-#include <Cmake.h>
 // LIBOS LICENCE
 //
 // GNU Lesser General Public License Version 3.0
@@ -17,7 +16,7 @@
 struct losSocket_T
 {
     SOCKET connect_socket = INVALID_SOCKET;
-    sockaddr_in server_address;
+    sockaddr_in server_address = {};
     bool isServer = false;
     bool isTCP = false;
 };
@@ -65,7 +64,7 @@ const losResult isLoaded(const bool clear)
     return LOS_SUCCESS;
 }
 
-losResult platformCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
+losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
 {
     *socket_in = new (std::nothrow) losSocket_T();
     if ((*socket_in) == NULL)
@@ -126,7 +125,7 @@ losResult platformCreateSocket(losSocket *socket_in, const losCreateSocketInfo &
     return LOS_SUCCESS;
 }
 
- losResult platformWaitForClient(const losSocket server, losSocket *socket_in)
+ losResult losWaitForClient(const losSocket server, losSocket *socket_in)
 {
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_MALFORMED_DATA;
@@ -139,7 +138,7 @@ losResult platformCreateSocket(losSocket *socket_in, const losCreateSocketInfo &
     return LOS_SUCCESS;
 }
 
-losResult platformReadSocket(const losSocket socket, void *data, const data_size_t size)
+losResult losReadSocket(const losSocket socket, void *data, const data_size_t size)
 {
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_INIT;
@@ -177,7 +176,7 @@ losResult platformReadSocket(const losSocket socket, void *data, const data_size
         return LOS_SUCCESS;
 }
 
-losResult platformWriteSocket(const losSocket socket, const void *data, const data_size_t size)
+losResult losWriteSocket(const losSocket socket, const void *data, const data_size_t size)
 {
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_INIT;
@@ -208,7 +207,7 @@ losResult platformWriteSocket(const losSocket socket, const void *data, const da
     return LOS_SUCCESS;
 }
 
-losResult platformDestroySocket(losSocket socket)
+losResult losDestroySocket(losSocket socket)
 {
     if (socket->isTCP)
         shutdown(socket->connect_socket, SD_SEND);

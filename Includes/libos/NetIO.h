@@ -34,11 +34,11 @@ typedef enum losSocketBit : uint8_t
  */
 typedef struct losCreateSocketInfo
 {
-    uint8_t socket_bits; //!< socket (bits/flags) combination tells the library how to handle the socket
+    uint8_t socket_bits = 0; //!< socket (bits/flags) combination tells the library how to handle the socket
     const char *address; //!< this is used to represent the address for where the socket is to bind or connect to based
                          //!< on if is client or server
-    data_size_t address_size; //!< size of string of address
-    uint16_t port;            //!< this is to tell the library what port to use for the socket
+    data_size_t address_size = 0; //!< size of string of address
+    uint16_t port = 0;            //!< this is to tell the library what port to use for the socket
 } losCreateSocketInfo;
 
 /*!

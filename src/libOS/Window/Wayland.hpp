@@ -4,8 +4,8 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#include <AbstractWindow.h>
-#if __has_include(<wayland-client.h>)
+#include "../Interface/AbstractWindow.h"
+#if __has_include(<wayland-client.h>) && ON_LINUX
 #    include "xdg-shell-client-protocol.h"
 #    include <extend_std/LookUpTable.h>
 #    include <libdecor.h>
@@ -14,13 +14,13 @@
 #    include <xkbcommon/xkbcommon.h>
 #endif
 
-class WaylandWindow : public AbstractWindow
+class WaylandWindow : public BaseWindow
 {
   protected:
+#if __has_include(<wayland-client.h>) && defined(ON_LINUX)
     std::atomic_bool should_close{false}, keys[256]{};
     int16_ts x = 0, y = 0;
     bool error = false;
-#if __has_include(<wayland-client.h>)
     const std::ReadOnlyLookupTable<uint16_t,uint16_t> upper_versions = {
         {XKB_KEY_A, XKB_KEY_a}, {XKB_KEY_B, XKB_KEY_b},  {XKB_KEY_C, XKB_KEY_c}, {XKB_KEY_D, XKB_KEY_d},
         {XKB_KEY_E, XKB_KEY_e}, {XKB_KEY_F, XKB_KEY_f},  {XKB_KEY_G, XKB_KEY_g}, {XKB_KEY_H, XKB_KEY_h},
@@ -135,7 +135,7 @@ class WaylandWindow : public AbstractWindow
     };
 #endif
   public:
-#if __has_include(<wayland-client.h>)
+#if __has_include(<wayland-client.h>) && defined(ON_LINUX)
     // temp
     wl_shm *shm;
     explicit WaylandWindow(const std::string title, losSize win_size) noexcept;
@@ -148,7 +148,11 @@ class WaylandWindow : public AbstractWindow
     virtual losSize losRequestMouseWheelDelta() const noexcept final override;
     virtual losSize losIsBeingPressed() const noexcept final override;
     virtual void losDestroyWindow() noexcept final override;
-    virtual losSize *getWindowSize() noexcept final override;
+    virtual losSize getWindowSize() noexcept final override;
+    virtual bool hasFailed() const noexcept final override
+    {
+        return error;
+    };
     virtual void *internalGet() noexcept final override;
 #else
     explicit WaylandWindow(const std::string, losSize) noexcept
@@ -189,22 +193,22 @@ class WaylandWindow : public AbstractWindow
     virtual void losDestroyWindow() noexcept final override
     {
     }
-    virtual losSize *getWindowSize() noexcept final override
+    virtual losSize getWindowSize() noexcept final override
     {
-        return nullptr;
+        return {};
     }
     virtual void *internalGet() noexcept final override
     {
         return nullptr;
     }
+
+    virtual bool hasFailed() const noexcept final override
+    {
+        return true;
+    };
 #endif
     virtual losUsedWindowAPI getType() const noexcept final override
     {
         return WAYLAND_API;
     }
-
-    virtual bool hasFailed() const noexcept final override
-    {
-        return error;
-    };
 };

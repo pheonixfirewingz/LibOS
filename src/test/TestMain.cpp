@@ -4,6 +4,7 @@
 #include <libos/FileIO.h>
 #include <libos/NetIO.h>
 #include <libos/Window.h>
+#include <chrono>
 struct testBINARY
 {
     uint16_t index = 0;
@@ -181,12 +182,23 @@ TEST(Graphics, Window)
     info.title_size = test_str.size();
     info.window_size = {(int64_t)500, (int64_t)500};
     EXPECT_EQ(losCreateWindow(&window, info), LOS_SUCCESS);
+    
     while (losUpdateWindow(window) != LOS_WINDOW_CLOSE)
     {
+        using namespace std::chrono;
+        using namespace std::literals;
+        system_clock::time_point start_time = system_clock::now();
         if (losIsKeyDown(window, LOS_KEY_X))
             losRequestClose(window);
         if (losIsKeyDown(window, LOS_KEY_SPACE))
             puts("beep beep!");
+        if (losIsMouseDown(window,LOS_LEFT_BUTTON))
+        {
+            losSize pos = losRequestMousePosition(window);
+            printf("Mouse Click At -> X: '%I64u ,Y: '%I64u\n", pos.length_one, pos.length_two);
+        }
+        system_clock::time_point end_time = system_clock::now();
+        std::this_thread::sleep_for(16.5ms - (end_time - start_time));
     }
     losDestroyWindow(window);
     libOSCleanUp();

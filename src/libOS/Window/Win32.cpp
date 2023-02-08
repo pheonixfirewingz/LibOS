@@ -37,9 +37,6 @@ LRESULT CALLBACK Win32Window::classWndProc(HWND hwnd, UINT msg, WPARAM wParam, L
         ZeroMemory(&mouse_buttons[0], sizeof(mouse_buttons));
         break;
     }
-    case WM_SIZING: {
-        break;
-    }
     case WM_KEYDOWN:
         key_buttons[wParam] = true;
         break;
@@ -64,29 +61,19 @@ LRESULT CALLBACK Win32Window::classWndProc(HWND hwnd, UINT msg, WPARAM wParam, L
     case WM_LBUTTONUP:
         mouse_buttons[2] = false;
         break;
-    case WM_MOUSEHOVER:
-        mouse_inside_window = true;
+    case WM_MOUSEMOVE:
+        if (!mouse_inside_window)
+            mouse_inside_window = true;
         break;
-    case WM_MOUSELEAVE:
+    case WM_MOUSELEAVE: {
         mouse_inside_window = false;
-        break;
+        ZeroMemory(&key_buttons[0], sizeof(key_buttons));
+        ZeroMemory(&mouse_buttons[0], sizeof(mouse_buttons));
+    } break;
     case WM_MOUSEWHEEL:
     case WM_MOUSEHWHEEL: {
         if (mouse_inside_window)
-        {
-            if (msg == WM_MOUSEWHEEL)
-                mouse_wheel_delta_y = (float64_t)GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
-            else
-                mouse_wheel_delta_x = (float64_t)GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
-        }
-        break;
-    }
-    case WM_MOUSEMOVE: {
-        if (mouse_inside_window)
-        {
-            mouse_position_x = (lParam & 0xffff);
-            mouse_position_y = ((lParam >> 16) & 0xffff);
-        }
+            mouse_wheel_delta = GET_WHEEL_DELTA_WPARAM(wParam);
         break;
     }
     default:
@@ -133,17 +120,23 @@ losResult Win32Window::losRequestClose() noexcept
 
 losSize Win32Window::losRequestMousePosition() const noexcept
 {
-    return {mouse_position_x, mouse_position_y};
+    static POINT pos;
+    if (mouse_inside_window)
+    {
+        GetCursorPos(&pos);
+        ScreenToClient(win_hand, &pos);
+    }
+    return {pos.x, pos.y};
 }
 
 losSize Win32Window::losRequestMouseWheelDelta() const noexcept
 {
-    return {static_cast<int64_t>(mouse_wheel_delta_x), static_cast<int64_t>(mouse_wheel_delta_y)};
+    return {mouse_wheel_delta, 0};
 }
 
 losSize Win32Window::losIsBeingPressed() const noexcept
 {
-    return {mouse_position_x, mouse_position_y};
+    return {};
 }
 
 void Win32Window::losDestroyWindow() noexcept
@@ -152,9 +145,11 @@ void Win32Window::losDestroyWindow() noexcept
     UnregisterClassW(L"LibOSWindowClass", GetModuleHandle(nullptr));
 }
 
-losSize * Win32Window::getWindowSize() noexcept
+losSize Win32Window::getWindowSize() noexcept
 {
-    return &win_size;
+    RECT rect;
+    GetClientRect(win_hand, &rect);
+    return {.length_one = rect.right - rect.left, .length_two = rect.bottom - rect.top};
 }
 
 void* Win32Window::internalGet() noexcept

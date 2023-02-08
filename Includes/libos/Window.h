@@ -166,7 +166,7 @@ EXPORT_DLL enum losResult losUpdateWindow(losWindow window_handle);
  * \return losSize
  * \brief losUpdateWindow is used to get the current window size of the window at the time of the request
  */
-EXPORT_DLL struct losSize* losRequestWindowSize(losWindow window_handle);
+EXPORT_DLL struct losSize losRequestWindowSize(losWindow window_handle);
 /*!
  * \param[in] window_handle
  * \param[in] button
@@ -192,21 +192,21 @@ EXPORT_DLL enum losResult losRequestClose(losWindow window_handle);
  * \return losSize
  * \brief losRequestMousePosition is used for the library user to ask where the mouse is in the window
  */
-EXPORT_DLL losSize losRequestMousePosition(losWindow window_handle);
+EXPORT_DLL struct losSize losRequestMousePosition(losWindow window_handle);
 /*!
  * \param[in] window_handle
  * \return losSize
  * \brief losRequestMouseWheelDelta is used for the library user to ask for the mouse wheel delta
  * \note this is note implemented on all platforms as of V1.0.0
  */
-EXPORT_DLL losSize losRequestMouseWheelDelta(losWindow window_handle);
+EXPORT_DLL struct losSize losRequestMouseWheelDelta(losWindow window_handle);
 /*!
  * \param[in] window_handle
  * \return losSize
  * \brief losRequestMousePosition is used for the library user to ask where the screen is being touched
  * \note this is note implemented on platforms as of V1.0.0
  */
-EXPORT_DLL losSize losIsBeingPressed(losWindow window_handle);
+EXPORT_DLL struct losSize losIsBeingPressed(losWindow window_handle);
 /*!
  * \param[in] window_handle
  * \brief losDestroyWindow is to close the library object and safely delete it

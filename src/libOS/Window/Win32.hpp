@@ -4,27 +4,23 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#include <AbstractWindow.h>
-#include <extend_std/Macro.h>
-#if IS_WINDOWS_WIN32()
+#include "../Interface/AbstractWindow.h"
+#include <libos/DataType.h>
+#ifdef ON_WINDOWS
 #    define WIN32_LEAN_AND_MEAN
 #    define NOCOMM
 #    include <windows.h>
 #endif
-class Win32Window : public AbstractWindow
+class Win32Window : public BaseWindow
 {
-    bool error = false;
-#if IS_WINDOWS_WIN32()
+#ifdef ON_WINDOWS
     HWND win_hand = NULL;
+    int64_t mouse_wheel_delta = 0;
+    bool error = false;
     bool should_window_close = false;
     bool mouse_inside_window = false;
-    bool key_buttons[256] = {false};
     bool mouse_buttons[3] = {false};
-    losSize win_size;
-    int64_t mouse_position_x = 0;
-    int64_t mouse_position_y = 0;
-    float64_t mouse_wheel_delta_x = 0;
-    float64_t mouse_wheel_delta_y = 0;
+    bool key_buttons[256] = {false};
     const uint16_t window_key_look_up_table[256] = {
         0x30,         0x31,          0x32,       0x33,        0x34,        0x35,        0x36,         0x37,
         0x38,         0x39,          0x41,       0x42,        0x43,        0x44,        0x45,         0x46,
@@ -42,7 +38,7 @@ class Win32Window : public AbstractWindow
     };
 #endif
   public:
-#if IS_WINDOWS_WIN32()
+#ifdef ON_WINDOWS
     explicit Win32Window(const std::string title, losSize win_size) noexcept;
     LRESULT CALLBACK classWndProc(HWND, UINT, WPARAM, LPARAM);
     static LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -60,9 +56,12 @@ class Win32Window : public AbstractWindow
     virtual losSize losRequestMousePosition() const noexcept final override;
     virtual losSize losRequestMouseWheelDelta() const noexcept final override;
     virtual losSize losIsBeingPressed() const noexcept final override;
-    virtual losSize *getWindowSize() noexcept final override;
+    virtual losSize getWindowSize() noexcept final override;
     virtual void losDestroyWindow() noexcept final override;
-
+    virtual bool hasFailed() const noexcept final override
+    {
+        return error;
+    };
     virtual void *internalGet() noexcept final override;
 #else
     explicit Win32Window(const std::string, losSize) noexcept
@@ -104,22 +103,22 @@ class Win32Window : public AbstractWindow
     virtual void losDestroyWindow() noexcept final override
     {
     }
-    virtual losSize *getWindowSize() noexcept final override
+    virtual losSize getWindowSize() noexcept final override
     {
-        return nullptr;
+        return {};
     }
     virtual void *internalGet() noexcept final override
     {
         return nullptr;
     }
+
+    virtual bool hasFailed() const noexcept final override
+    {
+        return true;
+    };
 #endif
     virtual losUsedWindowAPI getType() const noexcept final override
     {
         return WIN32_API;
     }
-
-    virtual bool hasFailed() const noexcept final override
-    {
-        return error;
-    };
 };

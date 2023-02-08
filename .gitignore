@@ -1,15 +1,6 @@
-debug-windows
-release-windows
-debug-windows-store
-debug-linux
-release-linux
-debug-osx
-release-osx
 build
 TOOLCHAIN
-src/lib/Cmake.h
 .vs
+.vscode
 .idea
-base
 src/test/Cmake.h
-src/shared/Cmake.h

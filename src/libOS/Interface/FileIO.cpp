@@ -8,10 +8,6 @@
 #include <vector>
 
 std::string asset_path = "NOT_SET";
-extern losResult platformOpenFile(losFileHandle *, const losFileOpenInfo);
-extern losResult platformReadFile(losFileHandle, void **, data_size_t *);
-extern losResult platformWriteFile(losFileHandle, const void *, const data_size_t);
-extern losResult platformCloseFile(losFileHandle);
 extern std::vector<std::string> platformSplit(std::string path) noexcept;
 extern std::string platformGetCurrentPath();
 
@@ -19,26 +15,6 @@ losResult losSetAssetPath(const char *path)
 {
     asset_path = path;
     return LOS_SUCCESS;
-}
-
-losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)
-{
-    return platformOpenFile(handle, info);
-}
-
-losResult losReadFile(losFileHandle handle, void **data, data_size_t *bytes_read)
-{
-    return platformReadFile(handle, data, bytes_read);
-}
-
-losResult losWriteFile(losFileHandle handle, const void *data, const data_size_t size)
-{
-    return platformWriteFile(handle, data, size);
-}
-
-losResult losCloseFile(losFileHandle handle)
-{
-    return platformCloseFile(handle);
 }
 
 std::string getCorrectPath(const char *path)
@@ -58,7 +34,7 @@ std::string getCorrectPath(const char *path)
             if (command == "binary_base")
             {
                 auto sun_tuk = platformSplit(platformGetCurrentPath());
-#if ON_LINUX
+#ifdef ON_LINUX
                     for (data_size_t i = 0; i < sun_tuk.size(); i++)
                         ret_path += (sun_tuk[i] += '/');
 #else
@@ -77,7 +53,7 @@ std::string getCorrectPath(const char *path)
         else
             ret_path += (tokens += '/');
     }
-#if ON_LINUX
+#ifdef ON_LINUX
         if (!ret_path.starts_with('/'))
         ret_path = (std::string() += '/') += ret_path;
 #endif

@@ -1,116 +1,119 @@
 {
   "version": 3,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 22,
-    "patch": 2
-  },
   "configurePresets": [
     {
-      "name": "base",
-      "description": "",
-      "displayName": "",
-      "inherits": [],
-      "binaryDir": "${sourceDir}/${presetName}"
+      "name": "windows-base",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
     },
     {
-      "name": "debug-linux",
-      "displayName": "linux",
-      "inherits": [
-        "base"
-      ],
+      "name": "linux-base",
+      "hidden": true,
       "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/install/${presetName}",
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "1",
-        "CMAKE_SYSTEM_NAME": "Linux",
+        "CMAKE_C_COMPILER": "gcc-12",
+        "CMAKE_CXX_COMPILER": "g++-12"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+        }
+      }
+    },
+    {
+      "name": "macos-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/install/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+        }
+      }
+    },
+    {
+      "name": "windows-x64-debug",
+      "displayName": "x64 Debug",
+      "inherits": "windows-base",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "release-linux",
-      "displayName": "linux",
-      "inherits": [
-        "base"
-      ],
-      "generator": "Ninja",
+      "name": "windows-x64-release",
+      "displayName": "x64 Release",
+      "inherits": "windows-x64-debug",
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "1",
-        "CMAKE_SYSTEM_NAME": "Linux",
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "debug-osx",
-      "displayName": "mac",
-      "inherits": [
-        "base"
-      ],
-      "generator": "xcode",
+      "name": "linux-x64-debug",
+      "displayName": "x64 Debug",
+      "inherits": "linux-base",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "1",
-        "CMAKE_C_COMPILER": "clang-15",
-        "CMAKE_CXX_COMPILER": "clang-15"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "debug-windows",
-      "displayName": "windows",
-      "inherits": [
-        "base"
-      ],
-      "generator": "Visual Studio 17 2022",
+      "name": "linux-x64-release",
+      "displayName": "x64 Release",
+      "inherits": "linux-x64-debug",
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "1",
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_SYSTEM_NAME": "Windows"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "release-windows",
-      "displayName": "windows",
-      "inherits": [
-        "base"
-      ],
-      "generator": "Visual Studio 17 2022",
+      "name": "macos-x64-debug",
+      "displayName": "x64 Debug",
+      "inherits": "macos-base",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "1",
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_SYSTEM_NAME": "Windows"
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "debug-windows-store",
-      "displayName": "windows-store",
-      "inherits": [
-        "base"
-      ],
-      "generator": "Visual Studio 17 2022",
+      "name": "macos-x64-release",
+      "displayName": "x64 Release",
+      "inherits": "macos-x64-debug",
       "cacheVariables": {
-        "CMAKE_SYSTEM_NAME": "WindowsStore",
-        "CMAKE_SYSTEM_VERSION": "10.0"
+        "CMAKE_BUILD_TYPE": "Release"
       }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "windows-debug",
-      "configurePreset": "debug-windows"
-    },
-    {
-      "name": "windows",
-      "configurePreset": "release-windows"
-    },
-    {
-      "name": "windows-store",
-      "configurePreset": "debug-windows-store"
-    },
-    {
-      "name": "linux-debug",
-      "configurePreset": "debug-linux"
-    },
-    {
-      "name": "linux",
-      "configurePreset": "release-linux"
     }
   ]
 }

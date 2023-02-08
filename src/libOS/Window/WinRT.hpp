@@ -4,17 +4,17 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#include <AbstractWindow.h>
-#include <extend_std/Macro.h>
-#if IS_WINDOWS_UWP()
+#include "../Interface/AbstractWindow.h"
+#ifdef ON_UWP
 #    include <winrt/windows.applicationmodel.h>
 #endif
-class WinRTWindow : public AbstractWindow
+class WinRTWindow : public BaseWindow
 {
+#ifdef ON_UWP
     bool error = false;
-
+#endif
   public:
-#if IS_WINDOWS_UWP()
+#ifdef ON_UWP
     explicit WinRTWindow(const std::string title, losSize win_size) noexcept;
     virtual bool hasWindowClosed() const noexcept final override;
     virtual losResult losUpdateWindow() noexcept final override;
@@ -25,12 +25,15 @@ class WinRTWindow : public AbstractWindow
     virtual losSize losRequestMouseWheelDelta() const noexcept final override;
     virtual losSize losIsBeingPressed() const noexcept final override;
     virtual void losDestroyWindow() noexcept final override;
-    virtual losSize *getWindowSize() noexcept final override;
+    virtual losSize getWindowSize() noexcept final override;
+    virtual bool hasFailed() const noexcept final override
+    {
+        return error;
+    };
     virtual void *internalGet() noexcept final override;
 #else
     explicit WinRTWindow(const std::string, losSize) noexcept
     {
-        error = true;
     }
     virtual bool hasWindowClosed() const noexcept final override
     {
@@ -67,22 +70,22 @@ class WinRTWindow : public AbstractWindow
     virtual void losDestroyWindow() noexcept final override
     {
     }
-    virtual losSize *getWindowSize() noexcept final override
+    virtual losSize getWindowSize() noexcept final override
     {
-        return nullptr;
+        return {};
     }
     virtual void *internalGet() noexcept final override
     {
         return nullptr;
     }
+
+    virtual bool hasFailed() const noexcept final override
+    {
+        return true;
+    };
 #endif
     virtual losUsedWindowAPI getType() const noexcept final override
     {
         return WINRT_API;
     }
-
-    virtual bool hasFailed() const noexcept final override
-    {
-        return error;
-    };
 };

@@ -4,9 +4,8 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#include <AbstractWindow.h>
-#include <extend_std/Macro.h>
-#if __has_include(<xcb/xcb.h>)
+#include "../Interface/AbstractWindow.h"
+#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX)
 #    include <xcb/xcb.h>
 #    include <xcb/xcb_keysyms.h>
 #    define XK_LATIN1
@@ -15,9 +14,10 @@
 #    undef XK_MISCELLANY
 #    undef XL_LATIN1
 #endif
-class DEPRICATED XcbWindow : public AbstractWindow
+class XcbWindow : public BaseWindow
 {
-#if __has_include(<xcb/xcb.h>)
+#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX)
+    bool error = false;
     xcb_connection_t *con;
     xcb_window_t win;
     xcb_screen_t *screen;
@@ -134,10 +134,8 @@ class DEPRICATED XcbWindow : public AbstractWindow
         82,
     };
 #endif
-    bool error = false;
-
   public:
-#if __has_include(<xcb/xcb.h>)
+#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX)
     explicit XcbWindow(const std::string title, losSize win_size) noexcept;
     virtual bool hasWindowClosed() const noexcept final override;
     virtual losResult losUpdateWindow() noexcept final override;
@@ -148,7 +146,11 @@ class DEPRICATED XcbWindow : public AbstractWindow
     virtual losSize losRequestMouseWheelDelta() const noexcept final override;
     virtual losSize losIsBeingPressed() const noexcept final override;
     virtual void losDestroyWindow() noexcept final override;
-    virtual losSize *getWindowSize() noexcept final override;
+    virtual losSize getWindowSize() noexcept final override;
+    virtual bool hasFailed() const noexcept final override
+    {
+        return error;
+    };
     virtual void *internalGet() noexcept final override;
 #else
     explicit XcbWindow(const std::string, losSize) noexcept
@@ -189,22 +191,21 @@ class DEPRICATED XcbWindow : public AbstractWindow
     virtual void losDestroyWindow() noexcept final override
     {
     }
-    virtual losSize *getWindowSize() noexcept final override
+    virtual losSize getWindowSize() noexcept final override
     {
-        return nullptr;
+        return {};
     }
     virtual void *internalGet() noexcept final override
     {
         return nullptr;
     }
+    virtual bool hasFailed() const noexcept final override
+    {
+        return true;
+    };
 #endif
     virtual losUsedWindowAPI getType() const noexcept final override
     {
         return XCB_API;
     }
-
-    virtual bool hasFailed() const noexcept final override
-    {
-        return error;
-    };
 };

@@ -36,22 +36,22 @@ extern std::vector<std::string> platformSplit(std::string path) noexcept
     return {};
 }
 
-losResult platformOpenFile(losFileHandle *, const losFileOpenInfo)
+losResult losOpenFile(losFileHandle *, const losFileOpenInfo)
 {
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-losResult platformCloseFile(losFileHandle)
+losResult losCloseFile(losFileHandle)
 {
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-losResult platformReadFile(losFileHandle, void **, data_size_t *)
+losResult losReadFile(losFileHandle, void **, data_size_t *)
 {
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-losResult platformWriteFile(losFileHandle, const void *, const data_size_t)
+losResult losWriteFile(losFileHandle, const void *, const data_size_t)
 {
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 }

@@ -29,7 +29,7 @@ struct losSocket_T
     bool isTCP = false;
 };
 
-losResult platformCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
+losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
 {
     if (!(*socket_in = new losSocket_T()))
         return LOS_ERROR_COULD_NOT_INIT;
@@ -87,7 +87,7 @@ losResult platformCreateSocket(losSocket *socket_in, const losCreateSocketInfo &
     return LOS_SUCCESS;
 }
 
-losResult platformWaitForClient(const losSocket server, losSocket *socket_in)
+losResult losWaitForClient(const losSocket server, losSocket *socket_in)
 {
     if (listen(server->connect_socket, 10) < 0)
         return tellError();
@@ -99,7 +99,7 @@ losResult platformWaitForClient(const losSocket server, losSocket *socket_in)
     return LOS_SUCCESS;
 }
 
-losResult platformReadSocket(const losSocket socket, void *data, const data_size_t size)
+losResult losReadSocket(const losSocket socket, void *data, const data_size_t size)
 {
     int iResult = 0;
     if (socket->isTCP)
@@ -136,7 +136,7 @@ losResult platformReadSocket(const losSocket socket, void *data, const data_size
         return LOS_SUCCESS;
 }
 
-losResult platformWriteSocket(const losSocket socket, const void *data, const data_size_t size)
+losResult losWriteSocket(const losSocket socket, const void *data, const data_size_t size)
 {
     if (socket->isTCP)
     {
@@ -164,7 +164,7 @@ losResult platformWriteSocket(const losSocket socket, const void *data, const da
     return LOS_SUCCESS;
 }
 
-losResult platformDestroySocket(losSocket socket)
+losResult losDestroySocket(losSocket socket)
 {
     if (socket->isTCP)
         shutdown(socket->connect_socket, SHUT_RDWR);
