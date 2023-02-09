@@ -6,6 +6,9 @@
 // Copyright Luke Shore (c) 2020, 2023
 Win32Window::Win32Window(const std::string title, const losSize window_size) noexcept
 {
+#ifdef WITH_DEBUG
+    puts("[LIBOS] <INFO> -> creating WIN32 API Window");
+#endif
     WNDCLASSEX wc;
 
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
@@ -17,10 +20,12 @@ Win32Window::Win32Window(const std::string title, const losSize window_size) noe
     wc.lpszClassName = static_cast<LPCSTR>("LibOSWindowClass");
     RegisterClassEx(&wc);
 #pragma warning(disable : 4244)
-    win_hand = CreateWindowEx(0, static_cast<LPCSTR>("LibOSWindowClass"), title.c_str(), WS_OVERLAPPEDWINDOW, 0, 0, 
-                        window_size.length_one, window_size.length_two,nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
+    win_hand = CreateWindowEx(0, static_cast<LPCSTR>("LibOSWindowClass"), title.c_str(), WS_OVERLAPPEDWINDOW, 0, 0,
+                              window_size.length_one, window_size.length_two, nullptr, nullptr,
+                              GetModuleHandle(nullptr), nullptr);
     ShowWindow(win_hand, SW_SHOWDEFAULT);
-    MoveWindow(win_hand, GetSystemMetrics(SM_CXSCREEN) / 12, GetSystemMetrics(SM_CYSCREEN) / 12, window_size.length_one, window_size.length_two, true);
+    MoveWindow(win_hand, GetSystemMetrics(SM_CXSCREEN) / 12, GetSystemMetrics(SM_CYSCREEN) / 12, window_size.length_one,
+               window_size.length_two, true);
 #pragma warning(default : 4244)
     SetWindowLongPtr(win_hand, GWLP_USERDATA, (LONG_PTR)this);
 }
@@ -69,7 +74,8 @@ LRESULT CALLBACK Win32Window::classWndProc(HWND hwnd, UINT msg, WPARAM wParam, L
         mouse_inside_window = false;
         ZeroMemory(&key_buttons[0], sizeof(key_buttons));
         ZeroMemory(&mouse_buttons[0], sizeof(mouse_buttons));
-    } break;
+    }
+    break;
     case WM_MOUSEWHEEL:
     case WM_MOUSEHWHEEL: {
         if (mouse_inside_window)
@@ -152,7 +158,7 @@ losSize Win32Window::getWindowSize() noexcept
     return {.length_one = rect.right - rect.left, .length_two = rect.bottom - rect.top};
 }
 
-void* Win32Window::internalGet() noexcept
+void *Win32Window::internalGet() noexcept
 {
     return new losWindowWin32(win_hand);
 }

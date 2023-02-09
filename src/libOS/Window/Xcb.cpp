@@ -1,13 +1,16 @@
 #include "Xcb.hpp"
+#include <cstdlib>
 // LIBOS LICENCE
 //
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#if __has_include(<xcb/xcb.h>)
 
 XcbWindow::XcbWindow(const std::string title, losSize win_size) noexcept
 {
+#ifdef WITH_DEBUG
+    puts("[LIBOS] <INFO> -> creating XCB API Window");
+#endif
     configured_size = win_size;
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     con = xcb_connect(nullptr, nullptr);
@@ -75,46 +78,46 @@ losResult XcbWindow::losUpdateWindow() noexcept
     switch (event->response_type & ~0x80)
     {
     case XCB_KEY_PRESS: {
+#ifdef WITH_DEBUG
         if (isInWindow)
-            keys[reinterpret_cast<xcb_key_press_event_t *>(event)->detail] = true;
+        {
+            printf("[LIBOS] <INFO> -> XCB_KEY_PRESS %d\n",
+                 xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_press_event_t *>(event)->detail, 0));
+            keys[*window_key_look_up_table.find(xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_press_event_t *>(event)->detail, 0))] =
+                true;
+        }
+#else
+        if (isInWindow)
+            keys[*window_key_look_up_table.find(xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_press_event_t *>(event)->detail, 0))] =
+                true;
+#endif
     }
     break;
     case XCB_KEY_RELEASE: {
         if (isInWindow)
-            keys[reinterpret_cast<xcb_key_release_event_t *>(event)->detail] = false;
+            keys[*window_key_look_up_table.find(xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_release_event_t *>(event)->detail, 0))] =
+                false;
     }
     break;
     case XCB_BUTTON_PRESS: {
         if (isInWindow)
-        {
-            auto button = reinterpret_cast<xcb_button_press_event_t *>(event);
-            buttons[button->detail] = true;
-        }
+            buttons[window_mouse_look_up_table[reinterpret_cast<xcb_button_press_event_t *>(event)->detail]] = true;
     }
     break;
     case XCB_BUTTON_RELEASE: {
         if (isInWindow)
-        {
-            auto button = reinterpret_cast<xcb_button_release_event_t *>(event);
-            buttons[button->detail] = false;
-        }
+            buttons[window_mouse_look_up_table[reinterpret_cast<xcb_button_release_event_t *>(event)->detail]] = false;
     }
     break;
-    case XCB_MOTION_NOTIFY: {
-        if (isInWindow)
-        {
-            auto mouse_move = reinterpret_cast<xcb_motion_notify_event_t *>(event);
-            x = mouse_move->event_x;
-            y = mouse_move->event_y;
-        }
-    }
-    break;
-     case XCB_RESIZE_REQUEST: {
-        auto resize = (xcb_resize_request_event_t*) event;
-        if (resize->width > 0) configured_size.length_one = resize->width;
-        if (resize->height > 0) configured_size.length_two = resize->height;
+    case XCB_RESIZE_REQUEST: {
+        auto resize = (xcb_resize_request_event_t *)event;
+        if (resize->width > 0)
+            configured_size.length_one = resize->width;
+        if (resize->height > 0)
+            configured_size.length_two = resize->height;
         break;
     }
+    
     case XCB_ENTER_NOTIFY: {
         isInWindow = true;
         isRest = false;
@@ -140,7 +143,7 @@ losResult XcbWindow::losUpdateWindow() noexcept
 
 bool XcbWindow::losIsKeyDown(losKeyboardButton button) const noexcept
 {
-    return keys[window_key_look_up_table[button]];
+    return keys[button];
 }
 
 bool XcbWindow::losIsMouseDown(losMouseButton button) const noexcept
@@ -156,9 +159,15 @@ losResult XcbWindow::losRequestClose() noexcept
 
 losSize XcbWindow::losRequestMousePosition() const noexcept
 {
-    uint16_t _x = x;
-    uint16_t _y = y;
-    return {_x, _y};
+    xcb_query_pointer_reply_t *pointer = xcb_query_pointer_reply(con, xcb_query_pointer(con, win), NULL);
+    if (pointer)
+    {
+        int16_t x = pointer->win_x;
+        int16_t y = pointer->win_y;
+        free(pointer);
+        return {x, y};
+    }
+    return {-1, -1};
 }
 
 losSize XcbWindow::losRequestMouseWheelDelta() const noexcept
@@ -168,9 +177,7 @@ losSize XcbWindow::losRequestMouseWheelDelta() const noexcept
 
 losSize XcbWindow::losIsBeingPressed() const noexcept
 {
-    uint16_t _x = x;
-    uint16_t _y = y;
-    return {_x, _y};
+    return {0, 0};
 }
 
 void XcbWindow::losDestroyWindow() noexcept
@@ -181,13 +188,12 @@ void XcbWindow::losDestroyWindow() noexcept
     free(atom_wm_delete_window);
 }
 
-losSize* XcbWindow::getWindowSize() noexcept
+losSize XcbWindow::getWindowSize() noexcept
 {
-    return &configured_size;
+    return configured_size;
 }
 
-void* XcbWindow::internalGet() noexcept
+void *XcbWindow::internalGet() noexcept
 {
-    return new losWindowXCB(con,&win);
+    return new losWindowXCB(con, &win);
 }
-#endif

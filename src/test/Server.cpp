@@ -62,7 +62,7 @@ void tcp()
         char read_buffer[14];
         data_size_t read_size = 14;
         losReadSocket(client, (void *)&read_buffer, read_size);
-        printf("TCP Server: %14.14s\n", &read_buffer);
+        printf("TCP Server: %s\n", std::string(read_buffer,0,read_size).c_str());
         losWriteSocket(client, (const void *)&read_buffer, read_size);
     }
 

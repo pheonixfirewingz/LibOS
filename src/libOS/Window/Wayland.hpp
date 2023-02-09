@@ -5,7 +5,7 @@
 //
 // Copyright Luke Shore (c) 2020, 2023
 #include "../Interface/AbstractWindow.h"
-#if __has_include(<wayland-client.h>) && ON_LINUX
+#if __has_include(<wayland-client.h>) && defined(ON_LINUX)
 #    include "xdg-shell-client-protocol.h"
 #    include <extend_std/LookUpTable.h>
 #    include <libdecor.h>
@@ -21,7 +21,7 @@ class WaylandWindow : public BaseWindow
     std::atomic_bool should_close{false}, keys[256]{};
     int16_ts x = 0, y = 0;
     bool error = false;
-    const std::ReadOnlyLookupTable<uint16_t,uint16_t> upper_versions = {
+    const std::ReadOnlyLookupTable<uint16_t, uint16_t> upper_versions = {
         {XKB_KEY_A, XKB_KEY_a}, {XKB_KEY_B, XKB_KEY_b},  {XKB_KEY_C, XKB_KEY_c}, {XKB_KEY_D, XKB_KEY_d},
         {XKB_KEY_E, XKB_KEY_e}, {XKB_KEY_F, XKB_KEY_f},  {XKB_KEY_G, XKB_KEY_g}, {XKB_KEY_H, XKB_KEY_h},
         {XKB_KEY_I, XKB_KEY_i}, {XKB_KEY_J, XKB_KEY_j},  {XKB_KEY_K, XKB_KEY_k}, {XKB_KEY_L, XKB_KEY_l},
@@ -151,6 +151,10 @@ class WaylandWindow : public BaseWindow
     virtual losSize getWindowSize() noexcept final override;
     virtual bool hasFailed() const noexcept final override
     {
+#    ifdef WITH_DEBUG
+        if (error)
+            puts("[LIBOS] <SOFT_ERROR> -> failed to create Wayland window fallback to XCB");
+#    endif
         return error;
     };
     virtual void *internalGet() noexcept final override;

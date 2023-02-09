@@ -4,20 +4,22 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#if __has_include(<wayland-client.h>)
-#    include <cassert>
-#    include <cstring>
-#    include <sys/mman.h>
-#    include <vector>
-#    define WAYLAND_CHECK(x, func) \
-        if (!(x = func))           \
-        {                          \
-            error = true;          \
-            return;                \
-        }
+#include <cassert>
+#include <cstring>
+#include <sys/mman.h>
+#include <vector>
+#define WAYLAND_CHECK(x, func) \
+    if (!(x = func))           \
+    {                          \
+        error = true;          \
+        return;                \
+    }
 
 WaylandWindow::WaylandWindow(const std::string title, losSize size) noexcept
 {
+#ifdef WITH_DEBUG
+    puts("[LIBOS] <INFO> -> creating WAYLAND API Window");
+#endif
     WAYLAND_CHECK(display, wl_display_connect(nullptr));
     WAYLAND_CHECK(registry, wl_display_get_registry(display));
     WAYLAND_CHECK(xkb_context, xkb_context_new(XKB_CONTEXT_NO_FLAGS));
@@ -89,7 +91,7 @@ void WaylandWindow::seat_capabilities(void *data, wl_seat *, uint32_t capabiliti
     }
 }
 
-void WaylandWindow::keyboard_keymap(void *data, wl_keyboard *, uint32_t, int32_t fd, uint32_t size)
+void WaylandWindow::keyboard_keymap(void *data, wl_keyboard *, uint32_t format, int32_t fd, uint32_t size)
 {
     WaylandWindow *window = static_cast<WaylandWindow *>(data);
     assert(format == WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1);
@@ -112,12 +114,12 @@ void WaylandWindow::keyboard_keymap(void *data, wl_keyboard *, uint32_t, int32_t
 void WaylandWindow::keyboard_enter(void *data, wl_keyboard *, uint32_t, wl_surface *, wl_array *keys)
 {
     WaylandWindow *window = static_cast<WaylandWindow *>(data);
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wpointer-arith"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-arith"
     std::vector<uint32_t> keys_v;
     keys_v.reserve(keys->size);
     memmove(keys_v.data(), keys->data, keys->size);
-#    pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
     for (uint32_t key : keys_v)
     {
         char buf[128];
@@ -199,13 +201,12 @@ void WaylandWindow::losDestroyWindow() noexcept
     libdecor_frame_close(frame);
 }
 
-losSize *WaylandWindow::getWindowSize() noexcept
+losSize WaylandWindow::getWindowSize() noexcept
 {
-    return &configured_size;
+    return configured_size;
 }
 
 void *WaylandWindow::internalGet() noexcept
 {
     return new losWindowWayland(display, surface);
 }
-#endif

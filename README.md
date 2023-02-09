@@ -1,4 +1,4 @@
-# LibOS - V1.0.0
+# LibOS - V1.1.0
 
 ## PROJECT GOAL
 

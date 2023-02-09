@@ -12,7 +12,7 @@
 //
 // Copyright Luke Shore (c) 2020, 2023
 /*! Importation of libraries*/
-#include <libos/Defines.h>
+#include <libos/DataType.h>
 #include <libos/Window.h>
 /*!
  *  \brief losUsedWindowAPI is returned by losWhatApiIsWindowUsed to query the library what native api is current use
@@ -33,6 +33,9 @@ typedef struct losWindowWayland
 {
     void *display; //!< display is a wl_display* under the hud
     void *surface; //!< surface is a wl_surface* under the hud
+    explicit losWindowWayland(void *display_in, void *surface_in)
+        : display(display_in)
+        , surface(surface_in){};
 } losWindowWayland;
 #endif
 #if __has_include(<xcb/xcb.h>)
@@ -43,6 +46,9 @@ typedef struct losWindowXCB
 {
     void *connection; //!< connection is a xcb_connection_t* under the hud
     void *window;     //!< window is a xcb_window_t* under the hud
+    explicit losWindowXCB(void *connection_in, void *window_in)
+        : connection(connection_in)
+        , window(window_in){};
 } losWindowXCB;
 #endif
 #if __has_include(<windows.h>)
@@ -52,8 +58,8 @@ typedef struct losWindowXCB
 typedef struct losWindowWin32
 {
     void *window; //!< window is a HWND under the hud
-    explicit losWindowWin32(void *window)
-        : window(window){};
+    explicit losWindowWin32(void *window_in)
+        : window(window_in){};
 } losWindowWin32;
 #endif
 /*!

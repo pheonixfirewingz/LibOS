@@ -1,4 +1,3 @@
-#include <Cmake.h>
 // LIBOS LICENCE
 //
 // GNU Lesser General Public License Version 3.0
@@ -15,7 +14,7 @@
 
 losResult tellError() noexcept
 {
-#if DEBUG_MODE
+#ifdef WITH_DEBUG
     perror("system error");
 #endif
     return LOS_NET_IO_CONNECTION_REFUSED;
@@ -27,6 +26,7 @@ struct losSocket_T
     struct sockaddr_in server_address = {};
     bool isServer = false;
     bool isTCP = false;
+    bool failed = false;
 };
 
 losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
@@ -75,13 +75,19 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
     if ((*socket_in)->isServer)
     {
         if ((bind((*socket_in)->connect_socket, (sockaddr *)(&sockAddr), sizeof(sockAddr))) < 0)
+        {
+            (*socket_in)->failed = true;
             return tellError();
+        }
     }
 
     if ((*socket_in)->isTCP && !(*socket_in)->isServer)
     {
         if (connect((*socket_in)->connect_socket, (sockaddr *)(&sockAddr), sizeof(sockAddr)) < 0)
+        {
+            (*socket_in)->failed = true;
             return tellError();
+        }
     }
 
     return LOS_SUCCESS;
@@ -89,18 +95,28 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
 
 losResult losWaitForClient(const losSocket server, losSocket *socket_in)
 {
+    if(!server->failed)
+        return LOS_ERROR_MALFORMED_DATA;
     if (listen(server->connect_socket, 10) < 0)
+    {
+        (*socket_in)->failed = true;
         return tellError();
+    }
     if (!(*socket_in = new losSocket_T()))
         return LOS_ERROR_COULD_NOT_INIT;
     (*socket_in)->isTCP = true;
     if (((*socket_in)->connect_socket = accept(server->connect_socket, NULL, NULL)) == -1)
+    {
+        (*socket_in)->failed = true;
         return tellError();
+    }
     return LOS_SUCCESS;
 }
 
 losResult losReadSocket(const losSocket socket, void *data, const data_size_t size)
 {
+    if (!socket->failed)
+        return LOS_ERROR_MALFORMED_DATA;
     int iResult = 0;
     if (socket->isTCP)
         iResult = recv(socket->connect_socket, (char *)data, (int)size, 0);
@@ -138,6 +154,8 @@ losResult losReadSocket(const losSocket socket, void *data, const data_size_t si
 
 losResult losWriteSocket(const losSocket socket, const void *data, const data_size_t size)
 {
+    if (!socket->failed)
+        return LOS_ERROR_MALFORMED_DATA;
     if (socket->isTCP)
     {
         if (send(socket->connect_socket, (const char *)data, size, 0) < 0)

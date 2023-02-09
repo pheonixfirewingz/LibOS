@@ -7,6 +7,7 @@
 
 WinRTWindow::WinRTWindow(const std::string, losSize) noexcept
 {
+    puts("[LIBOS] <INFO> -> creating WINRT API Window");
     error = true;
 }
 

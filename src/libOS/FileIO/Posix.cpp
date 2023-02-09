@@ -8,8 +8,9 @@
 #include <libgen.h>
 #include <libos/FileIO.h>
 #include <linux/limits.h>
+#include <iomanip>
+#include <iostream>
 #include <ranges>
-#include <string>
 #include <string_view>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -51,7 +52,7 @@ std::string platformGetCurrentPath()
 std::vector<std::string> iSplit(std::string s, char delimiter) noexcept
 {
     std::vector<std::string> ret;
-    for (const auto word : std::views::split(s, delimiter))
+    for (const auto word : std::views::split(s,delimiter))
         ret.push_back(std::string(word.begin(), word.end()));
     return ret;
 }

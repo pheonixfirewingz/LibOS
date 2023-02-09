@@ -13,7 +13,7 @@ class Buffer
     wl_buffer *buffer;
     uint32_t* buf;
     int32_t fd;
-    losSize *size;
+    losSize size;
     bool initalized = false;
     int create_shm()
     {
@@ -42,15 +42,15 @@ class Buffer
         int ret;
         do
         {
-            ret = ftruncate(fd, size->length_one * size->length_two * 4);
+            ret = ftruncate(fd, size.length_one * size.length_two * 4);
         } while (ret < 0 && errno == EINTR);
         if (ret < 0)
         {
             close(fd);
             return;
         }
-        wl_shm_pool *pool = wl_shm_create_pool(window->shm, fd, (size->length_one * 4) * size->length_two);
-        buffer = wl_shm_pool_create_buffer(pool, 0, size->length_one, size->length_two, size->length_one * 4, format);
+        wl_shm_pool *pool = wl_shm_create_pool(window->shm, fd, (size.length_one * 4) * size.length_two);
+        buffer = wl_shm_pool_create_buffer(pool, 0, size.length_one, size.length_two, size.length_one * 4, format);
         wl_shm_pool_destroy(pool);
         initalized = true;
     }
@@ -60,14 +60,14 @@ class Buffer
         if (!initalized)
             return false;
         buf = static_cast<uint32_t *>(
-            mmap(NULL, (size->length_one * 4) * size->length_two, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
+            mmap(NULL, (size.length_one * 4) * size.length_two, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
         if (buf == MAP_FAILED)
         {
             close(fd);
             return false;
         }
         memset(buf, window_state & LIBDECOR_WINDOW_STATE_ACTIVE ? 0xffbcbcbc : 0xff8e8e8e,
-               (size->length_one * 4) * size->length_two);
+               (size.length_one * 4) * size.length_two);
         return true;
     }
 
@@ -80,7 +80,7 @@ class Buffer
     {
         close(fd);
         wl_buffer_destroy(buffer);
-		munmap(buf, (size->length_one * 4) * size->length_two);
+		munmap(buf, (size.length_one * 4) * size.length_two);
     }
 };
 

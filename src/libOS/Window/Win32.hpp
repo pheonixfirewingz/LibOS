@@ -66,7 +66,6 @@ class Win32Window : public BaseWindow
 #else
     explicit Win32Window(const std::string, losSize) noexcept
     {
-        error = true;
     }
     virtual bool hasWindowClosed() const noexcept final override
     {
