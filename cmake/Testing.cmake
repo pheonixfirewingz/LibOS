@@ -1,5 +1,4 @@
 # this script is a mess and will need rewriting
-configure_file(src/test/Cmake.h.in ../src/test/Cmake.h @ONLY)
 include(FetchContent)
 include(GoogleTest)
 FetchContent_Declare(

@@ -34,19 +34,12 @@ struct losFileHandle_T
     }
 extern std::string getCorrectPath(const char *);
 
-std::string binaryPath()
+std::string platformGetCurrentPath()
 {
     char result[4096];
     if (readlink("/proc/self/exe", result, 4096) < 0)
         return "";
     return dirname(result);
-}
-
-std::string platformGetCurrentPath()
-{
-    // FIXME: doing this is bad and is a nasty hack
-    static std::string ret = binaryPath();
-    return ret;
 }
 
 std::vector<std::string> iSplit(std::string s, char delimiter) noexcept
@@ -121,7 +114,7 @@ losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)
         puts("\n");
         return LOS_ERROR_COULD_NOT_INIT;
     }
-    (*handle)->path = getCorrectPath(info.path);
+    (*handle)->path = std::move(path_corrected);
 
     if (flags_used == LOS_FILE_BIT_DELETE_AFTER_CLOSE)
         (*handle)->closeAfterDone = true;
