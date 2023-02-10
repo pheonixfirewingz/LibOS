@@ -1,4 +1,6 @@
 add_subdirectory(FileIO)
 add_subdirectory(Interface)
 add_subdirectory(NetIO)
-add_subdirectory(Window)
+if(NOT ${TERMIANL_MODE})
+	add_subdirectory(Window)
+endif()

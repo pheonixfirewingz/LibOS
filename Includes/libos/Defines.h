@@ -8,14 +8,20 @@
 #pragma once
 /*! \brief on windows some extra syntax is required for the dll to work properly so that is dose not affect the
  * platforms we check */
-#if _WIN64
-#    define EXPORT_DLL extern "C" __declspec(dllexport)
+#if ON_WINDOWS || ON_UWP || WIN32 || _WIN64
+#    if __cplusplus
+#        define EXPORT_DLL extern "C" __declspec(dllexport)
+#    else
+#        define EXPORT_DLL __declspec(dllexport)
+#    endif
+#    define EXPORT_CPP_DLL __declspec(dllexport)
 #else
 #    if __cplusplus
 #        define EXPORT_DLL extern "C"
 #    else
 #        define EXPORT_DLL
 #    endif
+#    define EXPORT_CPP_DLL
 #endif
 // LIBOS LICENCE
 //

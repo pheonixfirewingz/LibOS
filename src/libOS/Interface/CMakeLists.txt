@@ -5,7 +5,9 @@ ADD_FILES(
 	NetIO.cpp
 )
 
-ADD_FILES(
-	Window.cpp
-	AbstractWindow.h
-)
+if(NOT ${TERMIANL_MODE})
+	ADD_FILES(
+		Window.cpp
+		AbstractWindow.h
+	)
+endif()

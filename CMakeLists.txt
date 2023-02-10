@@ -3,8 +3,8 @@ project(libos C CXX)
 #options
 set(BUILD_DOCS OFF)
 set(ENABLE_TESTS ON)
-set(STATIC_BUILD ON)
-set(TERMIANL_MODE OFF)
+set(STATIC_BUILD OFF)
+set(TERMIANL_MODE ON)
 #options end
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")

@@ -18,7 +18,7 @@ typedef float float32_t;  //!< this data type is used to represent a 32bit float
 typedef double float64_t; //!< this data type is used to represent a 64bit floating point number
 typedef uint16_t unicode_t; //!< this data type is basically a uint16_t but from better code readably when working with text it will make more sense to use unicode_t
 typedef size_t data_size_t;   //!< this data type is used to represent size of some data unsigned version
-#if ON_WINDOWS || ON_UWP
+#if ON_WINDOWS || ON_UWP || WIN32 || _WIN64
 typedef signed long long int sdata_size_t; //!< this data type is used to represent size of some data signed version
 #else
 typedef ssize_t sdata_size_t; //!< this data type is used to represent size of some data signed version

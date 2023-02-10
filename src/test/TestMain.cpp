@@ -170,7 +170,7 @@ TEST(FileIO_Binary, deleteFile)
     EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
     libOSCleanUp();
 }
-
+#ifndef TERMIANL_MODE
 TEST(Graphics, Window)
 {
     int i = 0;
@@ -206,6 +206,7 @@ TEST(Graphics, Window)
     losDestroyWindow(window);
     libOSCleanUp();
 }
+#endif
 
 TEST(NetIO_Client, TCP)
 {
