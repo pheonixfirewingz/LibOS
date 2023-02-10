@@ -15,6 +15,9 @@ target_include_directories(Server PRIVATE ${PROJECT_SOURCE_DIR}/Includes)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_options(Server PRIVATE -static-libgcc -static-libstdc++)
 endif()
+if(MSVC)
+    target_compile_options(Server PRIVATE /EHsc)
+endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "WindowsStore")
     set(ASSET_FILES

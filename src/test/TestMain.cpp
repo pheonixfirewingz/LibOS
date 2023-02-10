@@ -25,7 +25,7 @@ TEST(FileIO_Normal, createFileOddPath)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_CREATE;
     file.path = path.data();
     file.path_size = path.size();
@@ -38,7 +38,7 @@ TEST(FileIO_Normal, deleteFileOddPath)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_DELETE_AFTER_CLOSE;
     file.path = path.data();
     file.path_size = path.size();
@@ -51,7 +51,7 @@ TEST(FileIO_Normal, createFile)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_CREATE;
     file.path = path_2.data();
     file.path_size = path_2.size();
@@ -64,7 +64,7 @@ TEST(FileIO_Normal, writeFile)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_WRITE;
     file.path = path_2.data();
     file.path_size = path_2.size();
@@ -78,12 +78,12 @@ TEST(FileIO_Normal, readFile)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_READ;
     file.path = path_2.data();
     file.path_size = path_2.size();
 
-    void *read_str;
+    void *read_str = nullptr;
     data_size_t read_str_size = 0;
 
     EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
@@ -99,7 +99,7 @@ TEST(FileIO_Normal, deleteFile)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_DELETE_AFTER_CLOSE;
     file.path = path_2.data();
     file.path_size = path_2.size();
@@ -112,7 +112,7 @@ TEST(FileIO_Binary, createFile)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_CREATE | LOS_FILE_BIT_BINARY;
     file.path = path_3.data();
     file.path_size = path_3.size();
@@ -125,7 +125,7 @@ TEST(FileIO_Binary, writeFile)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_WRITE | LOS_FILE_BIT_BINARY;
     file.path = path_3.data();
     file.path_size = path_3.size();
@@ -139,12 +139,12 @@ TEST(FileIO_Binary, readFile)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_READ | LOS_FILE_BIT_BINARY;
     file.path = path_3.data();
     file.path_size = path_3.size();
 
-    void *read_str;
+    void *read_str = nullptr;
     data_size_t read_str_size = 0;
 
     EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
@@ -162,7 +162,7 @@ TEST(FileIO_Binary, deleteFile)
 {
     libOSInit();
     losFileHandle handle;
-    losFileOpenInfo file;
+    losFileOpenInfo file{};
     file.fileBits = LOS_FILE_BIT_DELETE_AFTER_CLOSE | LOS_FILE_BIT_BINARY;
     file.path = path_3.data();
     file.path_size = path_3.size();
@@ -191,9 +191,9 @@ TEST(Graphics, Window)
             losRequestClose(window);
         if (losIsKeyDown(window, LOS_KEY_SPACE))
             puts("beep beep!");
-        if (losIsMouseDown(window, LOS_RIGHT_BUTTON))
+        if (losIsMouseDown(window, LOS_LEFT_BUTTON))
         {
-            losSize pos = losRequestMousePosition(window);
+            const losSize pos = losRequestMousePosition(window);
 #ifdef ON_WINDOWS
             printf("Mouse Click At -> X: '%I64u ,Y: '%I64u\n", pos.length_one, pos.length_two);
 #else
@@ -211,7 +211,7 @@ TEST(NetIO_Client, TCP)
 {
     libOSInit();
     losSocket handle;
-    losCreateSocketInfo file;
+    losCreateSocketInfo file{};
     file.socket_bits = LOS_SOCKET_TCP;
     file.address = address.c_str();
     file.port = 54000;
@@ -229,7 +229,7 @@ TEST(NetIO_Client, UDP)
 {
     libOSInit();
     losSocket handle;
-    losCreateSocketInfo file;
+    losCreateSocketInfo file{};
     file.socket_bits = LOS_SOCKET_UDP;
     file.address = address.c_str();
     file.port = 54001;
