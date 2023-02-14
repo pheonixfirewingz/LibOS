@@ -4,14 +4,11 @@
 //
 // Copyright Luke Shore (c) 2020, 2023
 #include <libos/NetIO.h>
-#    pragma comment(lib, "Ws2_32.lib")
-#    define _WINSOCK_DEPRECATED_NO_WARNINGS 1
-#    define WIN32_LEAN_AND_MEAN
-#    include <windows.h>
-#    include <iphlpapi.h>
-#    include <winsock2.h>
-#    include <ws2tcpip.h>
-#    include <stdio.h>
+#pragma comment(lib, "Ws2_32.lib")
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
+#include <string>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
 struct losSocket_T
 {
@@ -19,23 +16,33 @@ struct losSocket_T
     sockaddr_in server_address = {};
     bool isServer = false;
     bool isTCP = false;
+    bool failed = false;
 };
 
+uint32_ts g_sockets_in_use = 0;
+
 #define tellError() __tellError(__func__)
-inline losResult __tellError(const char *caller) noexcept
+inline losResult __tellError(const std::string caller) noexcept
 {
     int error = WSAGetLastError();
     switch (error)
     {
     case 0x274D: {
-        puts("ERROR: No connection could be made because the target machine actively refused it.\n");
+        OutputDebugStringW(L"ERROR: No connection could be made because the target machine actively refused it.\n");
         return LOS_NET_IO_CONNECTION_REFUSED;
     }
     default: {
+        std::wstring print_buffer = L"NETIO - ";
         wchar_t *s = NULL;
         FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                        NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&s, 0, NULL);
-        printf("NETIO - %s -> ERRORED: %i -> %S.\n", caller, error, s);
+        print_buffer += std::wstring(caller.begin(), caller.end());
+        print_buffer += L" -> ERRORED : ";
+        print_buffer += std::to_wstring(error);
+        print_buffer += L" ";
+        print_buffer += s;
+        print_buffer += L"\n";
+        OutputDebugStringW(print_buffer.c_str());
         LocalFree(s);
         return LOS_ERROR_COULD_NOT_INIT;
     }
@@ -96,14 +103,25 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
         (*socket_in)->isTCP = false;
         break;
     }
-    default:
+    default: {
+        (*socket_in)->failed = true;
         return LOS_ERROR_INVALID_FLAGS;
+    }
+    }
+
+    if ((*socket_in)->connect_socket == INVALID_SOCKET)
+    {
+        (*socket_in)->failed = true;
+        return tellError();
     }
 
     hostent *ip = gethostbyname(socket_info.address);
 
     if (ip == NULL)
+    {
+        (*socket_in)->failed = true;
         return LOS_NET_IO_DOMAIN_NOT_FOUND;
+    }
 
     sockaddr_in sockAddr = {0, 0, {}, {}};
     sockAddr.sin_port = htons(socket_info.port);
@@ -113,20 +131,29 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
     if ((*socket_in)->isServer)
     {
         if ((bind((*socket_in)->connect_socket, (sockaddr *)(&sockAddr), sizeof(sockAddr))) < 0)
+        {
+            (*socket_in)->failed = true;
             return tellError();
+        }
     }
 
     if ((*socket_in)->isTCP && !(*socket_in)->isServer)
     {
         if (connect((*socket_in)->connect_socket, (sockaddr *)(&sockAddr), sizeof(sockAddr)) < 0)
+        {
+            (*socket_in)->failed = true;
             return tellError();
+        }
     }
 
+    g_sockets_in_use++;
     return LOS_SUCCESS;
 }
 
- losResult losWaitForClient(const losSocket server, losSocket *socket_in)
+losResult losWaitForClient(const losSocket server, losSocket *socket_in)
 {
+    if (server->failed)
+        return LOS_ERROR_MALFORMED_DATA;
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_MALFORMED_DATA;
     if (listen(server->connect_socket, 10) < 0)
@@ -134,17 +161,23 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
     (*socket_in) = new losSocket_T();
     (*socket_in)->isTCP = true;
     if (((*socket_in)->connect_socket = accept(server->connect_socket, NULL, NULL)) == -1)
-        return tellError();
+    {
+       (*socket_in)->failed = true;
+       return tellError();
+    }
+    g_sockets_in_use++;
     return LOS_SUCCESS;
 }
 
 losResult losReadSocket(const losSocket socket, void *data, const data_size_t size)
 {
+    if (socket->failed)
+        return LOS_ERROR_MALFORMED_DATA;
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_INIT;
     int iResult = 0;
     if (socket->isTCP)
-        iResult = recv(socket->connect_socket, (char*)data, (int)size, 0);
+        iResult = recv(socket->connect_socket, (char *)data, (int)size, 0);
     else
     {
         int struct_size = sizeof(sockaddr_in);
@@ -152,7 +185,7 @@ losResult losReadSocket(const losSocket socket, void *data, const data_size_t si
         {
             losUdpData *casted = (losUdpData *)data;
             memset(casted, 0, sizeof(losUdpData));
-            casted->client = new (std::nothrow) losSocket_T();
+            casted->client = new losSocket_T();
             if (casted->client == NULL)
                 return LOS_ERROR_COULD_NOT_INIT;
             casted->client->isTCP = false;
@@ -165,7 +198,8 @@ losResult losReadSocket(const losSocket socket, void *data, const data_size_t si
         {
             if (!data)
                 data = new char[size];
-            iResult = recvfrom(socket->connect_socket, (char *)data, (int)size, 0, (SOCKADDR *)&socket->server_address, &struct_size);
+            iResult = recvfrom(socket->connect_socket, (char *)data, (int)size, 0, (SOCKADDR *)&socket->server_address,
+                               &struct_size);
         }
     }
     if (iResult < 0)
@@ -178,12 +212,14 @@ losResult losReadSocket(const losSocket socket, void *data, const data_size_t si
 
 losResult losWriteSocket(const losSocket socket, const void *data, const data_size_t size)
 {
+    if (socket->failed)
+        return LOS_ERROR_MALFORMED_DATA;
     if (isLoaded(false) != LOS_SUCCESS)
         return LOS_ERROR_COULD_NOT_INIT;
     if (socket->isTCP)
     {
 #pragma warning(disable : 4267)
-        if (send(socket->connect_socket, (const char*)data, size, 0) < 0)
+        if (send(socket->connect_socket, (const char *)data, size, 0) < 0)
             return tellError();
     }
     else
@@ -198,8 +234,9 @@ losResult losWriteSocket(const losSocket socket, const void *data, const data_si
         }
         else
         {
-            
-            if (sendto(socket->connect_socket, (const char *)data, size, 0, (sockaddr *)&socket->server_address,struct_size) < 0)
+
+            if (sendto(socket->connect_socket, (const char *)data, size, 0, (sockaddr *)&socket->server_address,
+                       struct_size) < 0)
 #pragma warning(default : 4267)
                 return tellError();
         }
@@ -212,8 +249,15 @@ losResult losDestroySocket(losSocket socket)
     if (socket->isTCP)
         shutdown(socket->connect_socket, SD_SEND);
     closesocket(socket->connect_socket);
-    if (isLoaded(true) != LOS_SUCCESS)
-        return LOS_ERROR_COULD_NOT_DESTROY;
+    if (socket)
+        delete socket;
+    if (g_sockets_in_use != 0)
+        g_sockets_in_use--;
+    if (g_sockets_in_use == 0)
+    {
+        if (isLoaded(true) != LOS_SUCCESS)
+            return LOS_ERROR_COULD_NOT_DESTROY;
+    }
     return LOS_SUCCESS;
 }
 
