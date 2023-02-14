@@ -95,7 +95,7 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
 
 losResult losWaitForClient(const losSocket server, losSocket *socket_in)
 {
-    if(!server->failed)
+    if(server->failed)
         return LOS_ERROR_MALFORMED_DATA;
     if (listen(server->connect_socket, 10) < 0)
     {
@@ -115,7 +115,7 @@ losResult losWaitForClient(const losSocket server, losSocket *socket_in)
 
 losResult losReadSocket(const losSocket socket, void *data, const data_size_t size)
 {
-    if (!socket->failed)
+    if (socket->failed)
         return LOS_ERROR_MALFORMED_DATA;
     int iResult = 0;
     if (socket->isTCP)
@@ -154,7 +154,7 @@ losResult losReadSocket(const losSocket socket, void *data, const data_size_t si
 
 losResult losWriteSocket(const losSocket socket, const void *data, const data_size_t size)
 {
-    if (!socket->failed)
+    if (socket->failed)
         return LOS_ERROR_MALFORMED_DATA;
     if (socket->isTCP)
     {
