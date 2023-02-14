@@ -9,6 +9,6 @@ function(add_files)
     endif()
 
     foreach(FILE IN LISTS PARAM_FILES)
-        target_sources(libos PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${FILE})
+        target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${FILE})
     endforeach()
 endfunction()
