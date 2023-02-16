@@ -68,6 +68,11 @@ std::vector<std::string> platformSplit(std::string path) noexcept
     return ret;
 }
 
+losResult losDoseFileExist(const char *path)
+{
+    return access(getCorrectPath(path).c_str(), F_OK) == 0? LOS_SUCCESS : LOS_ERROR_MALFORMED_DATA;
+}
+
 losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)
 {
     if (!(*handle = new losFileHandle_T()))

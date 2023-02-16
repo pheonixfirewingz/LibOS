@@ -73,6 +73,12 @@ std::vector<std::string> iSplit(std::string s, char delimiter) noexcept
     return pBuffer;
 }
 
+losResult losDoseFileExist(const char *path)
+{
+    DWORD fileAttributes = GetFileAttributes(getCorrectPath(path).c_str());
+    return fileAttributes != INVALID_FILE_ATTRIBUTES && !(fileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? LOS_SUCCESS : LOS_ERROR_MALFORMED_DATA;
+}
+
 losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)
 {
     if (!(*handle))

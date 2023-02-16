@@ -29,7 +29,9 @@ TEST(FileIO_Normal, createFileOddPath)
     file.fileBits = LOS_FILE_BIT_CREATE;
     file.path = path.data();
     file.path_size = path.size();
+    EXPECT_EQ(losDoseFileExist(path.c_str()), LOS_ERROR_MALFORMED_DATA);
     EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
+    EXPECT_EQ(losDoseFileExist(path.c_str()), LOS_SUCCESS);
     EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
     libOSCleanUp();
 }

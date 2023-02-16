@@ -50,6 +50,12 @@ typedef struct losFileOpenInfo
  */
 EXPORT_DLL losResult losSetAssetPath(const char *path);
 /*!
+ * \param[in] path
+ * \return losResult
+ * \brief losDoseFileExist can be used to check if the file exists
+ */
+EXPORT_DLL losResult losDoseFileExist(const char *path);
+/*!
  * \param[out] handle
  * \param[in] file_info
  * \return losResult
