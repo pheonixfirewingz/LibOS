@@ -66,7 +66,6 @@ else()
     add_library(libos SHARED ${PROJECT_SOURCE_DIR}/base.cpp)
 endif()
     flagsSetup()
-    set_target_properties(libos PROPERTIES OUTPUT_NAME "libos")
 
 if(CMAKE_SYSTEM_NAME MATCHES Linux)
     include(FindPkgConfig)
@@ -85,6 +84,9 @@ if(CMAKE_SYSTEM_NAME MATCHES Linux)
     target_include_directories(libos PRIVATE ${PROJECT_SOURCE_DIR}/src/shared STATIC)
 
     target_link_libraries(libos PRIVATE ${LIBDECOR_LIBRARIES} ${XKB_LIBRARIES} ${WAYLAND_LIBRARIES} ${XCB_LIBRARIES} ${XCB_KEYSYMS_LIBRARIES})
+    set_target_properties(libos PROPERTIES OUTPUT_NAME "os")
+else()
+    set_target_properties(libos PROPERTIES OUTPUT_NAME "libos")
 endif()
 
 target_include_directories(libos PRIVATE ${PROJECT_SOURCE_DIR}/Includes STATIC)
