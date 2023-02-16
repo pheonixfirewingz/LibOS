@@ -54,14 +54,14 @@ std::vector<std::string> platformSplit(std::string path) noexcept
 {
     std::vector<std::string> ret;
     auto s = iSplit(path.c_str(), '/');
-    for (auto str : s)
+    for (auto& str : s)
     {
         if (!str.contains("\\"))
             ret.push_back(str);
         else
         {
             auto t = iSplit(str, '\\');
-            for (auto r : t)
+            for (auto& r : t)
                 ret.push_back(r);
         }
     }
@@ -111,7 +111,7 @@ losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)
     default:
         return LOS_ERROR_INVALID_FLAGS;
     }
-    const std::string path_corrected = getCorrectPath(info.path);
+    const std::string path_corrected = getCorrectPath(std::string(info.path,0,info.path_size).c_str());
     if (((*handle)->n_handle = open64(path_corrected.c_str(), file_flags, extend)) < 0)
     {
         puts("LIBOS ERROR: Could not open file");

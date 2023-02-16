@@ -34,7 +34,7 @@ std::string getCorrectPath(const char *path)
             if (command == "binary_base")
             {
                 auto sun_tuk = platformSplit(platformGetCurrentPath());
-#ifdef ON_LINUX
+#if defined(ON_LINUX)
                     for (data_size_t i = 0; i < sun_tuk.size(); i++)
                         ret_path += (sun_tuk[i] += '/');
 #else

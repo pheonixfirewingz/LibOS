@@ -5,9 +5,6 @@
 //
 // Copyright Luke Shore (c) 2020, 2023
 #include "../Interface/AbstractWindow.h"
-#ifndef ON_LINUX
-#    define ON_LINUX
-#endif
 #if __has_include(<xcb/xcb.h>) && defined(ON_LINUX)
 #    include <xcb/xcb.h>
 #    include <xcb/xcb_keysyms.h>
