@@ -60,6 +60,7 @@ Nobody is perfect, and sometimes we mess things up. That said, Here are some goo
 >
 > - Windows 11 (WinRT)
 > - Ubuntu latest (Wayland)
+> - Android
 >
 > ## Planned
 >

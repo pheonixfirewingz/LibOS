@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-std::string asset_path = "NOT_SET";
+static std::string asset_path = "NOT_SET";
 extern std::vector<std::string> platformSplit(std::string path) noexcept;
 extern std::string platformGetCurrentPath();
 
@@ -34,7 +34,7 @@ std::string getCorrectPath(const char *path)
             if (command == "binary_base")
             {
                 auto sun_tuk = platformSplit(platformGetCurrentPath());
-#if defined(ON_LINUX)
+#if defined(ON_LINUX) || defined(ON_ANDROID)
                     for (data_size_t i = 0; i < sun_tuk.size(); i++)
                         ret_path += (sun_tuk[i] += '/');
 #else
@@ -53,7 +53,7 @@ std::string getCorrectPath(const char *path)
         else
             ret_path += (tokens += '/');
     }
-#ifdef ON_LINUX
+#if defined(ON_LINUX) || defined(ON_ANDROID)
         if (!ret_path.starts_with('/'))
         ret_path = (std::string() += '/') += ret_path;
 #endif

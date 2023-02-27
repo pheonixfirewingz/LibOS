@@ -18,7 +18,7 @@ typedef float float32_t;  //!< this data type is used to represent a 32bit float
 typedef double float64_t; //!< this data type is used to represent a 64bit floating point number
 typedef uint16_t unicode_t; //!< this data type is basically a uint16_t but from better code readably when working with text it will make more sense to use unicode_t
 typedef size_t data_size_t;   //!< this data type is used to represent size of some data unsigned version
-#if ON_WINDOWS || ON_UWP || WIN32 || _WIN64
+#if defined(ON_WINDOWS) || defined(ON_UWP) || defined(WIN32) || defined(_WIN64)
 typedef signed long long int sdata_size_t; //!< this data type is used to represent size of some data signed version
 #else
 typedef ssize_t sdata_size_t; //!< this data type is used to represent size of some data signed version
@@ -43,8 +43,8 @@ typedef std::atomic<sdata_size_t> sdata_size_ts; //!< this is men't do be a thre
  * \brief losSize is used to represent a size of a window or position of this mouse */
 typedef struct losSize
 {
-    int64_t length_one = (int64_t)0; //!< length_one is the same as width or x
-    int64_t length_two = (int64_t)0; //!< length_one is the same as height or y
+    int64_t length_one = static_cast<int64_t>(0); //!< length_one is the same as width or x
+    int64_t length_two = static_cast<int64_t>(0); //!< length_one is the same as height or y
 } losSize;
 /*!
  * \brief losResult enum is used to indicate the result of a LibOS function call that can fail instead of throwing a

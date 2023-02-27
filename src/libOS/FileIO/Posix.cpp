@@ -10,8 +10,12 @@
 #include <linux/limits.h>
 #include <iomanip>
 #include <iostream>
+#if __has_include(<ranges>)
 #include <ranges>
 #include <string_view>
+#else
+#include <string>
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -41,7 +45,7 @@ std::string platformGetCurrentPath()
         return "";
     return dirname(result);
 }
-
+#if __has_include(<ranges>)
 std::vector<std::string> iSplit(std::string s, char delimiter) noexcept
 {
     std::vector<std::string> ret;
@@ -49,6 +53,22 @@ std::vector<std::string> iSplit(std::string s, char delimiter) noexcept
         ret.push_back(std::string(word.begin(), word.end()));
     return ret;
 }
+#else
+std::vector<std::string> iSplit(std::string in,char delimiter) noexcept
+{
+    size_t pos = 0;
+    std::vector<std::string> ret;
+    do
+    {
+        size_t start = pos + 1;
+        pos = in.find(delimiter, start);
+        auto sub = in.substr(start, pos - start);
+        if (!sub.empty())
+            ret.push_back(sub);
+    } while (pos != std::string::npos);
+    return ret;
+}
+#endif
 
 std::vector<std::string> platformSplit(std::string path) noexcept
 {
@@ -56,7 +76,7 @@ std::vector<std::string> platformSplit(std::string path) noexcept
     auto s = iSplit(path.c_str(), '/');
     for (auto& str : s)
     {
-        if (!str.contains("\\"))
+        if (str.find("\\") != std::string::npos)
             ret.push_back(str);
         else
         {

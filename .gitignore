@@ -1,6 +1,6 @@
 build
-TOOLCHAIN
+.cxx
+.gradle
 .vs
 .vscode
 .idea
-src/test/Cmake.h

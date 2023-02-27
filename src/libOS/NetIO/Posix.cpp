@@ -7,10 +7,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <libos/NetIO.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <libos/NetIO.h>
 
 losResult tellError() noexcept
 {
@@ -64,7 +64,7 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
 
     hostent *ip = gethostbyname(socket_info.address);
 
-    if (ip == NULL)
+    if (ip == nullptr)
         return LOS_NET_IO_DOMAIN_NOT_FOUND;
 
     sockaddr_in sockAddr = {0, 0, {}, {}};
@@ -74,7 +74,7 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
 
     if ((*socket_in)->isServer)
     {
-        if ((bind((*socket_in)->connect_socket, (sockaddr *)(&sockAddr), sizeof(sockAddr))) < 0)
+        if ((bind((*socket_in)->connect_socket, reinterpret_cast<sockaddr *>(&sockAddr), sizeof(sockAddr))) < 0)
         {
             (*socket_in)->failed = true;
             return tellError();
@@ -83,7 +83,7 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
 
     if ((*socket_in)->isTCP && !(*socket_in)->isServer)
     {
-        if (connect((*socket_in)->connect_socket, (sockaddr *)(&sockAddr), sizeof(sockAddr)) < 0)
+        if (connect((*socket_in)->connect_socket, reinterpret_cast<sockaddr *>(&sockAddr), sizeof(sockAddr)) < 0)
         {
             (*socket_in)->failed = true;
             return tellError();
@@ -105,7 +105,7 @@ losResult losWaitForClient(const losSocket server, losSocket *socket_in)
     if (!(*socket_in = new losSocket_T()))
         return LOS_ERROR_COULD_NOT_INIT;
     (*socket_in)->isTCP = true;
-    if (((*socket_in)->connect_socket = accept(server->connect_socket, NULL, NULL)) == -1)
+    if (((*socket_in)->connect_socket = accept(server->connect_socket, nullptr, nullptr)) == -1)
     {
         (*socket_in)->failed = true;
         return tellError();
@@ -119,28 +119,28 @@ losResult losReadSocket(const losSocket socket, void *data, const data_size_t si
         return LOS_ERROR_MALFORMED_DATA;
     int iResult = 0;
     if (socket->isTCP)
-        iResult = recv(socket->connect_socket, (char *)data, (int)size, 0);
+        iResult = recv(socket->connect_socket, static_cast<char *>(data), static_cast<int>(size), 0);
     else
     {
         socklen_t struct_size = sizeof(sockaddr_in);
         if (socket->isServer)
         {
-            losUdpData *casted = (losUdpData *)data;
+            auto *casted = static_cast<losUdpData*>(data);
             memset(casted, 0, sizeof(losUdpData));
             casted->client = new losSocket_T();
-            if (casted->client == NULL)
+            if (casted->client == nullptr)
                 return LOS_ERROR_COULD_NOT_INIT;
             casted->client->isTCP = false;
             casted->client->isServer = false;
             casted->data = new char[size];
-            iResult = recvfrom(socket->connect_socket, (char *)casted->data, (int)size, 0,
-                               (sockaddr *)&casted->client->server_address, &struct_size);
+            iResult = recvfrom(socket->connect_socket, static_cast<char *>(casted->data), static_cast<int>(size), 0,
+                               reinterpret_cast<sockaddr *>(&casted->client->server_address), &struct_size);
         }
         else
         {
             if (!data)
                 data = new char[size];
-            iResult = recvfrom(socket->connect_socket, (char *)data, (int)size, 0, (sockaddr *)&socket->server_address,
+            iResult = recvfrom(socket->connect_socket, static_cast<char *>(data), static_cast<int>(size), 0, reinterpret_cast<sockaddr *>(&socket->server_address),
                                &struct_size);
         }
     }
@@ -158,7 +158,7 @@ losResult losWriteSocket(const losSocket socket, const void *data, const data_si
         return LOS_ERROR_MALFORMED_DATA;
     if (socket->isTCP)
     {
-        if (send(socket->connect_socket, (const char *)data, size, 0) < 0)
+        if (send(socket->connect_socket, static_cast<const char *>(data), size, 0) < 0)
             return tellError();
     }
     else
@@ -166,15 +166,15 @@ losResult losWriteSocket(const losSocket socket, const void *data, const data_si
         socklen_t struct_size = sizeof(sockaddr_in);
         if (socket->isServer)
         {
-            losUdpData *casted = (losUdpData *)data;
-            if (sendto(socket->connect_socket, (const char *)casted->data, size, 0,
-                       (sockaddr *)&casted->client->server_address, struct_size) < 0)
+            auto *casted = static_cast<const losUdpData*>(data);
+            if (sendto(socket->connect_socket, static_cast<const char *>(casted->data), size, 0,
+                       reinterpret_cast<sockaddr *>(&casted->client->server_address), struct_size) < 0)
                 return tellError();
         }
         else
         {
 
-            if (sendto(socket->connect_socket, (const char *)data, size, 0, (sockaddr *)&socket->server_address,
+            if (sendto(socket->connect_socket, static_cast<const char *>(data), size, 0, reinterpret_cast<sockaddr *>(&socket->server_address),
                        struct_size) < 0)
                 return tellError();
         }

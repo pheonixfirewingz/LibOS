@@ -5,7 +5,7 @@
 // Copyright Luke Shore (c) 2020, 2023
 #include <libos/Defines.h>
 
-#ifdef ON_LINUX
+#if defined(ON_LINUX) || defined(ON_ANDROID)
 void libOSInit()
 {
 }

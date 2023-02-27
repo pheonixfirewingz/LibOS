@@ -8,7 +8,7 @@
 #pragma once
 /*! \brief on windows some extra syntax is required for the dll to work properly so that is dose not affect the
  * platforms we check */
-#if ON_WINDOWS || ON_UWP || WIN32 || _WIN64
+#if defined(ON_WINDOWS) || defined(ON_UWP) || defined(WIN32) || defined(_WIN64)
 #    if __cplusplus
 #        define EXPORT_DLL extern "C" __declspec(dllexport)
 #    else
