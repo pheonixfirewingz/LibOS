@@ -1,7 +1,7 @@
 /*!
  * \file FileIO.h
  * \author Luke Shore <lukethemodded@gmail.com>
- * \version 1.0
+ * \version 1.2
  * \date 05/6/2022
  * \brief FileIO is a simple cross-platform API for reading and writing files from the filesystem
  */
@@ -23,12 +23,13 @@ typedef struct losFileHandle_T *losFileHandle;
  */
 typedef enum losFileBits
 {
-    LOS_FILE_BIT_READ = 0x001,               //!< Read file flag bit
-    LOS_FILE_BIT_WRITE = 0x002,              //!< Write file flag bit
-    LOS_FILE_BIT_BINARY = 0x004,             //!< Binary file flag bit
-    LOS_FILE_BIT_CREATE = 0x008,             //!< Create file if dose not exist flag bit
-    LOS_FILE_BIT_DELETE_AFTER_CLOSE = 0x016, //!< tells the library do delete the file after using it flag bit
-    LOS_FILE_BIT_FLIP_ENDIAN = 0x032,        //!< flip the files read bits form original flag bit (NOT_IMPLEMENTED)
+    LOS_FILE_BIT_READ = 0x01,               //!< Read file flag bit
+    LOS_FILE_BIT_WRITE = 0x02,              //!< Write file flag bit
+    LOS_FILE_BIT_BINARY = 0x04,             //!< Binary aka library handle file flag bit (NOT_IMPLEMENTED)
+    LOS_FILE_BIT_UNICODE = 0x08,            //!< Unicode file flag bit
+    LOS_FILE_BIT_CREATE = 0x10,             //!< Create file if does not exist flag bit
+    LOS_FILE_BIT_DELETE_AFTER_CLOSE = 0x20, //!< Tells the library to delete the file after using it flag bit
+    LOS_FILE_BIT_FLIP_ENDIAN = 0x40,        //!< Flip the file's read bits from the original flag bit (NOT_IMPLEMENTED)
 } losFileBits;
 /*!
  *  \brief losFileOpenInfo is the file creation struct we pass this into the creation function for the library to create
@@ -67,7 +68,7 @@ EXPORT_DLL losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo fi
  * \param[out] buffer
  * \param[out] bytes_read
  * \return losResult
- * \brief losReadFile read data to native file held by the library object
+ * \brief losReadFile read data to native file held by the library object when in unicode mode it will return UTF-8 data encoding from the read
  */
 EXPORT_DLL losResult losReadFile(losFileHandle handle, void **buffer, data_size_t *bytes_read);
 /*!
@@ -75,7 +76,7 @@ EXPORT_DLL losResult losReadFile(losFileHandle handle, void **buffer, data_size_
  * \param[in] buffer
  * \param[in] buffer_size
  * \return losResult
- * \brief losWriteFile write data to native file held by the library object
+ * \brief losWriteFile write data to native file held by the library object when in unicode mode it expects UTF-8 data encoding to write
  */
 EXPORT_DLL losResult losWriteFile(losFileHandle handle, const void *buffer, const data_size_t buffer_size);
 /*!

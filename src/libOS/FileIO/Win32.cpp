@@ -3,13 +3,13 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
+#include <atomic>
 #include <libos/Defines.h>
 #include <libos/FileIO.h>
-#include <string>
 #include <ranges>
+#include <string>
 #include <string_view>
 #include <vector>
-#include <atomic>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
@@ -28,7 +28,7 @@ struct losFileHandle_T
         break;                           \
     }
 
-extern std::string getCorrectPath(const char *);
+extern extern std::string getCorrectPath(const std::string);
 
 #pragma warning(push)
 #pragma warning(disable : 4172)
@@ -40,43 +40,20 @@ std::string platformGetCurrentPath()
 }
 #pragma warning(pop)
 
-std::vector<std::string> iSplit(std::string s, char delimiter) noexcept
-{
-    std::vector<std::string> ret;
-    for (const auto word : std::views::split(s, delimiter))
-        ret.push_back(std::string(word.begin(), word.end()));
-    return ret;
-}
-
- std::vector<std::string> platformSplit(std::string path) noexcept
-{
-    std::vector<std::string> ret;
-    auto s = iSplit(path.c_str(), '/');
-    for (auto& str : s)
-    {
-        if (!str.contains("\\"))
-            ret.push_back(str);
-        else
-        {
-            auto t = iSplit(str, '\\');
-            for (auto& r : t)
-                ret.push_back(r);
-        }
-    }
-    return ret;
-}
-
- LPSTR GetFormattedMessage(LPCVOID pMessage)
+LPSTR GetFormattedMessage(LPCVOID pMessage)
 {
     LPSTR pBuffer = NULL;
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, pMessage, 0, 0, (LPSTR)&pBuffer, 0,NULL);
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, pMessage, 0, 0, (LPSTR)&pBuffer, 0,
+                  NULL);
     return pBuffer;
 }
 
 losResult losDoseFileExist(const char *path)
 {
     DWORD fileAttributes = GetFileAttributes(getCorrectPath(path).c_str());
-    return fileAttributes != INVALID_FILE_ATTRIBUTES && !(fileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? LOS_SUCCESS : LOS_ERROR_MALFORMED_DATA;
+    return fileAttributes != INVALID_FILE_ATTRIBUTES && !(fileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+               ? LOS_SUCCESS
+               : LOS_ERROR_MALFORMED_DATA;
 }
 
 losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)

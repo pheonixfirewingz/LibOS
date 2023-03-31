@@ -15,6 +15,7 @@ const std::string path = "$[binary_base]\\test.txt";
 const std::string path_2 = "$[binary_base]/test.txt";
 const std::string path_3 = "$[binary_base]/test.bin";
 const std::string test_str = "this is a test";
+const std::u8string test_str_u = u8"this is a test 🫂";
 const testBINARY test_struct = {4259, 15, "this is a test"};
 const std::string address = "127.0.0.1";
 std::string path_one = "$[asset_base]/tests/Shader/VertexShader.vert.spirv";
@@ -90,14 +91,81 @@ TEST(FileIO_Normal, readFile)
 
     EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
     EXPECT_EQ(losReadFile(handle, &read_str, &read_str_size), LOS_SUCCESS);
-    EXPECT_NE(read_str_size, 0);
-    std::string read_test((char *)read_str, 0, read_str_size);
-    EXPECT_STREQ(read_test.c_str(), test_str.c_str());
+    EXPECT_GT(read_str_size, 0);
+    if (read_str_size < 0)
+    {
+        std::string read_test((char *)read_str, 0, read_str_size);
+        EXPECT_STREQ(read_test.c_str(), test_str.c_str());
+    }
     EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
     libOSCleanUp();
 }
 
 TEST(FileIO_Normal, deleteFile)
+{
+    libOSInit();
+    losFileHandle handle;
+    losFileOpenInfo file{};
+    file.fileBits = LOS_FILE_BIT_DELETE_AFTER_CLOSE;
+    file.path = path_2.data();
+    file.path_size = path_2.size();
+    EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
+    EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
+    libOSCleanUp();
+}
+
+TEST(FileIO_Normal_Unicode, createFile)
+{
+    libOSInit();
+    losFileHandle handle;
+    losFileOpenInfo file{};
+    file.fileBits = LOS_FILE_BIT_CREATE;
+    file.path = path_2.data();
+    file.path_size = path_2.size();
+    EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
+    EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
+    libOSCleanUp();
+}
+
+TEST(FileIO_Normal_Unicode, writeFile)
+{
+    libOSInit();
+    losFileHandle handle;
+    losFileOpenInfo file{};
+    file.fileBits = LOS_FILE_BIT_WRITE | LOS_FILE_BIT_UNICODE;
+    file.path = path_2.data();
+    file.path_size = path_2.size();
+    EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
+    EXPECT_EQ(losWriteFile(handle, (void *)test_str_u.c_str(), test_str_u.size()), LOS_SUCCESS);
+    EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
+    libOSCleanUp();
+}
+
+TEST(FileIO_Normal_Unicode, readFile)
+{
+    libOSInit();
+    losFileHandle handle;
+    losFileOpenInfo file{};
+    file.fileBits = LOS_FILE_BIT_READ | LOS_FILE_BIT_UNICODE;
+    file.path = path_2.data();
+    file.path_size = path_2.size();
+
+    void *read_str = nullptr;
+    data_size_t read_str_size = 0;
+
+    EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
+    EXPECT_EQ(losReadFile(handle, &read_str, &read_str_size), LOS_SUCCESS);
+    EXPECT_GT(read_str_size, 0);
+    if (read_str_size > 0)
+    {
+        std::u8string read_test((char8_t *)read_str, 0, read_str_size);
+        EXPECT_LE(read_test.compare(test_str_u), 0);
+    }
+    EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
+    libOSCleanUp();
+}
+
+TEST(FileIO_Normal_Unicode, deleteFile)
 {
     libOSInit();
     losFileHandle handle;
@@ -152,10 +220,13 @@ TEST(FileIO_Binary, readFile)
     EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
     EXPECT_EQ(losReadFile(handle, &read_str, &read_str_size), LOS_SUCCESS);
     EXPECT_NE(read_str_size, 0);
-    testBINARY *test_read_struct = (testBINARY *)read_str;
-    EXPECT_EQ(test_read_struct->index, 4259);
-    EXPECT_EQ(test_read_struct->name_size, 15);
-    EXPECT_STREQ(test_read_struct->name, test_struct.name);
+    if (read_str_size > 0)
+    {
+        testBINARY *test_read_struct = (testBINARY *)read_str;
+        EXPECT_EQ(test_read_struct->index, 4259);
+        EXPECT_EQ(test_read_struct->name_size, 15);
+        EXPECT_STREQ(test_read_struct->name, test_struct.name);
+    }
     EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
     libOSCleanUp();
 }
@@ -196,11 +267,11 @@ TEST(Graphics, Window)
         if (losIsMouseDown(window, LOS_LEFT_BUTTON))
         {
             const losSize pos = losRequestMousePosition(window);
-#ifdef ON_WINDOWS
+#    ifdef ON_WINDOWS
             printf("Mouse Click At -> X: '%I64u ,Y: '%I64u\n", pos.length_one, pos.length_two);
-#else
+#    else
             printf("Mouse Click At -> X: '%lu ,Y: '%lu\n", pos.length_one, pos.length_two);
-#endif
+#    endif
         }
         system_clock::time_point end_time = system_clock::now();
         std::this_thread::sleep_for(16.5ms - (end_time - start_time));

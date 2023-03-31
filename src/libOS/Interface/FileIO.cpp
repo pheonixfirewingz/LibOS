@@ -7,55 +7,33 @@
 #include <string>
 #include <vector>
 
-static std::string asset_path = "NOT_SET";
-extern std::vector<std::string> platformSplit(std::string path) noexcept;
 extern std::string platformGetCurrentPath();
 
+static std::string asset_path = "NOT_SET"; // Global variable to store the asset path
+
+// Declares a function that sets the asset path to be used by the library
 losResult losSetAssetPath(const char *path)
 {
-    asset_path = path;
-    return LOS_SUCCESS;
+    asset_path = path;  // Sets the asset path
+    return LOS_SUCCESS; // Returns success status
 }
 
-std::string getCorrectPath(const char *path)
+// A utility function to get the correct path of the file based on platform and asset path
+std::string getCorrectPath(const std::string path)
 {
-    std::string ret_path;
-    std::vector<std::string> path_tokens = platformSplit(path);
-
-    for (auto &tokens : path_tokens)
+    std::string corrected_path = path;                  // Creates a copy of the path to modify it
+    size_t pos = corrected_path.find("$[binary_base]"); // Searches for "$[binary_base]" string in the path
+    if (pos != std::string::npos)                       // If found
+        corrected_path.replace(pos, std::string("$[binary_base]").length(),
+                               platformGetCurrentPath()); // Replaces it with the platform-specific path of the binary
+    pos = corrected_path.find("$[asset_path]");           // Searches for "$[asset_path]" string in the path
+    if (pos != std::string::npos)                         // If found
+        corrected_path.replace(pos, std::string("$[asset_path]").length(),
+                               asset_path);              // Replaces it with the asset path
+    for (size_t i = 0; i < corrected_path.length(); ++i) // Loops through the path characters
     {
-        if (tokens[0] == '$')
-        {
-            std::string command;
-            {
-                std::string processed_1 = tokens.substr(2);
-                command = processed_1.substr(0, processed_1.size() - 1);
-            }
-            if (command == "binary_base")
-            {
-                auto sun_tuk = platformSplit(platformGetCurrentPath());
-#if defined(ON_LINUX) || defined(ON_ANDROID)
-                    for (data_size_t i = 0; i < sun_tuk.size(); i++)
-                        ret_path += (sun_tuk[i] += '/');
-#else
-                    for (data_size_t i = 0; i < sun_tuk.size() - 1; i++)
-                        ret_path += (sun_tuk[i] += '/');
-#endif
-            }
-            else if (command == "asset_base")
-            {
-                ret_path += asset_path;
-                ret_path += '/';
-            }
-        }
-        else if (tokens.find('.') != std::string::npos)
-            ret_path += tokens;
-        else
-            ret_path += (tokens += '/');
+        if (corrected_path[i] == '\\') // If the character is a backslash
+            corrected_path[i] = '/';   // Replaces it with a forward slash
     }
-#if defined(ON_LINUX) || defined(ON_ANDROID)
-        if (!ret_path.starts_with('/'))
-        ret_path = (std::string() += '/') += ret_path;
-#endif
-    return ret_path;
+    return corrected_path; // Returns the corrected path
 }
