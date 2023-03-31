@@ -14,9 +14,16 @@
 /*! Importation of libraries*/
 #include <atomic>
 #include <stdint.h>
+#    if __cplusplus
+#include <string>
+namespace std
+{
+    typedef u8string unicodestring; //!< simple string name alias 
+}
+#endif
 typedef float float32_t;  //!< this data type is used to represent a 32bit floating point number
 typedef double float64_t; //!< this data type is used to represent a 64bit floating point number
-typedef uint16_t unicode_t; //!< this data type is basically a uint16_t but from better code readably when working with text it will make more sense to use unicode_t
+typedef char8_t unicode_t; //!< this data type is basically a uint16_t but from better code readably when working with text it will make more sense to use unicode_t
 typedef size_t data_size_t;   //!< this data type is used to represent size of some data unsigned version
 #if defined(ON_WINDOWS) || defined(ON_UWP) || defined(WIN32) || defined(_WIN64)
 typedef signed long long int sdata_size_t; //!< this data type is used to represent size of some data signed version
