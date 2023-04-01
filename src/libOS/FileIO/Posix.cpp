@@ -102,6 +102,7 @@ losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo info)
     {
         (*handle)->errored = true;
         std::cerr << "system error: " << std::strerror(errno) << std::endl;
+        std::cerr << "path: " << (*handle)->path << std::endl;
         return LOS_ERROR_COULD_NOT_INIT;
     }
 
