@@ -5,7 +5,7 @@
 // Copyright Luke Shore (c) 2020, 2023
 #include <libos/FileIO.h>
 #include <string>
-#include <vector>
+#include <algorithm>
 
 extern std::string platformGetCurrentPath();
 
@@ -30,10 +30,7 @@ std::string getCorrectPath(const std::string path)
     if (pos != std::string::npos)                         // If found
         corrected_path.replace(pos, std::string("$[asset_path]").length(),
                                asset_path);              // Replaces it with the asset path
-    for (size_t i = 0; i < corrected_path.length(); ++i) // Loops through the path characters
-    {
-        if (corrected_path[i] == '\\') // If the character is a backslash
-            corrected_path[i] = '/';   // Replaces it with a forward slash
-    }
+
+    std::replace(corrected_path.begin(), corrected_path.end(), '\\', '/');
     return corrected_path; // Returns the corrected path
 }
