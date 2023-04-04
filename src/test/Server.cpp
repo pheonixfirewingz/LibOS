@@ -24,9 +24,8 @@ void udp()
     {
         using namespace std::chrono_literals;
         std::this_thread::sleep_for(1s);
-        losSocket client;
         losUdpData read_buffer;
-        data_size_t read_size = 14;
+        size_t read_size = 14;
         losReadSocket(handle, (void *)&read_buffer, read_size);
         printf("UDP Server: %14.14s\n", (char *)read_buffer.data);
         losWriteSocket(handle, (const void *)&read_buffer, read_size);
@@ -60,7 +59,7 @@ void tcp()
         if (losWaitForClient(handle, &client) != LOS_SUCCESS)
             exit(-1);
         char read_buffer[14];
-        data_size_t read_size = 14;
+        size_t read_size = 14;
         losReadSocket(client, (void *)&read_buffer, read_size);
         printf("TCP Server: %s\n", std::string(read_buffer,0,read_size).c_str());
         losWriteSocket(client, (const void *)&read_buffer, read_size);

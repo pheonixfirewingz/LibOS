@@ -34,3 +34,4 @@ std::string getCorrectPath(const std::string path)
     std::replace(corrected_path.begin(), corrected_path.end(), '\\', '/');
     return corrected_path; // Returns the corrected path
 }
+

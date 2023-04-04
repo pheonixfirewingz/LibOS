@@ -1,9 +1,9 @@
+#include <codecvt>
 #include <gtest/gtest.h>
 #include <libos/Defines.h>
 #include <libos/FileIO.h>
 #include <libos/NetIO.h>
 #include <libos/Window.h>
-#include <codecvt>
 #include <string>
 struct testBINARY
 {
@@ -12,19 +12,64 @@ struct testBINARY
     const char *name;
 };
 
+std::wstring u8convert(const char *utf8Str);
 const std::string path = "$[binary_base]\\test.txt";
 const std::string path_2 = "$[binary_base]/test.txt";
 const std::string path_3 = "$[binary_base]/test.bin";
-#if ON_WINDOWS
-const std::string path_4 = "kernel32.dll";
-#endif
-const std::string test_str = "this is a test"; 
-const std::wstring test_str_u = L"this is a test 🫂";
+const std::string path_4 = "libos";
+const std::string test_str = "this is a test";
+const std::wstring test_str_u = u8convert("this is a test 🫂");
 const testBINARY test_struct = {4259, 15, "this is a test"};
 const std::string address = "127.0.0.1";
 std::string path_one = "$[asset_base]/tests/Shader/VertexShader.vert.spirv";
 std::string path_two = "$[asset_base]/tests/Shader/fragmentShader.frag.spirv";
 const bool debug_mode = true;
+
+std::wstring u8convert(const char *utf8Str)
+{
+    std::wstring result;
+    const char *ptr = utf8Str;
+    while (*ptr != '\0')
+    {
+        // Determine the number of bytes in the current UTF-8 character
+        int numBytes = 0;
+        if ((*ptr & 0x80) == 0x00)
+        {
+            // 1-byte character
+            numBytes = 1;
+            result += (wchar_t)(*ptr);
+        }
+        else if ((*ptr & 0xE0) == 0xC0)
+        {
+            // 2-byte character
+            numBytes = 2;
+            wchar_t wch = ((*ptr & 0x1F) << 6) | (*(ptr + 1) & 0x3F);
+            result += wch;
+        }
+        else if ((*ptr & 0xF0) == 0xE0)
+        {
+            // 3-byte character
+            numBytes = 3;
+            wchar_t wch = ((*ptr & 0x0F) << 12) | ((*(ptr + 1) & 0x3F) << 6) | (*(ptr + 2) & 0x3F);
+            result += wch;
+        }
+        else if ((*ptr & 0xF8) == 0xF0)
+        {
+            // 4-byte character
+            numBytes = 4;
+            wchar_t wch =
+                ((*ptr & 0x07) << 18) | ((*(ptr + 1) & 0x3F) << 12) | ((*(ptr + 2) & 0x3F) << 6) | (*(ptr + 3) & 0x3F);
+            result += wch;
+        }
+        else
+        {
+            throw std::runtime_error("Invalid UTF-8 sequence");
+        }
+        ptr += numBytes;
+    }
+
+    return result;
+}
 
 TEST(FileIO_Normal, createFileOddPath)
 {
@@ -140,7 +185,7 @@ TEST(FileIO_Normal_Unicode, writeFile)
     file.path = path_2.data();
     file.path_size = path_2.size();
     EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
-    EXPECT_EQ(losWriteFile(handle, (void *)test_str_u.c_str(), test_str_u.size()), LOS_SUCCESS);
+    EXPECT_EQ(losWriteFile(handle, (const void *)test_str_u.c_str(), test_str_u.size()), LOS_SUCCESS);
     EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
     libOSCleanUp();
 }
@@ -258,17 +303,15 @@ TEST(FileIO_Lib, dynamicLoad)
     file.path_size = path_4.size();
     EXPECT_EQ(losOpenFile(&handle, file), LOS_SUCCESS);
     typedef int (*MyFunction)();
-    #if ON_WINDOWS
-    #if IS_MSVC
-#        pragma warning(push)
-#        pragma warning(disable : 4459)
-    #endif
-    MyFunction *address = (MyFunction*)losGetFuncAdress(handle, "GetLastError");
-    #if IS_MSVC
-#        pragma warning(pop)
-    #endif
-    #endif
-    EXPECT_NE(address, nullptr);
+#if IS_MSVC
+#    pragma warning(push)
+#    pragma warning(disable : 4459)
+#endif
+    MyFunction* address_ = (MyFunction *)losGetFuncAddress(handle, "losWriteFile");
+#if IS_MSVC
+#    pragma warning(pop)
+#endif
+    EXPECT_NE(address_, nullptr);
     EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
     libOSCleanUp();
 }

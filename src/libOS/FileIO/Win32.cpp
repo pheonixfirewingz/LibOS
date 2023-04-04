@@ -21,7 +21,7 @@ struct losFileHandle_T
 };
 
 // A utility function to get the correct path of the file based on platform and asset path
-extern std::string getCorrectPath(_In_ const std::string);
+extern std::string getCorrectPath(_in_ const std::string);
 
 #pragma warning(push)
 #pragma warning(disable : 4172)
@@ -52,7 +52,7 @@ std::string platformGetCurrentPath()
     return path;
 }
 #pragma warning(pop)
-losResult losDoseFileExist(_In_ const char *path)
+losResult losDoseFileExist(_in_ const char *path)
 {
     DWORD fileAttributes = GetFileAttributes(getCorrectPath(path).c_str());
     return fileAttributes != INVALID_FILE_ATTRIBUTES && !(fileAttributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -60,15 +60,19 @@ losResult losDoseFileExist(_In_ const char *path)
                : LOS_ERROR_MALFORMED_DATA;
 }
 
-losResult losOpenFile(_Out_ losFileHandle *handle, _In_ const losFileOpenInfo info)
+losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo info)
 {
     // Create a new losFileHandle object and check if it was successfully created
     if (!(*handle = new losFileHandle_T()))
         return LOS_ERROR_COULD_NOT_INIT;
     if ((info.fileBits & LOS_FILE_BIT_BINARY) != 0)
     {
+        std::string lib_str(info.path, 0, info.path_size);
+        if (!lib_str.ends_with(".dll"))
+            lib_str += ".dll";
+        lib_str = getCorrectPath(lib_str);
         (*handle)->dll_mode = true;
-        (*handle)->lib_handle = LoadLibrary(info.path);
+        (*handle)->lib_handle = LoadLibrary(lib_str.c_str());
         if ((*handle)->lib_handle == nullptr)
         {
             losPrintLastSystemError();
@@ -125,7 +129,8 @@ losResult losOpenFile(_Out_ losFileHandle *handle, _In_ const losFileOpenInfo in
     return LOS_SUCCESS;
 }
 
-losResult losCloseFile(_In_ losFileHandle handle)
+// Closes the file associated with the given handle and releases the resources.
+losResult losCloseFile(_in_ losFileHandle handle)
 {
     if (!handle->dll_mode)
     {
@@ -143,13 +148,13 @@ losResult losCloseFile(_In_ losFileHandle handle)
 }
 
 // Reads data from a file.
-losResult losReadFile(_In_ losFileHandle handle, _Out_ void ** data_ptr, _Out_ size_t *bytes_read)
+losResult losReadFile(_in_ losFileHandle handle, _out_ void **data_ptr, _out_ size_t *bytes_read)
 {
     // Check if the handle is in an error state
     if (handle->errored || handle->dll_mode)
     {
         *data_ptr = new char[1]{'\0'};
-        *bytes_read = 1;
+        *bytes_read = 0;
         return LOS_ERROR_MALFORMED_DATA;
     }
 
@@ -159,7 +164,7 @@ losResult losReadFile(_In_ losFileHandle handle, _Out_ void ** data_ptr, _Out_ s
     if (!GetFileInformationByHandleEx(handle->file_handle, FileStandardInfo, &file_info, sizeof(FILE_STANDARD_INFO)))
     {
         *data_ptr = new char[1]{'\0'};
-        *bytes_read = 1;
+        *bytes_read = 0;
         return LOS_ERROR_MALFORMED_DATA;
     }
     if (!handle->unicode_mode)
@@ -180,7 +185,7 @@ losResult losReadFile(_In_ losFileHandle handle, _Out_ void ** data_ptr, _Out_ s
         if (ReadFile(handle->file_handle, &data[0], DWORD(data.size()), &read_bytes, nullptr) == FALSE)
         {
             *data_ptr = new wchar_t[1]{'\0'};
-            *bytes_read = 0; 
+            *bytes_read = 0;
             losPrintLastSystemError();
             return LOS_ERROR_MALFORMED_DATA;
         }
@@ -196,7 +201,8 @@ losResult losReadFile(_In_ losFileHandle handle, _Out_ void ** data_ptr, _Out_ s
     return LOS_SUCCESS;
 }
 
-losResult losWriteFile(_In_ losFileHandle handle, _In_ const void *data_ptr, _In_ const size_t data_size)
+// Writes data to a file.
+losResult losWriteFile(_in_ losFileHandle handle, _in_ const void *data_ptr, _in_ const size_t data_size)
 {
     // Check if the handle is in an error state
     if (handle->errored || handle->dll_mode)
@@ -236,7 +242,7 @@ losResult losWriteFile(_In_ losFileHandle handle, _In_ const void *data_ptr, _In
     return LOS_SUCCESS;
 }
 
-void *losGetFuncAdress(_in_ const losFileHandle handle, _in_ const char *name)
+void *losGetFuncAddress(_in_ const losFileHandle handle, _in_ const char *name)
 {
     if (handle->errored || !handle->dll_mode)
         return nullptr;

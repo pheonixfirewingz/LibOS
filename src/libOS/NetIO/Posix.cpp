@@ -4,19 +4,17 @@
 //
 // Copyright Luke Shore (c) 2020, 2023
 #include <arpa/inet.h>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <libos/NetIO.h>
+#include <libos/Error.h>
 
 losResult tellError() noexcept
 {
-#ifdef WITH_DEBUG
-    perror("system error");
-#endif
+    losPrintLastSystemError();
     return LOS_NET_IO_CONNECTION_REFUSED;
 }
 
@@ -113,7 +111,7 @@ losResult losWaitForClient(const losSocket server, losSocket *socket_in)
     return LOS_SUCCESS;
 }
 
-losResult losReadSocket(const losSocket socket, void *data, const data_size_t size)
+losResult losReadSocket(const losSocket socket, void *data, const size_t size)
 {
     if (socket->failed)
         return LOS_ERROR_MALFORMED_DATA;
@@ -152,7 +150,7 @@ losResult losReadSocket(const losSocket socket, void *data, const data_size_t si
         return LOS_SUCCESS;
 }
 
-losResult losWriteSocket(const losSocket socket, const void *data, const data_size_t size)
+losResult losWriteSocket(const losSocket socket, const void *data, const size_t size)
 {
     if (socket->failed)
         return LOS_ERROR_MALFORMED_DATA;

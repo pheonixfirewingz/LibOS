@@ -89,7 +89,7 @@ EXPORT_DLL losResult losWriteFile(_in_ const losFileHandle handle, _in_ const vo
  * \brief losWriteFile write data to native file held by the library object when in unicode mode it expects UTF-8 data
  * encoding to write
  */
-EXPORT_DLL void *losGetFuncAdress(_in_ const losFileHandle handle, _in_ const char *name);
+EXPORT_DLL void *losGetFuncAddress(_in_ const losFileHandle handle, _in_ const char *name);
 /*!
  * \param[in] handle
  * \return losResult
