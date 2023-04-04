@@ -38,10 +38,10 @@ typedef enum losFileBits
 typedef struct losFileOpenInfo
 {
     uint8_t fileBits = 0; //!< file (bits/flags) combination tells the library how to lock the file down to act like a
-                      //!< sanity check
+                          //!< sanity check
     const char *path; //!< path to the file $[binary_base] and $[asset_base] can be used as relative path for internal
                       //!< program file path handling
-    data_size_t path_size = 0; //!< size of the path to the file
+    size_t path_size = 0; //!< size of the path to the file
 
 } losFileOpenInfo;
 /*!
@@ -49,39 +49,50 @@ typedef struct losFileOpenInfo
  * \return losResult
  * \brief losSetAssetPath can be used to set the full data path for $[asset_base]
  */
-EXPORT_DLL losResult losSetAssetPath(const char *path);
+EXPORT_DLL losResult losSetAssetPath(_in_ const char *path);
 /*!
  * \param[in] path
  * \return losResult
  * \brief losDoseFileExist can be used to check if the file exists
  */
-EXPORT_DLL losResult losDoseFileExist(const char *path);
+EXPORT_DLL losResult losDoseFileExist(_in_ const char *path);
 /*!
  * \param[out] handle
  * \param[in] file_info
  * \return losResult
  * \brief losOpenFile is to create the library object but dose not release the object to the library user
  */
-EXPORT_DLL losResult losOpenFile(losFileHandle *handle, const losFileOpenInfo file_info);
+EXPORT_DLL losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo file_info);
 /*!
  * \param[in] handle
  * \param[out] buffer
  * \param[out] bytes_read
  * \return losResult
- * \brief losReadFile read data to native file held by the library object when in unicode mode it will return UTF-8 data encoding from the read
+ * \brief losReadFile read data to native file held by the library object when in unicode mode it will return UTF-8 data
+ * encoding from the read
  */
-EXPORT_DLL losResult losReadFile(losFileHandle handle, void **buffer, data_size_t *bytes_read);
+EXPORT_DLL losResult losReadFile(_in_ losFileHandle handle, _out_ void **buffer, _out_ size_t *bytes_read);
 /*!
  * \param[in] handle
  * \param[in] buffer
  * \param[in] buffer_size
  * \return losResult
- * \brief losWriteFile write data to native file held by the library object when in unicode mode it expects UTF-8 data encoding to write
+ * \brief losWriteFile write data to native file held by the library object when in unicode mode it expects UTF-8 data
+ * encoding to write
  */
-EXPORT_DLL losResult losWriteFile(losFileHandle handle, const void *buffer, const data_size_t buffer_size);
+EXPORT_DLL losResult losWriteFile(_in_ const losFileHandle handle, _in_ const void *buffer,
+                                  _in_ const size_t buffer_size);
+/*!
+ * \param[in] handle
+ * \param[in] name
+ * \return address
+ * \brief losWriteFile write data to native file held by the library object when in unicode mode it expects UTF-8 data
+ * encoding to write
+ */
+EXPORT_DLL void *losGetFuncAdress(_in_ const losFileHandle handle, _in_ const char *name);
 /*!
  * \param[in] handle
  * \return losResult
  * \brief losCloseFile is to close the library object and safely delete it
  */
-EXPORT_DLL losResult losCloseFile(losFileHandle handle);
+EXPORT_DLL losResult losCloseFile(_in_ losFileHandle handle);

@@ -15,6 +15,8 @@
 #        define EXPORT_DLL __declspec(dllexport)
 #    endif
 #    define EXPORT_CPP_DLL __declspec(dllexport)
+#    define _in_ _In_
+#    define _out_ _Out_
 #else
 #    if __cplusplus
 #        define EXPORT_DLL extern "C"
@@ -22,6 +24,8 @@
 #        define EXPORT_DLL
 #    endif
 #    define EXPORT_CPP_DLL
+#    define _in_
+#    define _out_
 #endif
 // LIBOS LICENCE
 //

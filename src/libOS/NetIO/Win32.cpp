@@ -4,9 +4,9 @@
 //
 // Copyright Luke Shore (c) 2020, 2023
 #include <libos/NetIO.h>
+#include <libos/Error.h>
 #pragma comment(lib, "Ws2_32.lib")
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 1
-#include <string>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
@@ -22,34 +22,25 @@ struct losSocket_T
 uint32_ts g_sockets_in_use = 0;
 
 #define tellError() __tellError(__func__)
-inline losResult __tellError(const std::string caller) noexcept
+inline losResult __tellError(_In_ const char* caller) noexcept
 {
-    int error = WSAGetLastError();
+    DWORD error = WSAGetLastError();
     switch (error)
     {
     case 0x274D: {
-        OutputDebugStringW(L"ERROR: No connection could be made because the target machine actively refused it.\n");
+        losPrintError("ERROR: No connection could be made because the target machine actively refused it.\n");
         return LOS_NET_IO_CONNECTION_REFUSED;
     }
     default: {
-        std::wstring print_buffer = L"NETIO - ";
-        wchar_t *s = NULL;
-        FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                       NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&s, 0, NULL);
-        print_buffer += std::wstring(caller.begin(), caller.end());
-        print_buffer += L" -> ERRORED : ";
-        print_buffer += std::to_wstring(error);
-        print_buffer += L" ";
-        print_buffer += s;
-        print_buffer += L"\n";
-        OutputDebugStringW(print_buffer.c_str());
-        LocalFree(s);
+        SetLastError(error);
+        losPrintDebug(caller);
+        losPrintLastSystemError();
         return LOS_ERROR_COULD_NOT_INIT;
     }
     }
 }
 
-const losResult isLoaded(const bool clear)
+const losResult isLoaded(_In_ const bool clear)
 {
     static WSADATA wsaData;
     static bool wsainit = false;
@@ -71,7 +62,7 @@ const losResult isLoaded(const bool clear)
     return LOS_SUCCESS;
 }
 
-losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socket_info)
+losResult losCreateSocket(_Out_ losSocket *socket_in, _In_ const losCreateSocketInfo &socket_info)
 {
     *socket_in = new (std::nothrow) losSocket_T();
     if ((*socket_in) == NULL)
@@ -150,8 +141,9 @@ losResult losCreateSocket(losSocket *socket_in, const losCreateSocketInfo &socke
     return LOS_SUCCESS;
 }
 
-losResult losWaitForClient(const losSocket server, losSocket *socket_in)
+losResult losWaitForClient(_In_ const losSocket server, _Out_ losSocket *socket_in)
 {
+    *socket_in = nullptr;
     if (server->failed)
         return LOS_ERROR_MALFORMED_DATA;
     if (isLoaded(false) != LOS_SUCCESS)
@@ -169,15 +161,23 @@ losResult losWaitForClient(const losSocket server, losSocket *socket_in)
     return LOS_SUCCESS;
 }
 
-losResult losReadSocket(const losSocket socket, void *data, const data_size_t size)
+losResult losReadSocket(_In_ const losSocket socket, _Out_ void *data, _In_ const size_t size)
 {
+    
     if (socket->failed)
-        return LOS_ERROR_MALFORMED_DATA;
+    {
+       data = nullptr;
+       return LOS_ERROR_MALFORMED_DATA;
+    }
     if (isLoaded(false) != LOS_SUCCESS)
-        return LOS_ERROR_COULD_NOT_INIT;
-    int iResult = 0;
+    {
+       data = nullptr;
+       return LOS_ERROR_COULD_NOT_INIT;
+    }
+
+    int result = 0;
     if (socket->isTCP)
-        iResult = recv(socket->connect_socket, (char *)data, (int)size, 0);
+       result = recv(socket->connect_socket, (char *)data, (int)size, 0);
     else
     {
         int struct_size = sizeof(sockaddr_in);
@@ -191,26 +191,26 @@ losResult losReadSocket(const losSocket socket, void *data, const data_size_t si
             casted->client->isTCP = false;
             casted->client->isServer = false;
             casted->data = new char[size];
-            iResult = recvfrom(socket->connect_socket, (char *)casted->data, (int)size, 0,
+            result = recvfrom(socket->connect_socket, (char *)casted->data, (int)size, 0,
                                (SOCKADDR *)&casted->client->server_address, &struct_size);
         }
         else
         {
             if (!data)
                 data = new char[size];
-            iResult = recvfrom(socket->connect_socket, (char *)data, (int)size, 0, (SOCKADDR *)&socket->server_address,
+            result = recvfrom(socket->connect_socket, (char *)data, (int)size, 0, (SOCKADDR *)&socket->server_address,
                                &struct_size);
         }
     }
-    if (iResult < 0)
+    if (result < 0)
         return tellError();
-    else if (iResult == 0)
+    else if (result == 0)
         return LOS_NET_IO_CONNECTION_CLOSED_SERVER_END;
     else
         return LOS_SUCCESS;
 }
 
-losResult losWriteSocket(const losSocket socket, const void *data, const data_size_t size)
+losResult losWriteSocket(_In_ const losSocket socket, _In_ const void *data, _In_ const size_t size)
 {
     if (socket->failed)
         return LOS_ERROR_MALFORMED_DATA;
@@ -244,7 +244,7 @@ losResult losWriteSocket(const losSocket socket, const void *data, const data_si
     return LOS_SUCCESS;
 }
 
-losResult losDestroySocket(losSocket socket)
+losResult losDestroySocket(_In_ losSocket socket)
 {
     if (socket->isTCP)
         shutdown(socket->connect_socket, SD_SEND);

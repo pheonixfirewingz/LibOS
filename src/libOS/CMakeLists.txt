@@ -1,3 +1,4 @@
+add_subdirectory(Error)
 add_subdirectory(FileIO)
 add_subdirectory(Interface)
 add_subdirectory(NetIO)
