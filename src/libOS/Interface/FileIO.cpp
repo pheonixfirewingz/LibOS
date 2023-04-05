@@ -12,14 +12,14 @@ extern std::string platformGetCurrentPath();
 static std::string asset_path = "NOT_SET"; // Global variable to store the asset path
 
 // Declares a function that sets the asset path to be used by the library
-losResult losSetAssetPath(const char *path)
+losResult losSetAssetPath( _in_ const char *path)
 {
     asset_path = path;  // Sets the asset path
     return LOS_SUCCESS; // Returns success status
 }
 
 // A utility function to get the correct path of the file based on platform and asset path
-std::string getCorrectPath(const std::string path)
+std::string getCorrectPath(_in_ const std::string path)
 {
     std::string corrected_path = path;                  // Creates a copy of the path to modify it
     size_t pos = corrected_path.find("$[binary_base]"); // Searches for "$[binary_base]" string in the path

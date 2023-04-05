@@ -68,7 +68,7 @@ EXPORT_DLL losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFile
  * \param[out] buffer
  * \param[out] bytes_read
  * \return losResult
- * \brief losReadFile read data to native file held by the library object when in unicode mode it will return UTF-8 data
+ * \brief losReadFile read data to native file held by the library object when in unicode mode it will return wchar_t data
  * encoding from the read
  */
 EXPORT_DLL losResult losReadFile(_in_ losFileHandle handle, _out_ void **buffer, _out_ size_t *bytes_read);
@@ -77,7 +77,7 @@ EXPORT_DLL losResult losReadFile(_in_ losFileHandle handle, _out_ void **buffer,
  * \param[in] buffer
  * \param[in] buffer_size
  * \return losResult
- * \brief losWriteFile write data to native file held by the library object when in unicode mode it expects UTF-8 data
+ * \brief losWriteFile write data to native file held by the library object when in unicode mode it expects wchar_t data
  * encoding to write
  */
 EXPORT_DLL losResult losWriteFile(_in_ const losFileHandle handle, _in_ const void *buffer,
@@ -86,8 +86,7 @@ EXPORT_DLL losResult losWriteFile(_in_ const losFileHandle handle, _in_ const vo
  * \param[in] handle
  * \param[in] name
  * \return address
- * \brief losWriteFile write data to native file held by the library object when in unicode mode it expects UTF-8 data
- * encoding to write
+ * \brief losGetFuncAddress extracts the function memory address loaded when the LOS_FILE_BIT_BINARY is set
  */
 EXPORT_DLL void *losGetFuncAddress(_in_ const losFileHandle handle, _in_ const char *name);
 /*!
