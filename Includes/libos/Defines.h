@@ -55,3 +55,7 @@ EXPORT_DLL void libOSCleanUp();
  * \brief  due to some functions may not be avaliable between version this is used tp check at runtime
  */
 EXPORT_DLL uint32_t libOSABIVersion();
+
+EXPORT_DLL void losUnicodeToBytes(_in_ const wchar_t *src, _out_ char **dest);
+
+EXPORT_DLL void losBytesToUnicode(_in_ const char *src, _out_ wchar_t **dest);

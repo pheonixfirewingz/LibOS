@@ -248,3 +248,19 @@ void *losGetFuncAddress(_in_ const losFileHandle handle, _in_ const char *name)
         return nullptr;
     return GetProcAddress(handle->lib_handle, name);
 }
+
+void losUnicodeToBytes(_in_ const wchar_t *src, _out_ char **dest)
+{
+    int len = WideCharToMultiByte(CP_ACP, 0, src, -1, nullptr, 0, nullptr, nullptr) - 1;
+    *dest = new char[len];
+    std::memset(*dest, 0, len * sizeof(char));
+    WideCharToMultiByte(CP_ACP, 0, src, -1, &*dest[0], len, nullptr, nullptr);
+}
+
+void losBytesToUnicode(_in_ const char *src, _out_ wchar_t **dest)
+{
+    int len = MultiByteToWideChar(CP_UTF8, 0, src, -1, nullptr, 0);
+    *dest = new wchar_t[len];
+    std::memset(*dest, 0, len * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, src, -1, &*dest[0], len);
+}
