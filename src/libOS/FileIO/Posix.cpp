@@ -396,3 +396,28 @@ void *losGetFuncAddress(_in_ const losFileHandle handle, _in_ const char *name)
         return nullptr;
     return dlsym(handle->lib_handle, name);
 }
+
+void losUnicodeToBytes(_in_ const wchar_t *src, _out_ char **dest)
+{
+    // Convert the data to a UTF-8 string.
+    std::string data = Converter("WCHAR_T", "UTF-8").convert(reinterpret_cast<char *>(const_cast<wchar_t*>(src)), std::char_traits<wchar_t>::length(src));
+    // Allocate memory for the data to be read
+    *dest = new char[data.size() + 1]; // Add 1 for the null terminator
+    // Initialize the allocated memory to zero
+    memset(*dest, 0, (data.size() + 1) * sizeof(char));
+    // Multiply by sizeof(wchar_t) to get size in bytes
+    // Copy the wide string data including the null terminator
+    memcpy(*dest, data.c_str(), (data.size() + 1) * sizeof(char));
+}
+
+void losBytesToUnicode(_in_ const char *src, _out_ wchar_t **dest)
+{
+    std::wstring w_data = u8convert(src);
+    // Allocate memory for the data to be read
+    *dest = new wchar_t[w_data.size() + 1]; // Add 1 for the null terminator
+    // Initialize the allocated memory to zero
+    memset(*dest, 0, (w_data.size() + 1) * sizeof(wchar_t));
+    // Multiply by sizeof(wchar_t) to get size in bytes
+    // Copy the wide string data including the null terminator
+    memcpy(*dest, w_data.c_str(), (w_data.size() + 1) * sizeof(wchar_t));
+}
