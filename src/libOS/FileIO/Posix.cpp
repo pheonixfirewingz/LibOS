@@ -170,6 +170,11 @@ std::string platformGetCurrentPath()
     return path;
 }
 
+std::string platformGetHomePath()
+{
+    return std::getenv("HOME") != nullptr ? std::getenv("HOME") : "";
+}
+
 // Returns true if the specified file exists, false otherwise.
 losResult losDoseFileExist(_in_ const char *path)
 {
@@ -181,6 +186,16 @@ losResult losDoseFileExist(_in_ const char *path)
         return LOS_ERROR_MALFORMED_DATA;
     // access succeeded, return a success code.
     return LOS_SUCCESS;
+}
+
+std::string getParentDirectory(const std::string &filePath)
+{
+    size_t lastSlash = filePath.find_last_of("/\\");
+    if (lastSlash != std::string::npos)
+    {
+        return filePath.substr(0, lastSlash);
+    }
+    return "";
 }
 
 losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo info)
@@ -230,6 +245,22 @@ losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo in
 
         // Set path member of losFileHandle object to the correct path for the file
         (*handle)->path = getCorrectPath(std::string(info.path, 0, info.path_size).c_str());
+        // Create the Perant Dir if not created
+        if ((info.fileBits & LOS_FILE_BIT_CREATE) != 0)
+        {
+            std::string dir = getParentDirectory((*handle)->path);
+            if (losDoseFileExist(dir.c_str()) != LOS_SUCCESS)
+            {
+                int mkdirResult = mkdir(dir.c_str(),  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+                if (mkdirResult != 0)
+                {
+                    // Handle error if directory creation fails
+                    losPrintDebug((std::string("path: ") + dir).c_str());
+                    losPrintLastSystemError();
+                    return LOS_ERROR_COULD_NOT_INIT;
+                }
+            }
+        }
 
         // Open the file with the specified flags and file mode, and store the file descriptor in n_handle member of
         // losFileHandle object
@@ -254,7 +285,7 @@ losResult losCloseFile(_in_ losFileHandle handle)
         if (handle->close_after_done)     // If the file should be deleted
             remove(handle->path.c_str()); // Delete the file
 
-        close(handle->n_handle); // Close the file handle
+        close(handle->n_handle);          // Close the file handle
         handle = nullptr;
     }
     else
@@ -400,7 +431,9 @@ void *losGetFuncAddress(_in_ const losFileHandle handle, _in_ const char *name)
 void losUnicodeToBytes(_in_ const wchar_t *src, _out_ char **dest)
 {
     // Convert the data to a UTF-8 string.
-    std::string data = Converter("WCHAR_T", "UTF-8").convert(reinterpret_cast<char *>(const_cast<wchar_t*>(src)), std::char_traits<wchar_t>::length(src));
+    std::string data =
+        Converter("WCHAR_T", "UTF-8")
+            .convert(reinterpret_cast<char *>(const_cast<wchar_t *>(src)), std::char_traits<wchar_t>::length(src));
     // Allocate memory for the data to be read
     *dest = new char[data.size() + 1]; // Add 1 for the null terminator
     // Initialize the allocated memory to zero

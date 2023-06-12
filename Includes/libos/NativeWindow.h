@@ -12,7 +12,6 @@
 //
 // Copyright Luke Shore (c) 2020, 2023
 /*! Importation of libraries*/
-#include <libos/DataType.h>
 #include <libos/Window.h>
 /*!
  *  \brief losUsedWindowAPI is returned by losWhatApiIsWindowUsed to query the library what native api is current use

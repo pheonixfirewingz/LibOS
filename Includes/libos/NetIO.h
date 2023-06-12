@@ -10,7 +10,7 @@
 //
 // GNU Lesser General Public License Version 3.0
 //
-// Copyright Luke Shore (c) 2020, 2023
+// Copyright Luke Shore (c) 2022, 2023
 /*! Importation of libraries*/
 #include <libos/Defines.h>
 /*!

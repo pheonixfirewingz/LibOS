@@ -10,7 +10,7 @@
 //
 // GNU Lesser General Public License Version 3.0
 //
-// Copyright Luke Shore (c) 2020, 2023
+// Copyright Luke Shore (c) 2022, 2023
 /*! Importation of libraries*/
 #include <libos/Defines.h>
 /*!
@@ -53,7 +53,7 @@ EXPORT_DLL losResult losSetAssetPath(_in_ const char *path);
 /*!
  * \param[in] path
  * \return losResult
- * \brief losDoseFileExist can be used to check if the file exists
+ * \brief losDoseFileExist can be used to check if the file exists will return LOS_SUCCESS if the file exists else it will return LOS_ERROR_MALFORMED_DATA
  */
 EXPORT_DLL losResult losDoseFileExist(_in_ const char *path);
 /*!

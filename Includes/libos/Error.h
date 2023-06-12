@@ -10,11 +10,25 @@
 //
 // GNU Lesser General Public License Version 3.0
 //
-// Copyright Luke Shore (c) 2020, 2023
+// Copyright Luke Shore (c) 2023
 /*! Importation of libraries*/
 #include <libos/Defines.h>
-
+/*!
+ * \brief losPrintLastSystemError get and print last native system error
+ */
 EXPORT_DLL void losPrintLastSystemError();
-EXPORT_DLL void losPrintInfo(const char* str);
-EXPORT_DLL void losPrintDebug(const char *str);
-EXPORT_DLL void losPrintError(const char *str);
+/*!
+ * \param[in] msg
+ * \brief losPrintInfo print a normal message
+ */
+EXPORT_DLL void losPrintInfo(const char* msg);
+/*!
+ * \param[in] msg
+ * \brief losPrintDebug print a debug msg
+ */
+EXPORT_DLL void losPrintDebug(const char *msg);
+/*!
+ * \param[in] msg
+ * \brief losPrintError print a program error
+ */
+EXPORT_DLL void losPrintError(const char *msg);

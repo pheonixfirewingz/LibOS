@@ -8,7 +8,9 @@ if(DOXYGEN_FOUND)
     ${PROJECT_SOURCE_DIR}/Includes/libos/Window.h
     ${PROJECT_SOURCE_DIR}/Includes/libos/NativeWindow.h
     ${PROJECT_SOURCE_DIR}/Includes/libos/DataType.h
-    ${PROJECT_SOURCE_DIR}/Includes/libos/Defines.h)
+    ${PROJECT_SOURCE_DIR}/Includes/libos/Error.h
+    ${PROJECT_SOURCE_DIR}/Includes/libos/Defines.h
+    ${PROJECT_SOURCE_DIR}/Includes/libos/extensions/Config.h)
     
     option(BUILD_DOC "Build documentation" ON)
     set(DOXYGEN_MULTILINE_CPP_IS_BRIEF YES)

@@ -315,6 +315,38 @@ TEST(FileIO_Lib, dynamicLoad)
     EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
     libOSCleanUp();
 }
+#ifdef BUILD_EXTENTIONS
+#include <libos/extensions/Config.h>
+TEST(FileIO_EXTEND_Config_Normal, writeFile)
+{
+    libOSInit();
+    losFileHandle handle;
+    EXPECT_EQ(loseGetConfig(&handle,"libos_test_app"), LOS_SUCCESS);
+    EXPECT_EQ(losWriteFile(handle, (void *)test_str.c_str(), test_str.size()), LOS_SUCCESS);
+    EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
+    libOSCleanUp();
+}
+
+TEST(FileIO_EXTEND_Config_Normal, readFile)
+{
+    libOSInit();
+    losFileHandle handle;
+
+    void *read_str = nullptr;
+    size_t read_str_size = 0;
+
+    EXPECT_EQ(loseGetConfig(&handle,"libos_test_app"), LOS_SUCCESS);
+    EXPECT_EQ(losReadFile(handle, &read_str, &read_str_size), LOS_SUCCESS);
+    EXPECT_GT(read_str_size, 0);
+    if (read_str_size > 0)
+    {
+        std::string read_test((char *)read_str, 0, read_str_size);
+        EXPECT_STREQ(read_test.c_str(), test_str.c_str());
+    }
+    EXPECT_EQ(losCloseFile(handle), LOS_SUCCESS);
+    libOSCleanUp();
+}
+#endif
 #ifndef TERMIANL_MODE
 TEST(Graphics, Window)
 {
