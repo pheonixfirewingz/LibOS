@@ -4,10 +4,11 @@
 
 The goal of the LunaLux LibOS is to act as an abstraction layer for native Operating System APIS with a platform Vulkan Like Agnostic API to make cross platform development easier to achieve.
 
-## Documentation
+## API Documentation
 
  > # Doxygen
  > Documentation is available/generated using doxygen so for documentation make sure to enable documentation in the cmake script
+ > It is also avaliable on https://pheonixfirewingz.github.io/LibOSDocs/
 
 ## Contribution rules
 
@@ -50,7 +51,7 @@ Nobody is perfect, and sometimes we mess things up. That said, Here are some goo
 >
 > - Windows (WIN32 COMPLETED)(windows 11 is tested)
 > - Linux (XCB COMPLETED)(ubuntu based is tested)
-> - Linux (WayLand)(ubuntu based is tested) - (No Mouse Support)
+> - Linux (WayLand)(ubuntu based is tested)
 >
 > ## legacy Support
 >
@@ -89,19 +90,8 @@ Nobody is perfect, and sometimes we mess things up. That said, Here are some goo
 
 ## Linux
 
-> if your distro dose not have gcc-12 or up or Clang++ 15.0.0.2 or up use
-> 1. use for APT Package Manager Base: ```./Meta/LinuxSetupToolchain.sh```
-> 2. put in CMakePresets.json
-> 
-> ```json
-> "environment": {
-> "CC": "${sourceDir}/TOOLCHAIN/GCC-12/bin/gcc",
-> "CXX": "${sourceDir}/TOOLCHAIN/GCC-12/bin/g++"
-> },
-> ```
-> ### else
-> use for APT Package Manager Base: ```./Meta/LinuxSetupNoToolchain.sh```
-
+> need gcc-12, Clang++ 15.0.0.2 or newer
+> TODO
 # LICENSE
 
                    GNU LESSER GENERAL PUBLIC LICENSE
