@@ -4,6 +4,7 @@
 #include <libos/FileIO.h>
 #include <libos/NetIO.h>
 #include <libos/Window.h>
+#include <libos/Error.h>
 #include <string>
 struct testBINARY
 {
@@ -350,7 +351,6 @@ TEST(FileIO_EXTEND_Config_Normal, readFile)
 #ifndef TERMIANL_MODE
 TEST(Graphics, Window)
 {
-    int i = 0;
     libOSInit();
     losWindow window;
     losWindowInfo info{};
@@ -367,7 +367,7 @@ TEST(Graphics, Window)
         if (losIsKeyDown(window, LOS_KEY_X))
             losRequestClose(window);
         if (losIsKeyDown(window, LOS_KEY_SPACE))
-            puts("beep beep!");
+            losPrintInfo("beep beep!");
         if (losIsMouseDown(window, LOS_LEFT_BUTTON))
         {
             const losSize pos = losRequestMousePosition(window);

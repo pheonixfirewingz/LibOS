@@ -31,7 +31,9 @@ losResult losCreateWindow(losWindow *window, losWindowInfo info)
         (*window)->window = new (std::nothrow) Win32Window(info.title, info.window_size);
 #elif defined(ON_UWP)
         (*window)->window = new (std::nothrow) WinRTWindow(info.title, info.window_size);
-#elif defined(ON_LINUX)
+#elif defined(ON_LINUX) && defined(NO_XCB)
+        (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
+#elif defined(ON_LINUX) && !defined(NO_XCB)
         (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
         if ((*window)->window->hasFailed())
         {

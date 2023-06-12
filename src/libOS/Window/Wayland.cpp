@@ -6,6 +6,8 @@
 // Copyright Luke Shore (c) 2020, 2023
 #include <cassert>
 #include <cstring>
+#include <libos/Error.h>
+#include <linux/input-event-codes.h>
 #include <sys/mman.h>
 #include <vector>
 #define WAYLAND_CHECK(x, func) \
@@ -18,7 +20,7 @@
 WaylandWindow::WaylandWindow(const std::string title, losSize size) noexcept
 {
 #ifdef WITH_DEBUG
-    puts("[LIBOS] <INFO> -> creating WAYLAND API Window");
+    losPrintInfo("[LIBOS] <INFO> -> creating WAYLAND API Window");
 #endif
     WAYLAND_CHECK(display, wl_display_connect(nullptr));
     WAYLAND_CHECK(registry, wl_display_get_registry(display));
@@ -60,22 +62,64 @@ void WaylandWindow::registry_global(void *data, wl_registry *registry, uint32_t 
     }
 }
 
+void WaylandWindow::pointer_enter(void *data, wl_pointer *, uint32_t, struct wl_surface *, wl_fixed_t, wl_fixed_t)
+{
+    WaylandWindow *state = static_cast<WaylandWindow *>(data);
+    memset(&state->keys, 0, 256);
+    memset(&state->buttons, 0, 3);
+}
+void WaylandWindow::pointer_leave(void *data, wl_pointer *, uint32_t, wl_surface *)
+{
+    WaylandWindow *state = static_cast<WaylandWindow *>(data);
+    memset(&state->keys, 0, 256);
+    memset(&state->buttons, 0, 3);
+}
+/*void WaylandWindow::pointer_motion(void *data, wl_pointer *wl_pointer, uint32_t time, wl_fixed_t surface_x,
+                                   wl_fixed_t surface_y)*/
+void WaylandWindow::pointer_motion(void *data, wl_pointer *, uint32_t, wl_fixed_t surface_x, wl_fixed_t surface_y)
+{
+    WaylandWindow *state = static_cast<WaylandWindow *>(data);
+    state->x = surface_x;
+    state->y = surface_y;
+}
+/*void WaylandWindow::pointer_button(void *data, wl_pointer *wl_pointer, uint32_t serial, uint32_t time, uint32_t
+   button, uint32_t state)*/
+void WaylandWindow::pointer_button(void *data, wl_pointer *, uint32_t, uint32_t, uint32_t button, uint32_t state)
+{
+    WaylandWindow *wstate = static_cast<WaylandWindow *>(data);
+    bool pressed = state == WL_POINTER_BUTTON_STATE_PRESSED ? true : false;
+    switch (button)
+    {
+    case BTN_LEFT:
+        wstate->buttons[LOS_LEFT_BUTTON] = pressed;
+        break;
+    case BTN_RIGHT:
+        wstate->buttons[LOS_RIGHT_BUTTON] = pressed;
+        break;
+    case BTN_MIDDLE:
+        wstate->buttons[LOS_MIDDLE_BUTTON] = pressed;
+        break;
+    default:
+        break;
+    }
+}
+
 void WaylandWindow::seat_capabilities(void *data, wl_seat *, uint32_t capabilities)
 {
     WaylandWindow *state = static_cast<WaylandWindow *>(data);
 
-    // bool have_pointer = capabilities & WL_SEAT_CAPABILITY_POINTER;
+    bool have_pointer = capabilities & WL_SEAT_CAPABILITY_POINTER;
 
-    /*if (have_pointer && state->wl_pointer == NULL)
+    if (have_pointer && state->pointer == NULL)
     {
-        state->wl_pointer = wl_seat_get_pointer(state->wl_seat);
-        wl_pointer_add_listener(state->wl_pointer, &wl_pointer_listener, state);
+        state->pointer = wl_seat_get_pointer(state->seat);
+        wl_pointer_add_listener(state->pointer, &state->pointer_listener, state);
     }
-    else if (!have_pointer && state->wl_pointer != NULL)
+    else if (!have_pointer && state->pointer != NULL)
     {
-        wl_pointer_release(state->wl_pointer);
-        state->wl_pointer = NULL;
-    }*/
+        wl_pointer_release(state->pointer);
+        state->pointer = NULL;
+    }
 
     bool have_keyboard = capabilities & WL_SEAT_CAPABILITY_KEYBOARD;
 
@@ -142,8 +186,11 @@ void WaylandWindow::keyboard_key(void *data, wl_keyboard *, uint32_t, uint32_t, 
 {
     WaylandWindow *window = static_cast<WaylandWindow *>(data);
     uint16_t index = 0;
-    uint16_t *ret = window->upper_versions.find(xkb_state_key_get_one_sym(window->xkb_state, key + 8));
-    index = !ret ? xkb_state_key_get_one_sym(window->xkb_state, key + 8) : *ret;
+    if (auto ret = window->upper_versions.find(xkb_state_key_get_one_sym(window->xkb_state, key + 8));
+        ret == window->upper_versions.end())
+        index = xkb_state_key_get_one_sym(window->xkb_state, key + 8);
+    else
+        index = ret->second;
     window->keys[index] = state == WL_KEYBOARD_KEY_STATE_PRESSED ? true : false;
 }
 
@@ -166,9 +213,9 @@ bool WaylandWindow::losIsKeyDown(losKeyboardButton button) const noexcept
     return keys[window_key_look_up_table[button]];
 }
 
-bool WaylandWindow::losIsMouseDown(losMouseButton) const noexcept
+bool WaylandWindow::losIsMouseDown(losMouseButton button) const noexcept
 {
-    return false;
+    return buttons[button];
 }
 
 losResult WaylandWindow::losRequestClose() noexcept
@@ -179,8 +226,8 @@ losResult WaylandWindow::losRequestClose() noexcept
 
 losSize WaylandWindow::losRequestMousePosition() const noexcept
 {
-    uint16_t _x = x;
-    uint16_t _y = y;
+    uint32_t _x = x;
+    uint32_t _y = y;
     return {_x, _y};
 }
 
@@ -191,9 +238,7 @@ losSize WaylandWindow::losRequestMouseWheelDelta() const noexcept
 
 losSize WaylandWindow::losIsBeingPressed() const noexcept
 {
-    uint16_t _x = x;
-    uint16_t _y = y;
-    return {_x, _y};
+    return {0u, 0u};
 }
 
 void WaylandWindow::losDestroyWindow() noexcept

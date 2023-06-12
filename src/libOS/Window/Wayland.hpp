@@ -7,8 +7,8 @@
 #include "../Interface/AbstractWindow.h"
 #if __has_include(<wayland-client.h>) && defined(ON_LINUX)
 #    include "xdg-shell-client-protocol.h"
-#    include <extend_std/LookUpTable.h>
 #    include <libdecor.h>
+#    include <map>
 #    include <wayland-client.h>
 #    include <xkbcommon/xkbcommon-keysyms.h>
 #    include <xkbcommon/xkbcommon.h>
@@ -18,10 +18,10 @@ class WaylandWindow : public BaseWindow
 {
   protected:
 #if __has_include(<wayland-client.h>) && defined(ON_LINUX)
-    std::atomic_bool should_close{false}, keys[256]{};
-    int16_ts x = 0, y = 0;
+    std::atomic_bool should_close{false}, keys[256]{}, buttons[3]{};
+    int32_ts x = 0, y = 0;
     bool error = false;
-    const std::ReadOnlyLookupTable<uint16_t, uint16_t> upper_versions = {
+    const std::map<uint16_t, uint16_t> upper_versions = {
         {XKB_KEY_A, XKB_KEY_a}, {XKB_KEY_B, XKB_KEY_b},  {XKB_KEY_C, XKB_KEY_c}, {XKB_KEY_D, XKB_KEY_d},
         {XKB_KEY_E, XKB_KEY_e}, {XKB_KEY_F, XKB_KEY_f},  {XKB_KEY_G, XKB_KEY_g}, {XKB_KEY_H, XKB_KEY_h},
         {XKB_KEY_I, XKB_KEY_i}, {XKB_KEY_J, XKB_KEY_j},  {XKB_KEY_K, XKB_KEY_k}, {XKB_KEY_L, XKB_KEY_l},
@@ -74,6 +74,7 @@ class WaylandWindow : public BaseWindow
     struct xkb_context *xkb_context;
     struct xkb_keymap *xkb_keymap;
     // mouse
+    struct wl_pointer *pointer;
     static void registry_global(void *data, wl_registry *registry, uint32_t name, const char *interface,
                                 uint32_t version);
     static void registry_global_remove(void *, wl_registry *, uint32_t){};
@@ -83,6 +84,15 @@ class WaylandWindow : public BaseWindow
     static void keyboard_leave(void *, wl_keyboard *, uint32_t, wl_surface *){};
     static void keyboard_modifiers(void *data, wl_keyboard *keyboard, uint32_t serial, uint32_t mods_depressed,
                                    uint32_t mods_latched, uint32_t mods_locked, uint32_t group);
+
+    static void pointer_enter(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *surface,
+                              wl_fixed_t surface_x, wl_fixed_t surface_y);
+    static void pointer_leave(void *data, wl_pointer *wl_pointer, uint32_t serial, wl_surface *surface);
+    static void pointer_motion(void *data, wl_pointer *wl_pointer, uint32_t time, wl_fixed_t surface_x,
+                               wl_fixed_t surface_y);
+    static void pointer_button(void *data, wl_pointer *wl_pointer, uint32_t serial, uint32_t time, uint32_t button,
+                               uint32_t state);
+
     static void keyboard_key(void *data, wl_keyboard *keyboard, uint32_t serial, uint32_t time, uint32_t key,
                              uint32_t state);
     static void keyboard_repeat_info(void *, wl_keyboard *, int32_t, int32_t){};
@@ -110,6 +120,18 @@ class WaylandWindow : public BaseWindow
         lib_decor_handle_dismiss_popup,
     };
 #    pragma GCC diagnostic pop
+
+    const wl_pointer_listener pointer_listener = {
+        .enter = pointer_enter,
+        .leave = pointer_leave,
+        .motion = pointer_motion,
+        .button = pointer_button,
+        .axis = [](void *, wl_pointer *, uint32_t, uint32_t, wl_fixed_t){},
+        .frame = [](void *, wl_pointer *){},
+        .axis_source = [](void *, wl_pointer *, uint32_t){},
+        .axis_stop = [](void *, wl_pointer *, uint32_t, uint32_t){},
+        .axis_discrete = [](void *, wl_pointer *, uint32_t, int32_t){},
+    };
 
     const wl_keyboard_listener keyboard_listener = {
         .keymap = keyboard_keymap,

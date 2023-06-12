@@ -5,7 +5,7 @@
 //
 // Copyright Luke Shore (c) 2020, 2023
 #include "../Interface/AbstractWindow.h"
-#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX)
+#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX) && !defined(NO_XCB)
 #    include <xcb/xcb.h>
 #    include <xcb/xcb_keysyms.h>
 #    define XK_LATIN1
@@ -17,7 +17,7 @@
 #endif
 class XcbWindow : public BaseWindow
 {
-#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX)
+#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX) && !defined(NO_XCB)
     bool error = false;
     xcb_connection_t *con;
     xcb_window_t win;
@@ -134,7 +134,7 @@ class XcbWindow : public BaseWindow
     const uint8_t window_mouse_look_up_table[3] = {LOS_MIDDLE_BUTTON, LOS_RIGHT_BUTTON,LOS_LEFT_BUTTON};
 #endif
   public:
-#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX)
+#if __has_include(<xcb/xcb.h>) && defined(ON_LINUX) && !defined(NO_XCB)
     explicit XcbWindow(const std::string title, losSize win_size) noexcept;
     virtual bool hasWindowClosed() const noexcept final override;
     virtual losResult losUpdateWindow() noexcept final override;
