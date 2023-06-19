@@ -36,8 +36,13 @@ typedef std::atomic<int64_t> int64_ts; //!< this is men't do be a thread save ve
  * \brief losSize is used to represent a size of a window or position of this mouse */
 typedef struct losSize
 {
+#ifdef ON_ANDROID
+    int64_t length_one; //!< length_one is the same as width or x
+    int64_t length_two; //!< length_one is the same as height or y
+#else
     int64_t length_one = static_cast<int64_t>(0); //!< length_one is the same as width or x
     int64_t length_two = static_cast<int64_t>(0); //!< length_one is the same as height or y
+#endif
 } losSize;
 /*!
  * \brief losResult enum is used to indicate the result of a LibOS function call that can fail instead of throwing a

@@ -8,7 +8,7 @@
 #pragma once
 /*! \brief on windows some extra syntax is required for the dll to work properly so that is dose not affect the
  * platforms we check */
-#if defined(ON_WINDOWS) || defined(ON_UWP) || defined(WIN32) || defined(_WIN64)
+#if defined(ON_WINDOWS) || defined(ON_UWP)
 /*! \brief makes sure c++ dose not mangle names and tells MSVC to gen dll .lib bindings */
 #    if __cplusplus
 #        define EXPORT_DLL extern "C" __declspec(dllexport)
@@ -55,7 +55,7 @@
  * \brief  a quick dirty macro to make lib versions like vulkan
  */
 #define LOS_MAKE_ABI_VERSION(variant, major, minor, patch) \
-    ((((uint32_t)(variant)) << 29U) | (((uint32_t)(major)) << 22U) | (((uint32_t)(minor)) << 12U) | ((uint32_t)(patch)))
+    (((static_cast<uint32_t>(variant)) << 29U) | ((static_cast<uint32_t>(major)) << 22U) | ((static_cast<uint32_t>(minor)) << 12U) | (static_cast<uint32_t>(patch)))
 /*! \brief defines that this header set is designed for v1.1 at a minimumum for checks*/
 #define LOS_ABI_VERSION_1_1 LOS_MAKE_ABI_VERSION(0, 1, 1, 0)
 /*!
@@ -80,3 +80,6 @@ EXPORT_DLL void losUnicodeToBytes(_in_ const wchar_t *src, _out_ char **dest);
  * \brief  converts an byte array to Unicode String
  */
 EXPORT_DLL void losBytesToUnicode(_in_ const char *src, _out_ wchar_t **dest);
+#ifdef ON_ANDROID
+EXPORT_DLL int main(int, char **);
+#endif

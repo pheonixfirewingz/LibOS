@@ -143,9 +143,9 @@ typedef enum losKeyboardButton
  */
 typedef struct losWindowInfo
 {
-    losSize window_size;    //!< this size of the window (width|height)
-    const char *title;      //!< this is the title string
-    size_t title_size; //!< this is the title string size
+    losSize window_size; //!< this size of the window (width|height)
+    const char *title;   //!< this is the title string
+    size_t title_size;   //!< this is the title string size
 } losWindowInfo;
 /*!
  * \param[out] window_handle

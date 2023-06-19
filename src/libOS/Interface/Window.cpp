@@ -28,20 +28,20 @@ losResult losCreateWindow(losWindow *window, losWindowInfo info)
     }
 
 #ifdef ON_WINDOWS
-        (*window)->window = new (std::nothrow) Win32Window(info.title, info.window_size);
+    (*window)->window = new (std::nothrow) Win32Window(info.title, info.window_size);
 #elif defined(ON_UWP)
-        (*window)->window = new (std::nothrow) WinRTWindow(info.title, info.window_size);
+    (*window)->window = new (std::nothrow) WinRTWindow(info.title, info.window_size);
 #elif defined(ON_LINUX) && defined(NO_XCB)
-        (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
+    (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
 #elif defined(ON_LINUX) && !defined(NO_XCB)
-        (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
-        if ((*window)->window->hasFailed())
-        {
-            delete (*window)->window;
-            (*window)->window = new (std::nothrow) XcbWindow(info.title, info.window_size);
-        }
+    (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
+    if ((*window)->window->hasFailed())
+    {
+        delete (*window)->window;
+        (*window)->window = new (std::nothrow) XcbWindow(info.title, info.window_size);
+    }
 #else
-        return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
+    return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 #endif
 
     if ((*window)->window == NULL)
@@ -56,19 +56,19 @@ losResult losUpdateWindow(losWindow window)
     return window->window->losUpdateWindow();
 }
 
-losSize losRequestWindowSize(losWindow window)
+struct losSize losRequestWindowSize(losWindow window)
 {
-    return std::move(window->window->getWindowSize());
+    return window->window->getWindowSize();
 }
 
 uint8_t losIsKeyDown(losWindow window, losKeyboardButton key)
 {
-    return (uint8_t)window->window->losIsKeyDown(key);
+    return static_cast<uint8_t>(window->window->losIsKeyDown(key));
 }
 
 uint8_t losIsMouseDown(losWindow window, losMouseButton button)
 {
-    return (uint8_t)window->window->losIsMouseDown(button);
+    return static_cast<uint8_t>(window->window->losIsMouseDown(button));
 }
 
 losResult losRequestClose(losWindow window)
@@ -76,17 +76,17 @@ losResult losRequestClose(losWindow window)
     return window->window->losRequestClose();
 }
 
-losSize losRequestMousePosition(losWindow window)
+struct losSize losRequestMousePosition(losWindow window)
 {
     return window->window->losRequestMousePosition();
 }
 
-losSize losRequestMouseWheelDelta(losWindow window)
+struct losSize losRequestMouseWheelDelta(losWindow window)
 {
     return window->window->losRequestMouseWheelDelta();
 }
 
-losSize losIsBeingPressed(losWindow window)
+struct losSize losIsBeingPressed(losWindow window)
 {
     return window->window->losIsBeingPressed();
 }

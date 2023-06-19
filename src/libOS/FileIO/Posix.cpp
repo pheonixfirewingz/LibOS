@@ -51,7 +51,7 @@ std::wstring u8convert(const char *utf8Str)
         {
             // 1-byte character
             numBytes = 1;
-            result += (wchar_t)(*ptr);
+            result += static_cast<wchar_t>((*ptr));
         }
         else if ((*ptr & 0xE0) == 0xC0)
         {

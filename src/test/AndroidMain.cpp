@@ -1,6 +1,10 @@
 #include <jni.h>
+#include <libos/Defines.h>
+
+/*
 #include <game-activity/GameActivity.h>
 #include <game-text-input/gametextinput.h>
+#include <jni.h>
 extern "C" {
 #include <game-activity/native_app_glue/android_native_app_glue.h>
 
@@ -22,4 +26,12 @@ void android_main(struct android_app *pApp) {
         }
     } while (!pApp->destroyRequested);
 }
+}
+*/
+
+
+
+int main(int, char**)
+{
+    return 0;
 }
