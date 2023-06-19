@@ -3,7 +3,8 @@ ADD_FILES(
 	Wayland.cpp 
 	WaylandLibDecor.cpp
 	xdg-shell-client-protocol.h
-	xdg-shell-protocol.c)
+	xdg-shell-protocol.c
+	CONDITION ON_LINUX)
 
 ADD_FILES(
 	Xcb.hpp
