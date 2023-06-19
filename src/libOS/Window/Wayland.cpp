@@ -139,6 +139,7 @@ void WaylandWindow::keyboard_keymap(void *data, wl_keyboard *, uint32_t format, 
 {
     WaylandWindow *window = static_cast<WaylandWindow *>(data);
     assert(format == WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1);
+    (void)format;
 
     char *map_shm = static_cast<char *>(mmap(nullptr, size, PROT_READ, MAP_SHARED, fd, 0));
     assert(map_shm != MAP_FAILED);
