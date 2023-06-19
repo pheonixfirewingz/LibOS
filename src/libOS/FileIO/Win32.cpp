@@ -7,21 +7,49 @@
 #include <libos/FileIO.h>
 #define WIN32_LEAN_AND_MEAN
 #include <algorithm>
+#include <shlobj.h>
 #include <string>
 #include <windows.h>
 
 struct losFileHandle_T
 {
-    HANDLE file_handle = INVALID_HANDLE_VALUE;
-    HINSTANCE lib_handle = nullptr;
-    bool flip_endianness = false; // Whether the file's endianness should be flipped when reading/writing.
-    bool dll_mode = false;        // Whether the file is a dll or not.
-    bool unicode_mode = false;    // Whether the file is in Unicode mode.
-    bool errored = false;         // Whether an error occurred while operating on the file.
+    union {
+        HANDLE file;
+        HINSTANCE lib;
+    } handle;
+    bool flip_endianness : 1 = false; // Whether the file's endianness should be flipped when reading/writing.
+    bool dll_mode : 1 = false;        // Whether the file is a dll or not.
+    bool unicode_mode : 1 = false;    // Whether the file is in Unicode mode.
+    bool errored : 1 = false;         // Whether an error occurred while operating on the file.
 };
 
 // A utility function to get the correct path of the file based on platform and asset path
 extern std::string getCorrectPath(_in_ const std::string);
+
+std::string makeString(const char *data)
+{
+    // Convert the buffer to a C++ string.
+    std::string path(data);
+    // Strip the binary filename from the end of the path, leaving only the directory.
+    // Find the last occurrence of '/' in the string.
+    size_t pos = path.rfind('\\');
+    if (pos != std::string::npos)
+    {
+        // Erase everything after the last '\\' character.
+        path.erase(pos);
+        std::replace(path.begin(), path.end(), '\\', '/');
+    }
+    // Return the resulting path string.
+    return path;
+}
+// Returns the home directory of the user who launched that program as a string.
+std::string platformGetHomePath()
+{
+    // Allocate a buffer to store the path.
+    char buf[MAX_PATH];
+    SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, buf);
+    return makeString(buf);
+}
 
 #pragma warning(push)
 #pragma warning(disable : 4172)
@@ -41,15 +69,8 @@ std::string platformGetCurrentPath()
     if (pos != std::string::npos)
         // Erase everything after the last '/' character.
         path.erase(pos);
-    pos = path.rfind('\\');
-    if (pos != std::string::npos)
-    {
-        // Erase everything after the last '\\' character.
-        path.erase(pos);
-        std::replace(path.begin(), path.end(), '\\', '/');
-    }
-    // Return the resulting path string.
-    return path;
+    // bad but removes dup code
+    return makeString(path.c_str());
 }
 #pragma warning(pop)
 losResult losDoseFileExist(_in_ const char *path)
@@ -72,8 +93,8 @@ losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo in
             lib_str += ".dll";
         lib_str = getCorrectPath(lib_str);
         (*handle)->dll_mode = true;
-        (*handle)->lib_handle = LoadLibrary(lib_str.c_str());
-        if ((*handle)->lib_handle == nullptr)
+        (*handle)->handle.lib = LoadLibrary(lib_str.c_str());
+        if ((*handle)->handle.lib == nullptr)
         {
             losPrintLastSystemError();
             return LOS_ERROR_COULD_NOT_INIT;
@@ -83,12 +104,8 @@ losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo in
     {
         // Initialize file flags based on fileBits field of losFileOpenInfo structure
         DWORD at_flags = FILE_ATTRIBUTE_NORMAL;
-        DWORD create_file_flags = 0;
+        DWORD create_file_flags = (info.fileBits & LOS_FILE_BIT_CREATE) != 0 ? CREATE_NEW : OPEN_EXISTING;
         DWORD file_flags = 0;
-        if ((info.fileBits & LOS_FILE_BIT_CREATE) != 0)
-            create_file_flags = CREATE_NEW;
-        else
-            create_file_flags = OPEN_EXISTING;
 
         if ((info.fileBits & LOS_FILE_BIT_READ) != 0 && (info.fileBits & LOS_FILE_BIT_WRITE) != 0)
             file_flags |= GENERIC_READ | GENERIC_WRITE;
@@ -112,12 +129,12 @@ losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo in
         // Open the file with the specified flags and file mode, and store the file descriptor in n_handle member of
         // losFileHandle object
 #if UNICODE
-        std::wstring data = std::wstring(path.begin(), path.end());
-        (*handle)->file_handle = CreateFile(path.c_str(), file_flags, 0, nullptr, file_flags, at_flags, nullptr);
+        (*handle)->handle.file = CreateFile(std::wstring(path.begin(), path.end()).c_str(), file_flags, 0, nullptr, create_file_flags, at_flags, nullptr);
 #else
-        (*handle)->file_handle = CreateFile(path.c_str(), file_flags, 0, nullptr, create_file_flags, at_flags, nullptr);
+        (*handle)->handle.file = CreateFile(path.c_str(), file_flags, 0, nullptr, create_file_flags, at_flags, nullptr);
 #endif
-        if ((*handle)->file_handle == INVALID_HANDLE_VALUE)
+
+        if ((*handle)->handle.file == INVALID_HANDLE_VALUE)
         {
             (*handle)->errored = true;
             losPrintDebug((std::string("path: ") += path).c_str());
@@ -132,46 +149,33 @@ losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo in
 // Closes the file associated with the given handle and releases the resources.
 losResult losCloseFile(_in_ losFileHandle handle)
 {
-    if (!handle->dll_mode)
-    {
-        CloseHandle(handle->file_handle);
-        delete handle;
-        handle = nullptr;
-    }
-    else
-    {
-        FreeLibrary(handle->lib_handle);
-        delete handle;
-        handle = nullptr;
-    }
+    !handle->dll_mode ? CloseHandle(handle->handle.file) : FreeLibrary(handle->handle.lib);
+    delete handle;
+    handle = nullptr;
     return LOS_SUCCESS;
 }
 
 // Reads data from a file.
 losResult losReadFile(_in_ losFileHandle handle, _out_ void **data_ptr, _out_ size_t *bytes_read)
 {
+    *data_ptr = new char[1]{'\0'};
+    *bytes_read = 0;
     // Check if the handle is in an error state
     if (handle->errored || handle->dll_mode)
-    {
-        *data_ptr = new char[1]{'\0'};
-        *bytes_read = 0;
         return LOS_ERROR_MALFORMED_DATA;
-    }
 
     // Get file information using GetFileInformationByHandleEx system call
     FILE_STANDARD_INFO file_info = {0};
     DWORD read_bytes = 0;
-    if (!GetFileInformationByHandleEx(handle->file_handle, FileStandardInfo, &file_info, sizeof(FILE_STANDARD_INFO)))
-    {
-        *data_ptr = new char[1]{'\0'};
-        *bytes_read = 0;
+    if (!GetFileInformationByHandleEx(handle->handle.file, FileStandardInfo, &file_info, sizeof(FILE_STANDARD_INFO)))
         return LOS_ERROR_MALFORMED_DATA;
-    }
+
     if (!handle->unicode_mode)
     {
+        delete *data_ptr;
         *data_ptr = new char[file_info.EndOfFile.QuadPart + 1];
         std::memset(*data_ptr, 0, file_info.EndOfFile.QuadPart + 1);
-        if (ReadFile(handle->file_handle, *data_ptr, static_cast<DWORD>(file_info.EndOfFile.QuadPart), &read_bytes,
+        if (ReadFile(handle->handle.file, *data_ptr, static_cast<DWORD>(file_info.EndOfFile.QuadPart), &read_bytes,
                      nullptr) == FALSE)
         {
             losPrintLastSystemError();
@@ -182,14 +186,13 @@ losResult losReadFile(_in_ losFileHandle handle, _out_ void **data_ptr, _out_ si
     else
     {
         std::string data(file_info.EndOfFile.QuadPart, 0);
-        if (ReadFile(handle->file_handle, &data[0], DWORD(data.size()), &read_bytes, nullptr) == FALSE)
+        if (ReadFile(handle->handle.file, &data[0], DWORD(data.size()), &read_bytes, nullptr) == FALSE)
         {
-            *data_ptr = new wchar_t[1]{'\0'};
-            *bytes_read = 0;
             losPrintLastSystemError();
             return LOS_ERROR_MALFORMED_DATA;
         }
         int utf16_length = MultiByteToWideChar(CP_UTF8, 0, data.c_str(), -1, nullptr, 0);
+        delete *data_ptr;
         *data_ptr = new wchar_t[utf16_length];
         std::memset(*data_ptr, 0, utf16_length * sizeof(wchar_t));
         MultiByteToWideChar(CP_UTF8, 0, data.c_str(), -1, (wchar_t *)*data_ptr, utf16_length);
@@ -216,7 +219,7 @@ losResult losWriteFile(_in_ losFileHandle handle, _in_ const void *data_ptr, _in
         std::string bytes_str(len, 0);
         WideCharToMultiByte(CP_ACP, 0, dptr, -1, &bytes_str[0], len, nullptr, nullptr);
         // Call the Unicode version of WriteFile with the wide character buffer and the byte count
-        if (WriteFile(handle->file_handle, bytes_str.c_str(), static_cast<DWORD>(len), &bytes_written, nullptr) ==
+        if (WriteFile(handle->handle.file, bytes_str.c_str(), static_cast<DWORD>(len), &bytes_written, nullptr) ==
             FALSE)
         {
             losPrintLastSystemError();
@@ -229,7 +232,7 @@ losResult losWriteFile(_in_ losFileHandle handle, _in_ const void *data_ptr, _in
     else
     {
         // If the file is not in Unicode mode, call the regular version of WriteFile with the data pointer and size
-        if (WriteFile(handle->file_handle, data_ptr, static_cast<DWORD>(data_size), &bytes_written, nullptr) == FALSE)
+        if (WriteFile(handle->handle.file, data_ptr, static_cast<DWORD>(data_size), &bytes_written, nullptr) == FALSE)
         {
             losPrintLastSystemError();
             return LOS_ERROR_MALFORMED_DATA;
@@ -246,7 +249,7 @@ void *losGetFuncAddress(_in_ const losFileHandle handle, _in_ const char *name)
 {
     if (handle->errored || !handle->dll_mode)
         return nullptr;
-    return GetProcAddress(handle->lib_handle, name);
+    return GetProcAddress(handle->handle.lib, name);
 }
 
 void losUnicodeToBytes(_in_ const wchar_t *src, _out_ char **dest)
