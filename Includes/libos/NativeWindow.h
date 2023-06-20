@@ -21,7 +21,8 @@ typedef enum losUsedWindowAPI
     WIN32_API,  //!< window is in win32 mode
     WINRT_API,  //!< window is in winRT mode
     XCB_API,    //!< window is in xorg - xcb mode
-    WAYLAND_API //!< window is in wayland mode
+    WAYLAND_API, //!< window is in wayland mode
+    ANDROID_API //!< window is in android mode
 } losUsedWindowAPI;
 
 #if __has_include(<wayland-client.h>)

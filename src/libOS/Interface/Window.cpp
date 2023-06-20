@@ -5,6 +5,7 @@
 // Copyright Luke Shore (c) 2020, 2023
 #include "../Window/Wayland.hpp"
 #include "../Window/Win32.hpp"
+#include "../Window/Android.hpp"
 #include "../Window/WinRT.hpp"
 #include "../Window/Xcb.hpp"
 #include <libos/Window.h>
@@ -40,6 +41,8 @@ losResult losCreateWindow(losWindow *window, losWindowInfo info)
         delete (*window)->window;
         (*window)->window = new (std::nothrow) XcbWindow(info.title, info.window_size);
     }
+#elif defined(ON_ANDROID)
+    (*window)->window = new (std::nothrow) AndroidWindow(info.title, info.window_size);
 #else
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 #endif

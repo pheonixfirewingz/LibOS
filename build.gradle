@@ -1,17 +1,17 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application' version '8.0.0'
+    id 'com.android.application' version '8.0.2'
 }
 
 
 android {
     namespace 'io.github.lunaluxprojects.libos'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "io.github.lunaluxprojects.libos"
         minSdk 30
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

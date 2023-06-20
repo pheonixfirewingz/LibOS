@@ -93,7 +93,7 @@ class Converter
     Converter(const char *F, const char *T)
         : cd(iconv_open(T, F))
     {
-        if (cd == (iconv_t)-1)
+        if (cd == reinterpret_cast<iconv_t>(-1))
             throw std::runtime_error("Failed to open iconv");
     }
 
@@ -107,7 +107,7 @@ class Converter
         while (in > 0)
         {
             result = iconv(cd, &input, &in, &out_ptr, &out);
-            if (result == (size_t)-1)
+            if (result == static_cast<size_t>(-1))
             {
                 delete[] out_buf;
                 throw std::runtime_error("Conversion failed");
@@ -125,7 +125,6 @@ class Converter
         iconv_close(cd);
     }
 };
-
 // This struct represents a handle to a file in the LOS filesystem.
 struct losFileHandle_T
 {
@@ -321,6 +320,7 @@ losResult losReadFile(_in_ losFileHandle handle, _out_ void **data_ptr, _out_ si
         // Return error status
         return LOS_ERROR_MALFORMED_DATA;
     }
+
     if (handle->unicode_mode)
     {
         // Create a u8string to store the file contents
@@ -427,7 +427,6 @@ void *losGetFuncAddress(_in_ const losFileHandle handle, _in_ const char *name)
         return nullptr;
     return dlsym(handle->lib_handle, name);
 }
-
 void losUnicodeToBytes(_in_ const wchar_t *src, _out_ char **dest)
 {
     // Convert the data to a UTF-8 string.
