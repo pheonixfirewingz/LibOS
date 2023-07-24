@@ -97,7 +97,7 @@
     },
     {
       "name": "android-x64-debug",
-      "displayName": "x64 Debug",
+      "displayName": "Android x64 Debug",
       "inherits": "android-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
@@ -105,7 +105,7 @@
     },
     {
       "name": "android-x64-release",
-      "displayName": "x64 Release",
+      "displayName": "Android x64 Release",
       "inherits": "android-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"

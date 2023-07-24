@@ -83,7 +83,7 @@ losResult XcbWindow::losUpdateWindow() noexcept
         {
             printf("[LIBOS] <INFO> -> XCB_KEY_PRESS %d\n",
                  xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_press_event_t *>(event)->detail, 0));
-            keys[*window_key_look_up_table.find(xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_press_event_t *>(event)->detail, 0))] =
+            keys[window_key_look_up_table.find(xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_press_event_t *>(event)->detail, 0))->second] =
                 true;
         }
 #else
@@ -95,7 +95,7 @@ losResult XcbWindow::losUpdateWindow() noexcept
     break;
     case XCB_KEY_RELEASE: {
         if (isInWindow)
-            keys[*window_key_look_up_table.find(xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_release_event_t *>(event)->detail, 0))] =
+            keys[window_key_look_up_table.find(xcb_key_symbols_get_keysym(symbols, reinterpret_cast<xcb_key_release_event_t *>(event)->detail, 0))->second] =
                 false;
     }
     break;

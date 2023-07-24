@@ -25,3 +25,5 @@ ADD_FILES(
         WinRT.hpp
 		WinRT.cpp
 	CONDITION ON_UWP)
+
+add_subdirectory(libdecor)

@@ -11,9 +11,9 @@
 #    define XK_LATIN1
 #    define XK_MISCELLANY
 #    include <X11/keysym.h>
+#    include <map>
 #    undef XK_MISCELLANY
 #    undef XL_LATIN1
-#    include "../../shared/extend_std/LookUpTable.h"
 #endif
 class XcbWindow : public BaseWindow
 {
@@ -26,7 +26,7 @@ class XcbWindow : public BaseWindow
     losSize configured_size;
     xcb_intern_atom_reply_t *atom_wm_delete_window;
     std::atomic_bool should_close{false}, isInWindow{false}, isRest{false}, keys[256]{}, buttons[3]{};
-    const std::ReadOnlyLookupTable<int32_t, losKeyboardButton> window_key_look_up_table = {
+    const std::map<int32_t, losKeyboardButton> window_key_look_up_table = {
         {48, LOS_KEY_0},
         {49, LOS_KEY_1},
         {50, LOS_KEY_2},
@@ -128,8 +128,7 @@ class XcbWindow : public BaseWindow
         {XK_KP_Decimal, LOS_KEY_DECIMAL},
         {XK_KP_Divide, LOS_KEY_DIVIDE},
         {XK_KP_Multiply, LOS_KEY_MULTIPLY},
-        { XK_KP_Subtract,
-          LOS_KEY_SUBTRACT }};
+        { XK_KP_Subtract,LOS_KEY_SUBTRACT }};
 
     const uint8_t window_mouse_look_up_table[3] = {LOS_MIDDLE_BUTTON, LOS_RIGHT_BUTTON,LOS_LEFT_BUTTON};
 #endif

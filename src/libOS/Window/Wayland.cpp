@@ -14,10 +14,11 @@
     if (!(x = func))           \
     {                          \
         error = true;          \
+        losPrintLastSystemError();\
         return;                \
     }
 
-WaylandWindow::WaylandWindow(const std::string title, losSize size) noexcept
+WaylandWindow::WaylandWindow([[maybe_unused]] const std::string title, [[maybe_unused]]losSize size) noexcept
 {
 #ifdef WITH_DEBUG
     losPrintInfo("[LIBOS] <INFO> -> creating WAYLAND API Window");
@@ -202,7 +203,7 @@ bool WaylandWindow::hasWindowClosed() const noexcept
 
 losResult WaylandWindow::losUpdateWindow() noexcept
 {
-    if (should_close)
+    if (should_close || context == nullptr)
         return LOS_WINDOW_CLOSE;
     if (!(libdecor_dispatch(context, 0) >= 0))
         return LOS_WINDOW_CLOSE;
@@ -244,7 +245,8 @@ losSize WaylandWindow::losIsBeingPressed() const noexcept
 
 void WaylandWindow::losDestroyWindow() noexcept
 {
-    libdecor_frame_close(frame);
+    if(frame != nullptr)
+        libdecor_frame_close(frame);
 }
 
 losSize WaylandWindow::getWindowSize() noexcept

@@ -7,7 +7,7 @@
 #include "../Interface/AbstractWindow.h"
 #if __has_include(<wayland-client.h>) && defined(ON_LINUX)
 #    include "xdg-shell-client-protocol.h"
-#    include <libdecor.h>
+#    include "libdecor/libdecor.h"
 #    include <map>
 #    include <wayland-client.h>
 #    include <xkbcommon/xkbcommon-keysyms.h>
@@ -97,12 +97,14 @@ class WaylandWindow : public BaseWindow
                              uint32_t state);
     static void keyboard_repeat_info(void *, wl_keyboard *, int32_t, int32_t){};
     static void wm_base_ping(void *data, xdg_wm_base *xdg_wm_base, uint32_t serial);
+
     static void lib_decor_handle_error(libdecor *context, libdecor_error error, const char *message);
     static void lib_decor_handle_close(libdecor_frame *frame, void *user_data);
     static void lib_decor_handle_commit(libdecor_frame *frame, void *user_data);
     static void lib_decor_handle_dismiss_popup(libdecor_frame *frame, const char *seat_name, void *user_data);
     static void lib_decor_handle_configure(libdecor_frame *frame, libdecor_configuration *configuration,
                                            void *user_data);
+                                           
     static void seat_capabilities(void *data, wl_seat *wl_seat, uint32_t capabilities);
     static void seat_name(void *, wl_seat *, const char *){};
     static void redraw(WaylandWindow *window);
@@ -119,7 +121,6 @@ class WaylandWindow : public BaseWindow
         lib_decor_handle_commit,
         lib_decor_handle_dismiss_popup,
     };
-#    pragma GCC diagnostic pop
 
     const wl_pointer_listener pointer_listener = {
         .enter = pointer_enter,
@@ -132,7 +133,7 @@ class WaylandWindow : public BaseWindow
         .axis_stop = [](void *, wl_pointer *, uint32_t, uint32_t){},
         .axis_discrete = [](void *, wl_pointer *, uint32_t, int32_t){},
     };
-
+#    pragma GCC diagnostic pop
     const wl_keyboard_listener keyboard_listener = {
         .keymap = keyboard_keymap,
         .enter = keyboard_enter,
@@ -174,8 +175,13 @@ class WaylandWindow : public BaseWindow
     virtual bool hasFailed() const noexcept final override
     {
 #    ifdef WITH_DEBUG
+#if defined(NO_XCB)
+        if (error)
+            puts("[LIBOS] <HARD_ERROR> -> failed to create Wayland window if program dose not crash that is the dev's using the library fault.");
+#else
         if (error)
             puts("[LIBOS] <SOFT_ERROR> -> failed to create Wayland window fallback to XCB");
+#endif
 #    endif
         return error;
     };
