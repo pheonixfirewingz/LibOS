@@ -5,9 +5,9 @@
 // Copyright Luke Shore (c) 2020, 2023
 #include <libos/Defines.h>
 
-uint32_t libOSBuildApiVersion()
+uint32_t libOSABIVersion()
 {
-    return LOS_ABI_VERSION_1_1;
+    return LOS_ABI_VERSION_1_2;
 }
 
 #if defined(ON_LINUX) || defined(ON_ANDROID)

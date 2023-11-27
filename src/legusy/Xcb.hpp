@@ -4,7 +4,7 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#include "../Interface/AbstractWindow.h"
+#include "../libOS/Interface/AbstractWindow.h"
 #if __has_include(<xcb/xcb.h>) && defined(ON_LINUX) && !defined(NO_XCB)
 #    include <xcb/xcb.h>
 #    include <xcb/xcb_keysyms.h>

@@ -19,8 +19,7 @@
 typedef enum losUsedWindowAPI
 {
     WIN32_API,  //!< window is in win32 mode
-    WINRT_API,  //!< window is in winRT mode
-    XCB_API,    //!< window is in xorg - xcb mode
+    //XCB_API,    //!< window is in xorg - xcb mode
     WAYLAND_API, //!< window is in wayland mode
     ANDROID_API //!< window is in android mode
 } losUsedWindowAPI;
@@ -38,10 +37,9 @@ typedef struct losWindowWayland
         , surface(surface_in){};
 } losWindowWayland;
 #endif
-#if __has_include(<xcb/xcb.h>)
-/*!
+/*#if __has_include(<xcb/xcb.h>)
  *  \brief losWindowXCB is the struct we pass to the library user if the underlying window is running Xcb api
- */
+ *
 typedef struct losWindowXCB
 {
     void *connection; //!< connection is a xcb_connection_t* under the hud
@@ -50,7 +48,7 @@ typedef struct losWindowXCB
         : connection(connection_in)
         , window(window_in){};
 } losWindowXCB;
-#endif
+#endif*/
 #if __has_include(<windows.h>)
 /*!
  *  \brief losWindowWin32 is the struct we pass to the library user if the underlying window is running the win32 api

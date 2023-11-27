@@ -8,7 +8,7 @@
 #pragma once
 /*! \brief on windows some extra syntax is required for the dll to work properly so that is dose not affect the
  * platforms we check */
-#if defined(ON_WINDOWS) || defined(ON_UWP)
+#if defined(ON_WINDOWS)
 /*! \brief makes sure c++ dose not mangle names and tells MSVC to gen dll .lib bindings */
 #    if __cplusplus
 #        define EXPORT_DLL extern "C" __declspec(dllexport)
@@ -56,8 +56,10 @@
  */
 #define LOS_MAKE_ABI_VERSION(variant, major, minor, patch) \
     (((static_cast<uint32_t>(variant)) << 29U) | ((static_cast<uint32_t>(major)) << 22U) | ((static_cast<uint32_t>(minor)) << 12U) | (static_cast<uint32_t>(patch)))
-/*! \brief defines that this header set is designed for v1.1 at a minimumum for checks*/
+/*! \brief defines that this header set is designed for v1.1 at a minimum for checks*/
 #define LOS_ABI_VERSION_1_1 LOS_MAKE_ABI_VERSION(0, 1, 1, 0)
+/*! \brief defines that this header set is designed for v1.2 at a minimum for checks*/
+#define LOS_ABI_VERSION_1_2 LOS_MAKE_ABI_VERSION(0, 1, 2, 0)
 /*!
  * \brief  due to some of the platforms that libOS abstracts on some platforms some !!!IMPORTANT!!! platform specific
  * initialization code for the library it work

@@ -1527,8 +1527,8 @@ init_plugins(struct libdecor *context)
 	struct libdecor_plugin *plugin;
 
 	plugin_dir_env = getenv("LIBDECOR_PLUGIN_DIR");
-	if (!plugin_dir_env) {
-		plugin_dir_env = "/usr/share/libos/libdecor-0/plugins/";
+	if (!plugin_dir_env || strlen(plugin_dir_env) == 0) {
+		plugin_dir_env = "/usr/lib/x86_64-linux-gnu/libdecor/plugins-1/";
 	}
 	all_plugin_dirs = strdup(plugin_dir_env);
 

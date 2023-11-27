@@ -117,10 +117,19 @@ losResult losReadSocket(const losSocket socket, void *data, const size_t size)
         return LOS_ERROR_MALFORMED_DATA;
     int iResult = 0;
     if (socket->isTCP)
+    {
+        if (!data)
+            data = new char[size];
+        memset(data,0,size);
         iResult = recv(socket->connect_socket, static_cast<char *>(data), static_cast<int>(size), 0);
+    }
     else
     {
         socklen_t struct_size = sizeof(sockaddr_in);
+        timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000;
+        setsockopt(socket->connect_socket, SOL_SOCKET, SO_RCVTIMEO,&tv,sizeof(tv));
         if (socket->isServer)
         {
             auto *casted = static_cast<losUdpData*>(data);
@@ -138,6 +147,7 @@ losResult losReadSocket(const losSocket socket, void *data, const size_t size)
         {
             if (!data)
                 data = new char[size];
+            memset(data,0,size);
             iResult = recvfrom(socket->connect_socket, static_cast<char *>(data), static_cast<int>(size), 0, reinterpret_cast<sockaddr *>(&socket->server_address),
                                &struct_size);
         }

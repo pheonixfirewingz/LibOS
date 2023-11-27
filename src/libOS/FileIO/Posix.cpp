@@ -209,7 +209,7 @@ losResult losOpenFile(_out_ losFileHandle *handle, _in_ const losFileOpenInfo in
             lib_str += ".so";
         lib_str = getCorrectPath(lib_str);
         (*handle)->dll_mode = true;
-        (*handle)->lib_handle = dlopen(lib_str.c_str(), RTLD_LAZY);
+        (*handle)->lib_handle = dlopen(lib_str.c_str(), RTLD_NOW | RTLD_LOCAL);
         if ((*handle)->lib_handle == nullptr)
         {
             (*handle)->errored = true;

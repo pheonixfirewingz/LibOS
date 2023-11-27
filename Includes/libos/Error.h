@@ -21,14 +21,14 @@ EXPORT_DLL void losPrintLastSystemError();
  * \param[in] msg
  * \brief losPrintInfo print a normal message
  */
-EXPORT_DLL void losPrintInfo(const char* msg);
+EXPORT_DLL void losPrintInfo(const char* msg...);
 /*!
  * \param[in] msg
  * \brief losPrintDebug print a debug msg
  */
-EXPORT_DLL void losPrintDebug(const char *msg);
+EXPORT_DLL void losPrintDebug(const char *msg...);
 /*!
  * \param[in] msg
  * \brief losPrintError print a program error
  */
-EXPORT_DLL void losPrintError(const char *msg);
+EXPORT_DLL void losPrintError(const char *msg...);

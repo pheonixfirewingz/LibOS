@@ -3,28 +3,41 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#include <libos/Error.h>
 #include <cerrno>
-#include <cstring>
+#include <cstdarg>
 #include <cstdio>
-
+#include <cstring>
+#include <libos/Error.h>
 
 void losPrintLastSystemError()
 {
-    fprintf(stderr,"SYSTEM ERROR: %s\n", strerror(errno));
+    fprintf(stderr, "SYSTEM ERROR: %s\n", strerror(errno));
 }
 
-void losPrintInfo(const char *str)
+void losPrintInfo(const char *str...)
 {
-    printf("PROGRAM INFO: %s\n", str);
+    char *ptr = new char[std::strlen(str) + 1];
+    va_list list;
+    va_start(list, str);
+    sprintf(ptr, str, list);
+    va_end(list);
+    puts(ptr);
+    delete[] ptr;
 }
 
-void losPrintDebug(const char *str)
+void losPrintDebug([[maybe_unused]] const char *str...)
 {
-    printf("PROGRAM DEBUG: %s\n", str);
+#if DEBUG_MODE
+    losPrintInfo(str);
+#endif
 }
 
-void losPrintError(const char *str)
+void losPrintError(const char *str...)
 {
-    fprintf(stderr,"PROGRAM ERROR: %s\n", str);
+    char *ptr = nullptr;
+    va_list list;
+    va_start(list, str);
+    sprintf(ptr, str, list);
+    va_end(list);
+    puts(ptr);
 }

@@ -1,4 +1,3 @@
-#include <codecvt>
 #include <gtest/gtest.h>
 #include <libos/Defines.h>
 #include <libos/FileIO.h>
@@ -9,8 +8,8 @@
 struct testBINARY
 {
     uint16_t index = 0;
-    size_t name_size;
-    const char *name;
+    size_t name_size{};
+    const char *name{};
 };
 
 std::wstring u8convert(const char *utf8Str);
@@ -33,7 +32,7 @@ std::wstring u8convert(const char *utf8Str)
     while (*ptr != '\0')
     {
         // Determine the number of bytes in the current UTF-8 character
-        int numBytes = 0;
+        int numBytes;
         if ((*ptr & 0x80) == 0x00)
         {
             // 1-byte character
@@ -272,7 +271,7 @@ TEST(FileIO_Binary, readFile)
     EXPECT_NE(read_str_size, 0);
     if (read_str_size > 0)
     {
-        testBINARY *test_read_struct = (testBINARY *)read_str;
+        auto *test_read_struct = (testBINARY *)read_str;
         EXPECT_EQ(test_read_struct->index, 4259);
         EXPECT_EQ(test_read_struct->name_size, 15);
         EXPECT_STREQ(test_read_struct->name, test_struct.name);
@@ -308,7 +307,7 @@ TEST(FileIO_Lib, dynamicLoad)
 #    pragma warning(push)
 #    pragma warning(disable : 4459)
 #endif
-    MyFunction* address_ = (MyFunction *)losGetFuncAddress(handle, "losWriteFile");
+    auto* address_ = (MyFunction *)losGetFuncAddress(handle, "losWriteFile");
 #if IS_MSVC
 #    pragma warning(pop)
 #endif
@@ -395,8 +394,8 @@ TEST(NetIO_Client, TCP)
     file.port = 54000;
     EXPECT_EQ(losCreateSocket(&handle, file), LOS_SUCCESS);
     EXPECT_EQ(losWriteSocket(handle, (const void *)test_str.c_str(), test_str.size()), LOS_SUCCESS);
-    char data[14];
-    size_t data_size = 14;
+    const size_t data_size = 14;
+    char data[data_size];
     EXPECT_EQ(losReadSocket(handle, (void *)&data, data_size), LOS_SUCCESS);
     EXPECT_STREQ(std::string(data, 0, data_size).c_str(), test_str.c_str());
     EXPECT_EQ(losDestroySocket(handle), LOS_SUCCESS);

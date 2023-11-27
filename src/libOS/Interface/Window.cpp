@@ -3,11 +3,12 @@
 // GNU Lesser General Public License Version 3.0
 //
 // Copyright Luke Shore (c) 2020, 2023
-#include "../Window/Wayland.hpp"
+#if defined(ON_WINDOWS)
 #include "../Window/Win32.hpp"
+#elif defined(ON_ANDROID)
 #include "../Window/Android.hpp"
-#include "../Window/WinRT.hpp"
-#include "../Window/Xcb.hpp"
+#endif
+#ifndef ON_LINUX
 #include <libos/Window.h>
 #include <new>
 #include <stdexcept>
@@ -19,10 +20,10 @@ struct losWindow_T
 losResult losCreateWindow(losWindow *window, losWindowInfo info)
 {
     (*window) = new (std::nothrow) losWindow_T();
-    if ((*window) == NULL)
+    if ((*window) == nullptr)
         return LOS_ERROR_COULD_NOT_INIT;
 
-    if (info.title == NULL)
+    if (info.title == nullptr)
     {
         info.title = "Title Not Set";
         info.title_size = 14;
@@ -30,24 +31,22 @@ losResult losCreateWindow(losWindow *window, losWindowInfo info)
 
 #ifdef ON_WINDOWS
     (*window)->window = new (std::nothrow) Win32Window(info.title, info.window_size);
-#elif defined(ON_UWP)
-    (*window)->window = new (std::nothrow) WinRTWindow(info.title, info.window_size);
 #elif defined(ON_LINUX) && defined(NO_XCB)
     (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
-#elif defined(ON_LINUX) && !defined(NO_XCB)
+/*#elif defined(ON_LINUX) && !defined(NO_XCB)
     (*window)->window = new (std::nothrow) WaylandWindow(info.title, info.window_size);
     if ((*window)->window->hasFailed())
     {
         delete (*window)->window;
         (*window)->window = new (std::nothrow) XcbWindow(info.title, info.window_size);
-    }
+    }*/
 #elif defined(ON_ANDROID)
     (*window)->window = new (std::nothrow) AndroidWindow(info.title, info.window_size);
 #else
     return LOS_ERROR_FEATURE_NOT_IMPLEMENTED;
 #endif
 
-    if ((*window)->window == NULL)
+    if ((*window)->window == nullptr)
         return LOS_ERROR_COULD_NOT_INIT;
     if ((*window)->window->hasFailed())
         return LOS_ERROR_COULD_NOT_INIT;
@@ -109,3 +108,4 @@ void *losGetWindowNativePointer(losWindow window)
 {
     return window->window->internalGet();
 }
+#endif

@@ -29,6 +29,7 @@ void udp()
         losReadSocket(handle, (void *)&read_buffer, read_size);
         printf("UDP Server: %14.14s\n", (char *)read_buffer.data);
         losWriteSocket(handle, (const void *)&read_buffer, read_size);
+        running = false;
     }
 
     if (losDestroySocket(handle) != LOS_SUCCESS)
@@ -63,6 +64,7 @@ void tcp()
         losReadSocket(client, (void *)&read_buffer, read_size);
         printf("TCP Server: %s\n", std::string(read_buffer,0,read_size).c_str());
         losWriteSocket(client, (const void *)&read_buffer, read_size);
+        running = false;
     }
 
     if (losDestroySocket(handle) != LOS_SUCCESS)
